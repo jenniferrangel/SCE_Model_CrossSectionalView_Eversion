@@ -1,0 +1,13 @@
+*
+!*/
+/CMakeFiles
+/bin
+!*.cpp
+!*.cu
+!*.h
+!CMakeLists.txt
+!README.txt
+!License.txt
+!Doxyfile.in
+!.gitignore
+

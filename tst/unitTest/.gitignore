@@ -1,0 +1,9 @@
+*
+!/resources
+!.gitignore
+!*.cpp
+!*.h
+!*.cu
+!CMakeLists.txt
+!sceCell.config
+!sceDiskCell.config
