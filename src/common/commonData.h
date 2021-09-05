@@ -470,6 +470,8 @@ struct RawDataInput_M {
 	std::vector<std::vector<MembraneType1> > mTypeV2; //Ali 
 	std::vector<std::vector<CVector> > initIntnlNodePoss;
 	std::vector<std::vector<CVector> > initMembrNodePoss;
+	std::vector<std::vector<CVector> > initMembrMultip_actomyo;
+	std::vector<std::vector<CVector> > initMembrMultip_integrin;
 
 };
 
@@ -523,6 +525,8 @@ struct SimulationInitData_V2_M {
 	std::vector<double> initGrowProgVec;
 	std::vector<SceNodeType> nodeTypes;
 	std::vector<CVector> initNodeVec;
+	std::vector<CVector> initNodeMultip_actomyo;
+	std::vector<CVector> initNodeMultip_integrin;
 	std::vector<bool> initIsActive;
 	std::vector<ECellType> eCellTypeV1;  //Ali 
 	std::vector<double> mDppV;  //Ali 
@@ -532,7 +536,10 @@ struct SimulationInitData_V2_M {
 std::vector<double> getArrayXComp(std::vector<CVector> &nodePosVec);
 std::vector<double> getArrayYComp(std::vector<CVector> &nodePosVec);
 std::vector<double> getArrayZComp(std::vector<CVector> &nodePosVec);
-
+std::vector<double> getArrayXActomyosin(std::vector<CVector> &nodeMultip);
+std::vector<double> getArrayYActomyosin(std::vector<CVector> &nodeMultip);
+std::vector<double> getArrayXIntegrin(std::vector<CVector> &nodeMultip);
+std::vector<double> getArrayYIntegrin(std::vector<CVector> &nodeMultip);
 /**
  * This class is not used for now but might be useful in the future
  */
@@ -659,6 +666,8 @@ struct AniRawData {
 	std::vector<LinkAniData> memLinks;
 	std::vector<LinkAniData> internalLinks;
 	std::vector<BondInfo> bondsArr;
+	std::vector<double> aniNodeVel_Mag;
+	std::vector<double> aniNodeContrApi;
 };
 
 struct AniResumeData {
@@ -699,8 +708,14 @@ struct VecValT {
 };
 
 
+// std::vector<CVector> obtainPtsBetween(CVector& pt1, CVector& pt2,
+// 		double& spacing, uint maxNewMembrNodeCount);
 std::vector<CVector> obtainPtsBetween(CVector& pt1, CVector& pt2,
-		double& spacing, uint maxNewMembrNodeCount);
+		uint num_of_NewPts, uint maxNewMembrNodeCount);
+std::vector<CVector> obtainPtsBetween_cellCenterLine(CVector& pt1, CVector& pt2,
+		std::vector<CVector>& cellCenterLine,
+		std::vector<CVector>& cellCenterLine_shift,
+		std::vector<double>& cellCenterLine_AdhereLength);
 
 struct CellStats {
 	uint cellRank;
@@ -720,6 +735,8 @@ struct CellStats {
 	CVector cellApicalLoc; //Ali 
 	CVector cellBasalLoc;  //Ali 
 	CVector cellNucleusLoc; //Ali 
+	CVector cellNucleusLocMax;
+	CVector cellNucleusLocMin;
 	double  cellPressure ;  //Ali 
 	void printToFile(ofstream& ofs);
 

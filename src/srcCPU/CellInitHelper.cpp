@@ -353,6 +353,8 @@ SimulationInitData_V2_M CellInitHelper::initInputsV3_M(
 	initData.mDppV.resize(maxNodeInDomain); // Ali 
 	initData.mTypeV.resize(maxNodeInDomain); // Ali 
 	initData.initNodeVec.resize(initMaxNodeCount);
+	initData.initNodeMultip_actomyo.resize(initMaxNodeCount);
+	initData.initNodeMultip_integrin.resize(initMaxNodeCount);
 	initData.initIsActive.resize(initMaxNodeCount, false);
 	//initData.initGrowProgVec.resize(initCellCount, 0);
     ECellType eCellTypeTmp2 ; // Ali
@@ -388,6 +390,10 @@ SimulationInitData_V2_M CellInitHelper::initInputsV3_M(
 			if (nodeRank < activeMembrNodeCountThisCell) {
 				initData.initNodeVec[i] =
 						rawData_m.initMembrNodePoss[cellRank][nodeRank];
+				initData.initNodeMultip_actomyo[i] =
+						rawData_m.initMembrMultip_actomyo[cellRank][nodeRank];
+				initData.initNodeMultip_integrin[i] =
+						rawData_m.initMembrMultip_integrin[cellRank][nodeRank];
 				initData.initIsActive[i] = true;
 				initData.mDppV[i]=rawData_m.mDppV2[cellRank][nodeRank] ;  //Ali
 				initData.mTypeV[i]=rawData_m.mTypeV2[cellRank][nodeRank] ;  //Ali
@@ -564,7 +570,7 @@ RawDataInput_M CellInitHelper::generateRawInput_M() {   // an Important function
 	// This functions reads membrane nodes coordinates, dpp levels and types, and generates internal nodes coordinates
 	generateCellInitNodeInfo_v3(rawData.initCellCenters,
 			rawData.cellGrowProgVec, rawData.initMembrNodePoss,
-			rawData.initIntnlNodePoss, rawData.mDppV2,rawData.mTypeV2); 
+			rawData.initIntnlNodePoss, rawData.initMembrMultip_actomyo, rawData.initMembrMultip_integrin, rawData.mDppV2,rawData.mTypeV2); 
 
 	//std::cout << "finished generate raw data" << std::endl;
 	//std::cout.flush();
@@ -702,74 +708,407 @@ void CellInitHelper::generateCellInitNodeInfo_v2(vector<CVector>& initPos) {
 	initPos = generateInitCellNodes();
 }
 
-void CellInitHelper::generateCellInitNodeInfo_v3(vector<CVector>& initCenters,   //This function is called Ali 
+void CellInitHelper::generateCellInitNodeInfo_v3(vector<CVector>& initCenters,   //This function is called //Ali 
 		vector<double>& initGrowProg, vector<vector<CVector> >& initMembrPos,
 		vector<vector<CVector> >& initIntnlPos, 
+		vector<vector<CVector> >& initMembrMultip_actomyo,
+		vector<vector<CVector> >& initMembrMultip_integrin,
 		vector<vector<double> >& mDppV2, 
 		vector<vector<MembraneType1> >& mTypeV2 )
 {
+	// vector<double> multip_info; //Note: the weighted intensity here represents the actomyosin intensity.
+	// multip_info.push_back(0.6932);
+	// multip_info.push_back(0.7895);
+	// multip_info.push_back(0.8259);
+	// multip_info.push_back(0.9003);
+	// multip_info.push_back(0.9115);
+	// multip_info.push_back(0.9868);
+	// multip_info.push_back(0.8688);
+	// multip_info.push_back(1.0000);
+	// multip_info.push_back(0.8834);
+	// multip_info.push_back(0.9042);
+	// multip_info.push_back(0.9368);
+	// multip_info.push_back(0.7465);
+	// multip_info.push_back(0.8535);
+	// multip_info.push_back(0.8026);
+	// multip_info.push_back(0.8325);
+	// multip_info.push_back(0.7171);
+	// multip_info.push_back(0.6745);
+	// multip_info.push_back(0.6003);
+	// multip_info.push_back(0.6159);
+	// multip_info.push_back(0.6449);
+	// multip_info.push_back(0.5711);
+	// multip_info.push_back(0.5144);
+	// multip_info.push_back(0.4960);
+	// multip_info.push_back(0.5026);
+	// multip_info.push_back(0.5172);
+	// multip_info.push_back(0.5261);
+	// multip_info.push_back(0.5330);
+	// multip_info.push_back(0.5733);
+	// multip_info.push_back(0.5609);
+	// multip_info.push_back(0.5874);
+	// multip_info.push_back(0.6210);
+	// multip_info.push_back(0.6499);
+	// multip_info.push_back(0.6540);
+	// multip_info.push_back(0.6798);
+	// multip_info.push_back(0.7186);
+	// multip_info.push_back(0.7509);
+	// multip_info.push_back(0.7037);
+	// multip_info.push_back(0.7228);
+	// multip_info.push_back(0.7725);
+	// multip_info.push_back(0.8035);
+	// multip_info.push_back(0.7611);
+	// multip_info.push_back(0.8351);
+	// multip_info.push_back(0.7737);
+	// multip_info.push_back(0.9053);
+	// multip_info.push_back(0.8444);
+	// multip_info.push_back(0.8266);
+	// multip_info.push_back(0.8132);
+	// multip_info.push_back(0.9219);
+	// multip_info.push_back(0.8528);
+	// multip_info.push_back(0.8072);
+	// multip_info.push_back(0.8008);
+	// multip_info.push_back(0.8564);
+	// multip_info.push_back(0.8507);
+	// multip_info.push_back(0.7850);
+	// multip_info.push_back(0.8535);
+	// multip_info.push_back(0.8771);
+	// multip_info.push_back(0.7674);
+	// multip_info.push_back(0.8777);
+	// multip_info.push_back(0.9007);
+	// multip_info.push_back(0.9127);
+	// multip_info.push_back(0.9237);
+
+	// (1/11/2021) arbitrary step functions to adjust scaling.
+	// (1/08/2021) basal actomyo from new data of Disc1 out of seven discs in [...]. The scaling is based on a new calculation method.
+	// (1/07/2021) basal actomyo from new data of Disc1 out of seven discs in ProteinConcentration xlsx file
 	vector<double> multip_info;
-	multip_info.push_back(0.6914);
-	multip_info.push_back(0.7244);
-	multip_info.push_back(0.8416);
-	multip_info.push_back(0.9323);
-	multip_info.push_back(0.9506);
-	multip_info.push_back(0.9557);
-	multip_info.push_back(0.9894);
-	multip_info.push_back(0.9673);
-	multip_info.push_back(1.0000);
-	multip_info.push_back(0.9372);
-	multip_info.push_back(0.9967);
-	multip_info.push_back(0.8780);
-	multip_info.push_back(0.9808);
-	multip_info.push_back(0.8239);
-	multip_info.push_back(0.8359);
-	multip_info.push_back(0.6596);
-	multip_info.push_back(0.6817);
-	multip_info.push_back(0.6537);
-	multip_info.push_back(0.6119);
-	multip_info.push_back(0.6599);
-	multip_info.push_back(0.6465);
-	multip_info.push_back(0.6567);
-	multip_info.push_back(0.6445);
-	multip_info.push_back(0.6284);
-	multip_info.push_back(0.6690);
-	multip_info.push_back(0.4900);
-	multip_info.push_back(0.4936);
-	multip_info.push_back(0.5284);
-	multip_info.push_back(0.5716);
-	multip_info.push_back(0.6128);
-	multip_info.push_back(0.6634);
-	multip_info.push_back(0.6281);
-	multip_info.push_back(0.6285);
-	multip_info.push_back(0.6321);
-	multip_info.push_back(0.6064);
-	multip_info.push_back(0.7185);
-	multip_info.push_back(0.7697);
-	multip_info.push_back(0.8455);
-	multip_info.push_back(0.7229);
-	multip_info.push_back(0.7074);
-	multip_info.push_back(0.6867);
-	multip_info.push_back(0.7827);
-	multip_info.push_back(0.6867);
-	multip_info.push_back(0.7272);
-	multip_info.push_back(0.7957);
-	multip_info.push_back(0.7489);
-	multip_info.push_back(0.7652);
-	multip_info.push_back(0.6261);
-	multip_info.push_back(0.6585);
-	multip_info.push_back(0.5438);
-	multip_info.push_back(0.5440);
-	multip_info.push_back(0.5527);
-	multip_info.push_back(0.5565);
-	multip_info.push_back(0.5630);
-	multip_info.push_back(0.5593);
-	multip_info.push_back(0.5104);
-	multip_info.push_back(0.5080);
-	multip_info.push_back(0.5442);
-	multip_info.push_back(0.6366);
-	multip_info.push_back(0.5390);
-	multip_info.push_back(0.4950);
+	double step1 = 1.0;
+	int step1_size = 10;
+	double step2 = 1.0;
+	int step2_size = 10;
+	double step3 = 1.0;
+	int step3_size = 21;
+	double step4 = 1.0;
+	int step4_size = 10;
+	double step5 = 1.0;
+	int step5_size = 10;
+	// cout<<"Scaling applied for step1 ="<<step1<<", "<<"Size of step1 = "<<step1_size<<endl;
+	// cout<<"Scaling applied for step2 ="<<step2<<", "<<"Size of step2 = "<<step2_size<<endl;
+	// cout<<"Scaling applied for step3 ="<<step3<<", "<<"Size of step3 = "<<step3_size<<endl;
+	// cout<<"Scaling applied for step4 ="<<step4<<", "<<"Size of step4 = "<<step4_size<<endl;
+	// cout<<"Scaling applied for step5 ="<<step5<<", "<<"Size of step5 = "<<step5_size<<endl;
+
+	int Contractility_Scaling_Assigned = 0;
+
+	for (int i = 0; i < step1_size; i++){
+		multip_info.push_back(step1);
+		Contractility_Scaling_Assigned += 1;
+	}
+	for (int i = 0; i < step2_size; i++){
+		multip_info.push_back(step2);
+		Contractility_Scaling_Assigned += 1;
+	}
+	for (int i = 0; i < step3_size; i++){
+		multip_info.push_back(step3);
+		Contractility_Scaling_Assigned += 1;
+	}
+	for (int i = 0; i < step4_size; i++){
+		multip_info.push_back(step4);
+		Contractility_Scaling_Assigned += 1;
+	}
+	for (int i = 0; i < step5_size; i++){
+		multip_info.push_back(step5);
+		Contractility_Scaling_Assigned += 1;
+	}
+
+	if (Contractility_Scaling_Assigned != 61){
+		cout<<"INCORRECT NUMBER OF CONTRACTILITY SCALER ASSIGNED!!!!!!!!!!!!!!!!!!!!!!!"<<endl;
+		cout<<"PLEASE CHECK IMMEDIATELY!!!!!!!!!!!!!!!!!!!!!!!"<<endl;
+		cout<<"OR THE SIMULATION RESULTS WILL BE INVALID!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<endl;
+	}
+	// multip_info.push_back(step1);//step1);//(1/11/2021)		//0.774811967);//(1/8/2021) 	//(1/7/2021) 302.08);
+    // multip_info.push_back(step1);//step1);//(1/11/2021)		//0.761620724);//(1/8/2021) 	//(1/7/2021) 299.84);
+    // multip_info.push_back(step1);//step1);//(1/11/2021)		//0.846785241);//(1/8/2021) 	//(1/7/2021) 330.32);
+    // multip_info.push_back(step1);//step1);//(1/11/2021)		//0.916907113);//(1/8/2021) 	//(1/7/2021) 349.56);
+    // multip_info.push_back(step1);//step1);//(1/11/2021)		//0.923387022);//(1/8/2021) 	//(1/7/2021) 349.68);
+    // multip_info.push_back(step1);//step1);//(1/11/2021)		//0.997443123);//(1/8/2021) 	//(1/7/2021) 383.84);
+    // multip_info.push_back(step1);//step1);//(1/11/2021)		//1.017345701);//(1/8/2021) 	//(1/7/2021) 389.80);
+    // multip_info.push_back(step1);//step1);//(1/11/2021)		//1.178957263);//(1/8/2021) 	//(1/7/2021) 443.72);
+    // multip_info.push_back(step1);//step1);//(1/11/2021)		//1.189589142);//(1/8/2021) 	//(1/7/2021) 447.72);
+    // multip_info.push_back(step1);//step1);//(1/11/2021)		//1.188604709);//(1/8/2021) 	//(1/7/2021) 449.00);
+    // multip_info.push_back(step1);//step1);//(1/11/2021)		//1.143241074);//(1/8/2021) 	//(1/7/2021) 437.96);
+    // multip_info.push_back(step1);//step1);//(1/11/2021)		//1.220768556);//(1/8/2021) 	//(1/7/2021) 463.28);
+    // multip_info.push_back(step2);//step1);//(1/11/2021)		//1.252199097);//(1/8/2021) 	//(1/7/2021) 494.92);
+    // multip_info.push_back(step2);//step1);//(1/11/2021)		//1.255152397);//(1/8/2021) 	//(1/7/2021) 491.96);
+    // multip_info.push_back(step2);//step1);//(1/11/2021)		//1.122644221);//(1/8/2021) 	//(1/7/2021) 442.80);
+    // multip_info.push_back(step2);//step1);//(1/11/2021)		//1.149720983);//(1/8/2021) 	//(1/7/2021) 447.20);
+    // multip_info.push_back(step2);//step1);//(1/11/2021)		//1.130744107);//(1/8/2021) 	//(1/7/2021) 437.56);
+    // multip_info.push_back(step2);//step1);//(1/11/2021)		//1.171012113);//(1/8/2021) 	//(1/7/2021) 451.08);
+    // multip_info.push_back(step2);//step1);//(1/11/2021)		//1.131669808);//(1/8/2021) 	//(1/7/2021) 429.20);
+    // multip_info.push_back(step2);//step1);//(1/11/2021)		//0.945141001);//(1/8/2021) 	//(1/7/2021) 369.72);
+    // multip_info.push_back(step2);//step2);//(1/11/2021)		//0.912741457);//(1/8/2021) 	//(1/7/2021) 368.16);
+    // multip_info.push_back(step2);//step2);//(1/11/2021)		//1.061085086);//(1/8/2021) 	//(1/7/2021) 399.88);
+    // multip_info.push_back(step2);//step2);//(1/11/2021)		//0.939936869);//(1/8/2021) 	//(1/7/2021) 354.04);
+    // multip_info.push_back(step2);//step2);//(1/11/2021)		//0.963423602);//(1/8/2021) 	//(1/7/2021) 366.08);
+    // multip_info.push_back(step3);//step2);//(1/11/2021)		//0.943983875);//(1/8/2021) 	//(1/7/2021) 386.80);
+    // multip_info.push_back(step3);//step2);//(1/11/2021)		//0.991521172);//(1/8/2021) 	//(1/7/2021) 372.92);
+    // multip_info.push_back(step3);//step2);//(1/11/2021)		//0.859513634);//(1/8/2021) 	//(1/7/2021) 332.52);
+    // multip_info.push_back(step3);//step2);//(1/11/2021)		//0.919452791);//(1/8/2021) 	//(1/7/2021) 363.48);
+    // multip_info.push_back(step3);//step2);//(1/11/2021)		//0.815311398);//(1/8/2021) 	//(1/7/2021) 308.32);
+    // multip_info.push_back(step3);//step2);//(1/11/2021)		//0.913750945);//(1/8/2021) 	//(1/7/2021) 349.24);
+    // multip_info.push_back(step3);//step2);//(1/11/2021)		//0.939586794);//(1/8/2021) 	//(1/7/2021) 359.68);
+    // multip_info.push_back(step3);//step2);//(1/11/2021)		//0.996049565);//(1/8/2021) 	//(1/7/2021) 400.72);
+    // multip_info.push_back(step3);//step2);//(1/11/2021)		//0.959257946);//(1/8/2021) 	//(1/7/2021) 376.88);
+    // multip_info.push_back(step3);//step2);//(1/11/2021)		//1.000914503);//(1/8/2021) 	//(1/7/2021) 380.92);
+    // multip_info.push_back(step3);//step2);//(1/11/2021)		//0.962578834);//(1/8/2021) 	//(1/7/2021) 364.12);
+    // multip_info.push_back(step3);//step2);//(1/11/2021)		//0.90024449);//(1/8/2021) 	//(1/7/2021) 343.80);
+    // multip_info.push_back(step4);//step2);//(1/11/2021)		//0.957175118);//(1/8/2021) 	//(1/7/2021) 365.36);
+    // multip_info.push_back(step4);//step2);//(1/11/2021)		//0.775043392);//(1/8/2021) 	//(1/7/2021) 302.52);
+    // multip_info.push_back(step4);//step2);//(1/11/2021)		//0.810682891);//(1/8/2021) 	//(1/7/2021) 311.44);
+    // multip_info.push_back(step4);//step2);//(1/11/2021)		//0.910403872);//(1/8/2021) 	//(1/7/2021) 360.12);
+    // multip_info.push_back(step4);//step3);//(1/11/2021)		//0.882642854);//(1/8/2021) 	//(1/7/2021) 332.52);
+    // multip_info.push_back(step4);//step3);//(1/11/2021)		//0.934958287);//(1/8/2021) 	//(1/7/2021) 359.72);
+    // multip_info.push_back(step4);//step3);//(1/11/2021)		//0.870159198);//(1/8/2021) 	//(1/7/2021) 344.32);
+    // multip_info.push_back(step4);//step3);//(1/11/2021)		//0.989749192);//(1/8/2021) 	//(1/7/2021) 374.84);
+    // multip_info.push_back(step4);//step3);//(1/11/2021)		//0.955555141);//(1/8/2021) 	//(1/7/2021) 372.68);
+    // multip_info.push_back(step4);//step3);//(1/11/2021)		//0.933833383);//(1/8/2021) 	//(1/7/2021) 363.72);
+    // multip_info.push_back(step4);//step3);//(1/11/2021)		//0.961200627);//(1/8/2021) 	//(1/7/2021) 378.16);
+    // multip_info.push_back(step4);//step3);//(1/11/2021)		//0.923989051);//(1/8/2021) 	//(1/7/2021) 354.76);
+    // multip_info.push_back(step5);//step3);//(1/11/2021)		//0.896031146);//(1/8/2021) 	//(1/7/2021) 340.68);
+    // multip_info.push_back(step5);//step3);//(1/11/2021)		//0.888549453);//(1/8/2021) 	//(1/7/2021) 336.76);
+    // multip_info.push_back(step5);//step3);//(1/11/2021)		//0.913667158);//(1/8/2021) 	//(1/7/2021) 343.96);
+    // multip_info.push_back(step5);//step3);//(1/11/2021)		//1.013180045);//(1/8/2021) 	//(1/7/2021) 383.48);
+    // multip_info.push_back(step5);//step3);//(1/11/2021)		//0.96631968);//(1/8/2021) 	//(1/7/2021) 374.08);
+    // multip_info.push_back(step5);//step3);//(1/11/2021)		//1.0545249);//(1/8/2021) 	//(1/7/2021) 412.80);
+    // multip_info.push_back(step5);//step3);//(1/11/2021)		//1.019085303);//(1/8/2021) 	//(1/7/2021) 406.48);
+    // multip_info.push_back(step5);//step3);//(1/11/2021)		//1.066338099);//(1/8/2021) 	//(1/7/2021) 426.00);
+    // multip_info.push_back(step5);//step3);//(1/11/2021)		//1.029126522);//(1/8/2021) 	//(1/7/2021) 403.12);
+    // multip_info.push_back(step5);//step3);//(1/11/2021)		//0.875554935);//(1/8/2021) 	//(1/7/2021) 350.92);
+    // multip_info.push_back(step5);//step3);//(1/11/2021)		//0.818064033);//(1/8/2021) 	//(1/7/2021) 327.84);
+    // multip_info.push_back(step5);//step3);//(1/11/2021)		//0.8141263);//(1/8/2021) 	//(1/7/2021) 323.16);
+    // multip_info.push_back(step5);//step3);//(1/11/2021)		//0.883581867);//(1/8/2021) 	//(1/7/2021) 335.88);
+
+	//apical actomyo from new data on 11/29/2020
+	vector<double> multip_info2;
+	multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+    multip_info2.push_back(0.00);
+
+	double total_net_intensity = 0.0;
+	double alpha, beta;
+	alpha = 1.0;
+	beta = 1.0;
+	// cout<<"Coefficients of linear combination (alpha*basal + beta*apical) of basal and apical actomyosin intensity are alpha = "<<alpha<<" & beta = "<<beta<<endl;
+	for (uint i = 0; i < multip_info.size(); i++){
+		if (multip_info.size() != multip_info2.size()){
+			cout<<"Basal and apical ctomyosin intensities have different dimension! Something is wrong!"<<endl;
+			break;
+		}
+		// multip_info[i] = alpha*multip_info[i] + beta*multip_info2[i];
+		// if (multip_info[i] < 0){
+			// multip_info[i] = 0.0; //Does not allow negative net intensity between the basal and apical.
+		// }
+		// total_net_intensity += multip_info[i];
+		// total_net_intensity += multip_info[i] + multip_info2[i];
+	}
+
+	double max_weighted_intensity = -1000.0;
+	for (uint i = 0; i < multip_info.size(); i++){
+		// multip_info[i] = multip_info[i]/total_net_intensity;
+		if (multip_info[i] >= max_weighted_intensity){
+			max_weighted_intensity = multip_info[i];
+		}
+		if (multip_info2[i] >= max_weighted_intensity){
+			max_weighted_intensity = multip_info2[i];
+		}
+	}
+
+	for (uint i = 0; i < multip_info.size(); i++){
+		multip_info[i] = pow(multip_info[i],1.0);//alpha*pow(multip_info[i]/max_weighted_intensity, 3.0);
+		multip_info2[i] = beta*pow(multip_info2[i]/max_weighted_intensity, 1.0);
+	}
+
+	vector<double> multip_info_integrin; //Weighted basal integrin from new data on 11/29/2020
+	double step1_integrin = 1.0;
+	int step1_size_integrin = 10;
+	double step2_integrin = 1.0;
+	int step2_size_integrin = 10;
+	double step3_integrin = 1.0;
+	int step3_size_integrin = 21;
+	double step4_integrin = 1.0;
+	int step4_size_integrin = 10;
+	double step5_integrin = 1.0;
+	int step5_size_integrin = 10;
+	// cout<<"Scaling applied for step1 (integrin) ="<<step1_integrin<<", "<<"Size of step1 = "<<step1_size_integrin<<endl;
+	// cout<<"Scaling applied for step2 (integrin) ="<<step2_integrin<<", "<<"Size of step2 = "<<step2_size_integrin<<endl;
+	// cout<<"Scaling applied for step3 (integrin) ="<<step3_integrin<<", "<<"Size of step3 = "<<step3_size_integrin<<endl;
+	// cout<<"Scaling applied for step4 (integrin) ="<<step4_integrin<<", "<<"Size of step4 = "<<step4_size_integrin<<endl;
+	// cout<<"Scaling applied for step5 (integrin) ="<<step5_integrin<<", "<<"Size of step5 = "<<step5_size_integrin<<endl;
+
+	int Integrin_Scaling_Assigned = 0;
+
+	for (int i = 0; i < step1_size; i++){
+		multip_info_integrin.push_back(step1_integrin);
+		Integrin_Scaling_Assigned += 1;
+	}
+	for (int i = 0; i < step2_size; i++){
+		multip_info_integrin.push_back(step2_integrin);
+		Integrin_Scaling_Assigned += 1;
+	}
+	for (int i = 0; i < step3_size; i++){
+		multip_info_integrin.push_back(step3_integrin);
+		Integrin_Scaling_Assigned += 1;
+	}
+	for (int i = 0; i < step4_size; i++){
+		multip_info_integrin.push_back(step4_integrin);
+		Integrin_Scaling_Assigned += 1;
+	}
+	for (int i = 0; i < step5_size; i++){
+		multip_info_integrin.push_back(step5_integrin);
+		Integrin_Scaling_Assigned += 1;
+	}
+
+	if (Integrin_Scaling_Assigned != 61){
+		cout<<"INCORRECT NUMBER OF INTEGRIN SCALER ASSIGNED!!!!!!!!!!!!!!!!!!!!!!!"<<endl;
+		cout<<"PLEASE CHECK IMMEDIATELY!!!!!!!!!!!!!!!!!!!!!!!"<<endl;
+		cout<<"OR THE SIMULATION RESULTS WILL BE INVALID!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<endl;
+	}
+	// multip_info_integrin.push_back(0.6626);//0.6802);
+	// multip_info_integrin.push_back(    0.6728);//0.7486);
+	// multip_info_integrin.push_back(    0.7889);//0.7479);
+	// multip_info_integrin.push_back(    0.8750);//0.7976);
+	// multip_info_integrin.push_back(    0.8350);//0.7696);
+	// multip_info_integrin.push_back(    0.9224);//0.8024);
+	// multip_info_integrin.push_back(    0.9446);//0.7205);
+	// multip_info_integrin.push_back(    1.0000);//0.7455);
+	// multip_info_integrin.push_back(    1.0000);//0.7118);
+	// multip_info_integrin.push_back(    1.0000);//0.7124);
+	// multip_info_integrin.push_back(    1.0000);//0.7234);
+	// multip_info_integrin.push_back(    1.0000);//0.6424);
+	// multip_info_integrin.push_back(    1.0000);//0.6778);
+	// multip_info_integrin.push_back(    1.0000);//0.6242);
+	// multip_info_integrin.push_back(    1.0000);//0.5983);
+	// multip_info_integrin.push_back(    1.0000);//0.5942);
+	// multip_info_integrin.push_back(    0.9975);//0.5364);
+	// multip_info_integrin.push_back(    1.0000);//0.5429);
+	// multip_info_integrin.push_back(    0.8765);//0.5252);
+	// multip_info_integrin.push_back(    0.8333);//0.5304);
+	// multip_info_integrin.push_back(    0.8334);//0.5245);
+	// multip_info_integrin.push_back(    0.8014);//0.4571);
+	// multip_info_integrin.push_back(    0.7978);//0.4590);
+	// multip_info_integrin.push_back(    0.7763);//0.4560);
+	// multip_info_integrin.push_back(    0.8430);//0.4628);
+	// multip_info_integrin.push_back(    0.7556);//0.4643);
+	// multip_info_integrin.push_back(    0.7338);//0.4490);
+	// multip_info_integrin.push_back(    0.7594);//0.4615);
+	// multip_info_integrin.push_back(    0.7627);//0.4766);
+	// multip_info_integrin.push_back(    0.6574);//0.4522);
+	// multip_info_integrin.push_back(    0.7115);//0.4518);
+	// multip_info_integrin.push_back(    0.7148);//0.4518);
+	// multip_info_integrin.push_back(    0.7473);//0.5053);
+	// multip_info_integrin.push_back(    0.7939);//0.4974);
+	// multip_info_integrin.push_back(    0.8839);//0.5543);
+	// multip_info_integrin.push_back(    0.9415);//0.5600);
+	// multip_info_integrin.push_back(    0.7523);//0.5696);
+	// multip_info_integrin.push_back(    0.5744);//0.5957);
+	// multip_info_integrin.push_back(    0.6795);//0.6031);
+	// multip_info_integrin.push_back(    0.7583);//0.6064);
+	// multip_info_integrin.push_back(    0.8990);//0.6430);
+	// multip_info_integrin.push_back(    0.8602);//0.6967);
+	// multip_info_integrin.push_back(    0.8482);//0.7063);
+	// multip_info_integrin.push_back(    0.8682);//0.6791);
+	// multip_info_integrin.push_back(    0.9078);//0.7059);
+	// multip_info_integrin.push_back(    0.8573);//0.7659);
+	// multip_info_integrin.push_back(    0.7818);//0.6978);
+	// multip_info_integrin.push_back(    0.8695);//0.7431);
+	// multip_info_integrin.push_back(    0.8427);//0.7486);
+	// multip_info_integrin.push_back(    0.7631);//0.7306);
+	// multip_info_integrin.push_back(    0.8541);//0.7286);
+	// multip_info_integrin.push_back(    0.9187);//0.7685);
+	// multip_info_integrin.push_back(    0.9622);//0.7197);
+	// multip_info_integrin.push_back(    0.9729);//0.7024);
+	// multip_info_integrin.push_back(    0.9581);//0.7466);
+	// multip_info_integrin.push_back(    0.9733);//0.7529);
+	// multip_info_integrin.push_back(    0.9332);//0.7357);
+	// multip_info_integrin.push_back(    0.8471);//0.7512);
+	// multip_info_integrin.push_back(    0.8496);//0.7483);
+	// multip_info_integrin.push_back(    0.7934);//0.7729);
+	// multip_info_integrin.push_back(    0.7933);//0.8480);
+
+	vector<double> multip_info_integrin_apical;
+	multip_info_integrin_apical.push_back(1.0);//0.5116);//0.6316);
+    multip_info_integrin_apical.push_back(1.0);//    0.5345);//0.5806);
+    multip_info_integrin_apical.push_back(1.0);//    0.5698);//0.5933);
+    multip_info_integrin_apical.push_back(1.0);//    0.5275);//0.7223);
+    multip_info_integrin_apical.push_back(1.0);//    0.5964);//0.7116);
+    multip_info_integrin_apical.push_back(1.0);//    0.6576);//0.5848);
+    multip_info_integrin_apical.push_back(1.0);//    0.7648);//0.5480);
+    multip_info_integrin_apical.push_back(1.0);//    0.6967);//0.6923);
+    multip_info_integrin_apical.push_back(1.0);//    0.7585);//0.7782);
+    multip_info_integrin_apical.push_back(1.0);//    0.8361);//0.9288);
+    multip_info_integrin_apical.push_back(1.0);//    0.6972);//0.8486);
+	for (int h = 0; h < multip_info_integrin_apical.size();h++){
+		cout<<"Apical integrin scaling factor = "<<multip_info_integrin_apical[h]<<endl;
+	}
 
 	vector<CVector> initIntnlPosTmp;
 
@@ -805,8 +1144,10 @@ void CellInitHelper::generateCellInitNodeInfo_v3(vector<CVector>& initCenters,  
 			initIntnlPos.push_back(initIntnlPosTmp);
 		}
 
-		// initMembrPos=readMembNodes(initCenters.size(),maxMembrNodeCountPerCell,mTypeV2, mDppV2, MembraneNodesFileName ); 	
-		initMembrPos=readMembNodes(initCenters.size(),maxMembrNodeCountPerCell,mTypeV2, mDppV2, MembraneNodesFileName, multip_info ); 	
+		initMembrPos=readMembNodes(initCenters.size(),maxMembrNodeCountPerCell,mTypeV2, mDppV2, MembraneNodesFileName ); 	
+		// initMembrMultip=readMembNodes_multip_info(initCenters.size(),maxMembrNodeCountPerCell,mTypeV2, mDppV2, MembraneNodesFileName, multip_info, multip_info2, multip_info_ECM, multip_info_ECM_apical ); 	
+		initMembrMultip_actomyo=readMembNodes_multip_actomyo(initCenters.size(),maxMembrNodeCountPerCell,mTypeV2, mDppV2, MembraneNodesFileName, multip_info, multip_info2); 
+		initMembrMultip_integrin=readMembNodes_multip_integrin(initCenters.size(),maxMembrNodeCountPerCell,mTypeV2, mDppV2, MembraneNodesFileName, multip_info_integrin, multip_info_integrin_apical ); 		
 	}
 	else if (resumeSimulation==1) {
 		cout<< " The simulation is in Resume mode" << endl ;
@@ -815,8 +1156,10 @@ void CellInitHelper::generateCellInitNodeInfo_v3(vector<CVector>& initCenters,  
 		initIntnlPos=readResumeIntnlNodes( initCenters.size(),maxIntnlNodeCountPerCell,intnlFileName) ;  
 
         std:: string membFileName = "./resources/" + membNodesFileNameResume  + uniqueSymbol + "Resume.cfg";
-		// initMembrPos=readMembNodes(initCenters.size(),maxMembrNodeCountPerCell,mTypeV2, mDppV2, membFileName); 			
-		initMembrPos=readMembNodes(initCenters.size(),maxMembrNodeCountPerCell,mTypeV2, mDppV2, membFileName, multip_info); 			
+		initMembrPos=readMembNodes(initCenters.size(),maxMembrNodeCountPerCell,mTypeV2, mDppV2, membFileName); 			
+		// initMembrMultip=readMembNodes_multip_info(initCenters.size(),maxMembrNodeCountPerCell,mTypeV2, mDppV2, membFileName, multip_info, multip_info2, multip_info_ECM, multip_info_ECM_apical); 			
+		initMembrMultip_actomyo=readMembNodes_multip_actomyo(initCenters.size(),maxMembrNodeCountPerCell,mTypeV2, mDppV2, MembraneNodesFileName, multip_info, multip_info2); 	
+		initMembrMultip_integrin=readMembNodes_multip_integrin(initCenters.size(),maxMembrNodeCountPerCell,mTypeV2, mDppV2, MembraneNodesFileName, multip_info_integrin, multip_info_integrin_apical ); 	
 	}
 	else {
 		throw std::invalid_argument("ResumeSimulation parameter in the input file must be either 1 or 0"); 
@@ -1204,64 +1547,8 @@ vector<vector<CVector> >  CellInitHelper::readResumeIntnlNodes(int numCells, int
 
   
 
-// vector<vector<CVector> > CellInitHelper::readMembNodes(int numCells,int maxMembrNodeCountPerCell,
-//                                                            vector<vector<MembraneType1> >& mTypeV2,vector<vector<double> >& mDppV2, string membFileName) 
-// {
-//     vector<CVector> initMembrPosTmp;
-//     vector<vector<CVector> > initMembrPos ; 
-//     vector<double> mDppVTmp;  
-//     vector<MembraneType1> mTypeVTmp;  
-//     std::fstream inputc;
-
-//     inputc.open(membFileName.c_str());
-//     if (inputc.is_open()){
-//        cout << "File for reading membrane nodes coordinates opened successfully " << endl ; 
-//     }
-// 	else{
-//        cout << "failed opening membrane nodes coordinates " << endl ; 
-//     }
-
-// 	int cellIDOld=-1;
-// 	int cellID ;
-//     CVector mCoordinate ;
-// 	double mDpp ; 
-// 	string mTypeString ; 
-// 	MembraneType1 mType ; 
-// 	for (int j=0 ; j<numCells ; j++) {
-// 		initMembrPosTmp.clear() ;
-// 		mDppVTmp.clear() ; 
-// 		mTypeVTmp.clear() ; 
-// 		cellIDOld++  ;
-// 		if (j!=0) {
-// 	    	initMembrPosTmp.push_back(mCoordinate);
-// 	    	mDppVTmp.push_back(mDpp);
-// 	    	mTypeVTmp.push_back(mType);
-// 		}
-//         for (int i = 0; i <maxMembrNodeCountPerCell; i++) {
-// 	    	inputc >> cellID >> mCoordinate.x >> mCoordinate.y >> mDpp >> mTypeString ;
-// 			mType =StringToMembraneType1Convertor (mTypeString) ; 
-// 			if (cellID != cellIDOld) {
-// 				break ;// for reading the next cell's membrane coordinates
-// 			}
-			
-// 			if (inputc.eof()) {  
-// 				break ; // to not push backing data when the read file is finished.
-// 			}
-// 	    	initMembrPosTmp.push_back(mCoordinate);
-// 	    	mDppVTmp.push_back(mDpp);
-// 	    	mTypeVTmp.push_back(mType);
-// 	//		cout <<"cell ID= "<<cellID<<"x membrane= "<<mCoordinate.x << " y membrane= "<<mCoordinate.y <<" dpp level=" << mDpp <<" type membrane="<<mType << endl ;  
-//       	}
-// 		initMembrPos.push_back(initMembrPosTmp);
-// 		mDppV2.push_back(mDppVTmp);
-// 		mTypeV2.push_back(mTypeVTmp);
-// 	}
-// 	cout << " I read membrane nodes successfully" << endl ; 	
-// 	return initMembrPos ;  
-// }
-
 vector<vector<CVector> > CellInitHelper::readMembNodes(int numCells,int maxMembrNodeCountPerCell,
-                                                           vector<vector<MembraneType1> >& mTypeV2,vector<vector<double> >& mDppV2, string membFileName, vector<double> multip_info) 
+                                                           vector<vector<MembraneType1> >& mTypeV2,vector<vector<double> >& mDppV2, string membFileName) 
 {
     vector<CVector> initMembrPosTmp;
     vector<vector<CVector> > initMembrPos ; 
@@ -1303,13 +1590,6 @@ vector<vector<CVector> > CellInitHelper::readMembNodes(int numCells,int maxMembr
 			if (inputc.eof()) {  
 				break ; // to not push backing data when the read file is finished.
 			}
-			if (cellID>1 && cellID <63){
-				mCoordinate.z = pow(multip_info[cellID-2],1.0);
-			}
-			else{mCoordinate.z = 0.0;}
-			if (j == 1 || j == 2 || j == 32 || j == 60 || j == 63 || j == 70){
-				std::cout<<"cell["<<cellID<<"] with nodeID("<<i<<") multiplier = "<<mCoordinate.z<<std::endl;
-			}
 	    	initMembrPosTmp.push_back(mCoordinate);
 	    	mDppVTmp.push_back(mDpp);
 	    	mTypeVTmp.push_back(mType);
@@ -1324,9 +1604,127 @@ vector<vector<CVector> > CellInitHelper::readMembNodes(int numCells,int maxMembr
 }
 
 
+vector<vector<CVector> > CellInitHelper::readMembNodes_multip_actomyo(int numCells,int maxMembrNodeCountPerCell,
+                                                           vector<vector<MembraneType1> >& mTypeV2,vector<vector<double> >& mDppV2, string membFileName, vector<double> multip_info, vector<double> multip_info2) 
+{
+	vector<CVector> initMembrMultipTmp;
+	vector<vector<CVector> > initMembrMultip ; 
+    std::fstream inputc;
 
+    inputc.open(membFileName.c_str());
+    if (inputc.is_open()){
+       cout << "File for reading membrane nodes coordinates opened successfully " << endl ; 
+    }
+	else{
+       cout << "failed opening membrane nodes coordinates " << endl ; 
+    }
 
+	int cellIDOld=-1;
+	int cellID ;
+	CVector dummy;
+	CVector mMultip_info;
+	double mDpp ; 
+	string mTypeString ; 
+	MembraneType1 mType ; 
+	for (int j=0 ; j<numCells ; j++) {
+		initMembrMultipTmp.clear();
+		cellIDOld++  ;
+		if (j!=0) {
+			initMembrMultipTmp.push_back(mMultip_info);
+		}
+        for (int i = 0; i <maxMembrNodeCountPerCell; i++) {
+	    	inputc >> cellID >> dummy.x >> dummy.y >> mDpp >> mTypeString ;
+			mType =StringToMembraneType1Convertor (mTypeString) ; 
+			if (cellID != cellIDOld) {
+				break ;// for reading the next cell's membrane coordinates
+			}
+			
+			if (inputc.eof()) {  
+				break ; // to not push backing data when the read file is finished.
+			}
+			if (cellID>1 && cellID <63){
+				mMultip_info.x = multip_info[cellID-2];// 
+				mMultip_info.y = 0.0;//multip_info2[cellID-2];// pow(multip_info2[cellID-2],1.0);
+			}
+			else{
+				mMultip_info.x = 0.0;//0.0;
+				mMultip_info.y = 0.0;
+			}
+			if (j == 1 || j == 10 || j == 32 || j == 70 || j == 78){
+				// std::cout<<"cell["<<cellID<<"] with nodeID("<<i<<") apical & basal actomyo multiplier = "<<mMultip_info.y<<" & "<<mMultip_info.x<<std::endl;
+			}
+			initMembrMultipTmp.push_back(mMultip_info);
+	//		cout <<"cell ID= "<<cellID<<"x membrane= "<<mCoordinate.x << " y membrane= "<<mCoordinate.y <<" dpp level=" << mDpp <<" type membrane="<<mType << endl ;  
+      	}
+		initMembrMultip.push_back(initMembrMultipTmp);
+	
+	}
+	cout << " I read membrane nodes successfully" << endl ; 	
+	return initMembrMultip ;  
+}
 
+vector<vector<CVector> > CellInitHelper::readMembNodes_multip_integrin(int numCells,int maxMembrNodeCountPerCell,
+                                                           vector<vector<MembraneType1> >& mTypeV2,vector<vector<double> >& mDppV2, string membFileName, vector<double> multip_info_ECM, vector<double> multip_info_ECM_apical) 
+{
+	vector<CVector> initMembrMultipTmp;
+	vector<vector<CVector> > initMembrMultip ; 
+    std::fstream inputc;
+
+    inputc.open(membFileName.c_str());
+    if (inputc.is_open()){
+       cout << "File for reading membrane nodes coordinates opened successfully " << endl ; 
+    }
+	else{
+       cout << "failed opening membrane nodes coordinates " << endl ; 
+    }
+
+	int cellIDOld=-1;
+	int cellID ;
+	CVector dummy;
+	CVector mMultip_info;
+	double mDpp ; 
+	string mTypeString ; 
+	MembraneType1 mType ; 
+	for (int j=0 ; j<numCells ; j++) {
+		initMembrMultipTmp.clear();
+		cellIDOld++  ;
+		if (j!=0) {
+			initMembrMultipTmp.push_back(mMultip_info);
+		}
+        for (int i = 0; i <maxMembrNodeCountPerCell; i++) {
+	    	inputc >> cellID >> dummy.x >> dummy.y >> mDpp >> mTypeString ;
+			mType =StringToMembraneType1Convertor (mTypeString) ; 
+			if (cellID != cellIDOld) {
+				break ;// for reading the next cell's membrane coordinates
+			}
+			
+			if (inputc.eof()) {  
+				break ; // to not push backing data when the read file is finished.
+			}
+			if (cellID>1 && cellID <63){
+				mMultip_info.x = pow(multip_info_ECM[cellID-2],1.0);
+				// mMultip_info.y = 0.0;
+			}
+			else if (cellID>69 && cellID<81){
+				// mMultip_info.x = 0.0;//0.0;
+				mMultip_info.x = pow(multip_info_ECM_apical[cellID%70],1.0);
+			}
+			else{
+				mMultip_info.x = 1.0;//0.5;;
+				// mMultip_info.y = 0.5;
+			}
+			if (j == 1 || j == 10 || j == 32 || j == 70 || j == 78){
+				// std::cout<<"cell["<<cellID<<"] with nodeID("<<i<<") integrin multiplier = "<<mMultip_info.x<<std::endl;//" & "<<mMultip_info.y<<std::endl;
+			}
+			initMembrMultipTmp.push_back(mMultip_info);
+	//		cout <<"cell ID= "<<cellID<<"x membrane= "<<mCoordinate.x << " y membrane= "<<mCoordinate.y <<" dpp level=" << mDpp <<" type membrane="<<mType << endl ;  
+      	}
+		initMembrMultip.push_back(initMembrMultipTmp);
+	
+	}
+	cout << " I read membrane nodes successfully" << endl ; 	
+	return initMembrMultip ;  
+}
 
 
 /* CGAL DEACTIVATION

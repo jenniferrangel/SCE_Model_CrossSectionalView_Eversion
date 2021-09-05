@@ -94,7 +94,7 @@ class SimulationDomainGPU {
 	 * improved from the previous version.
 	 */
 	void initializeNodes_M(std::vector<SceNodeType> &nodeTypes,
-			std::vector<bool> &nodeIsActive, std::vector<CVector> &initNodesVec,
+			std::vector<bool> &nodeIsActive, std::vector<CVector> &initNodesVec,std::vector<CVector> &initNodeMultip_actomyo, std::vector<CVector> &initNodeMultip_integrin,
 			std::vector<uint> &numOfInitActiveEpiNodeCounts,
 			std::vector<uint> &numOfInitActiveInternalNodeCounts,
 			std::vector<double> &initGrowProgVec, 
@@ -139,8 +139,16 @@ public:
 	 * @param dt timestep
 	 */
 //Ali 	void runAllLogic_M(double dt);
-	void runAllLogic_M(double & dt,double Damp_Coef,double InitTimeStage);
-
+	// void runAllLogic_M(double & dt,double Damp_Coef,double InitTimeStage, 
+	// 						double timeRatio, double timeRatio_Crit_actomyo, double timeRatio_Crit_ECM, double timeRatio_Crit_Growth,
+	// 							double volume_Increase_Target_Ratio, double volume_Increase_Scale, double postDivision_restorationRateScale, int cycle,
+	// 							double distFromNucleus_max, double distFromNucleus_min, double distFromNucleus_normalMax, double distFromNucleus_normalMax_apical, double percentage_before_timeRatio_Crit_Division_scaling,
+	// 							double growthProgressSpeed, int maxApicalBasalNodeNum, int minApicalBasalNodeNum, double maxLengthToAddMemNodes);
+	void runAllLogic_M(double & dt,double Damp_Coef,double InitTimeStage, 
+							double timeRatio, double timeRatio_Crit_actomyo, double timeRatio_Crit_ECM, double timeRatio_Crit_Growth,
+								double volume_Increase_Target_Ratio, double volume_Increase_Scale, double postDivision_restorationRateScale, int cycle,
+								double distFromNucleus_max, double distFromNucleus_min, double distFromNucleus_normalMax, double distFromNucleus_normalMax_apical, double percentage_before_timeRatio_Crit_Division_scaling,
+								double growthProgressSpeed, int maxApicalBasalNodeNum, double maxLengthToAddMemNodes, double mitoRndActomyoStrengthScaling, double thresholdToIntroduceNewCell);
 	bool isDividing_ForAni();
 
 	/**

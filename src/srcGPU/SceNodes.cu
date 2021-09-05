@@ -322,6 +322,12 @@ SceNodes::SceNodes(uint maxTotalCellCount, uint maxAllNodePerCell, uint currentA
 	cout<< " I am inside SceNodes constructor which I beleive is active" << endl ;
 
 	isMemNodeTypeAssigned=false ; 
+	isMemNodeTypeAssigned_postCellDivision=false;
+	isMemNodeTypeAssigned_postAddNode=true;
+	isActinLevelDisplayed=false;
+	isCellAreaDisplayed= false;
+	isECMPairPrinted=false;
+	isBucketValuesIncludingNeighborPrinted=false;
 	isApicalAdhPresent=true ;
 	int simuTypeConfigValue =
 			globalConfigVars.getConfigValue("SimulationType").toInt();
@@ -761,6 +767,8 @@ void SceNodes::initValues(std::vector<CVector>& initBdryCellNodePos,
 // It copies the information of node locations from CPU to GPU
 void SceNodes::initValues_M(std::vector<bool>& initIsActive,
 		std::vector<CVector>& initCellNodePos,
+		std::vector<CVector>& initCellNodeMultip_actomyo,
+		std::vector<CVector>& initCellNodeMultip_integrin,
 		std::vector<SceNodeType>& nodeTypes,
 		std::vector<double>& mDppV,
 		std::vector<MembraneType1>& mTypeV) {
@@ -769,14 +777,31 @@ void SceNodes::initValues_M(std::vector<bool>& initIsActive,
 
 	std::vector<double> initCellNodePosY = getArrayYComp(initCellNodePos);
 
-	std::vector<double> initCellNodePosZ = getArrayZComp(initCellNodePos);
+	// std::vector<double> initCellNodePosZ = getArrayZComp(initCellNodePos);
 
+	std::vector<double> initCellNodeActomyosin_basal = getArrayXActomyosin(initCellNodeMultip_actomyo);
+	std::vector<double> initCellNodeActomyosin_apical = getArrayYActomyosin(initCellNodeMultip_actomyo);
+	std::cout<<"size of initCellNodeActomyosin = "<<initCellNodeActomyosin_basal.size()<< std::endl;
+	std::vector<double> initCellNodeIntegrin = getArrayXIntegrin(initCellNodeMultip_integrin);
+	// std::vector<double> initCellNodeIntegrin_apical = getArrayYIntegrin(initCellNodeMultip_integrin);
+	std::cout<<"size of initCellNodeIntegrin = "<<initCellNodeIntegrin.size()<<std::endl;
 	thrust::copy(initCellNodePosX.begin(), initCellNodePosX.end(),
 			infoVecs.nodeLocX.begin() + allocPara_M.bdryNodeCount);
 	thrust::copy(initCellNodePosY.begin(), initCellNodePosY.end(),
 			infoVecs.nodeLocY.begin() + allocPara_M.bdryNodeCount);
-	thrust::copy(initCellNodePosZ.begin(), initCellNodePosZ.end(),
-			infoVecs.nodeLocZ.begin() + allocPara_M.bdryNodeCount);
+	// thrust::copy(initCellNodePosZ.begin(), initCellNodePosZ.end(),
+	// 		infoVecs.nodeLocZ.begin() + allocPara_M.bdryNodeCount);
+	
+	thrust::copy(initCellNodeActomyosin_basal.begin(), initCellNodeActomyosin_basal.end(),
+			infoVecs.nodeActomyosinMultip_basal.begin() + allocPara_M.bdryNodeCount);
+	thrust::copy(initCellNodeActomyosin_apical.begin(), initCellNodeActomyosin_apical.end(),
+			infoVecs.nodeActomyosinMultip_apical.begin() + allocPara_M.bdryNodeCount);
+			
+	thrust::copy(initCellNodeIntegrin.begin(), initCellNodeIntegrin.end(),
+			infoVecs.nodeIntegrinMultip.begin() + allocPara_M.bdryNodeCount);
+	// thrust::copy(initCellNodeIntegrin_apical.begin(), initCellNodeIntegrin_apical.end(),
+			// infoVecs.nodeIntegrinMultip_apical.begin() + allocPara_M.bdryNodeCount);
+			
 	thrust::copy(nodeTypes.begin(), nodeTypes.end(),
 			infoVecs.nodeCellType.begin() + allocPara_M.bdryNodeCount);
 	thrust::copy(mDppV.begin(), mDppV.end(),
@@ -2300,24 +2325,40 @@ void SceNodes::applySceForcesDisc_M() {
 	//	cout << "Epithelial cell type is="<<eCellTypeTmp <<endl ; 
 		//eCellTypeVHost.push_back(eCellTypeTmp) ; 
 //	}
+	if (adhUpdate == true){
+		// std::cout<<"Entering adhesion pair between neighboring cells update step!"<<std::endl;
+	}
 	if (adhUpdate) {
 		adhUpdate=false ;
 		int maxNumAdh=180 ;
 		//vector <ECellType> eCellTypeV2Host ;
 
      	thrust :: copy (infoVecs.nodeLocX.begin(),infoVecs.nodeLocX.end(),infoVecs.nodeLocXHost.begin()) ; // Ali	
+		
      	thrust :: copy (infoVecs.nodeLocY.begin(),infoVecs.nodeLocY.end(),infoVecs.nodeLocYHost.begin()) ; // Ali 	
+		
      	thrust :: copy (infoVecs.nodeIsActive.begin(),infoVecs.nodeIsActive.end(),infoVecs.nodeIsActiveHost.begin()) ; // Ali 	
+		
      	thrust :: copy (infoVecs.nodeCellRankFront.begin() ,infoVecs.nodeCellRankFront.end() ,infoVecs.nodeCellRankFrontHost.begin()) ; // Ali 	
+		
      	thrust :: copy (infoVecs.nodeCellRankBehind.begin(),infoVecs.nodeCellRankBehind.end(),infoVecs.nodeCellRankBehindHost.begin()) ; // Ali 	
+		
      	thrust :: copy (infoVecs.memNodeType1.begin(),infoVecs.memNodeType1.end(),infoVecs.memNodeType1Host.begin()) ; // Ali 
-		thrust :: copy (cellsSceNodes->getCellInfoVecs().eCellTypeV2.begin(),cellsSceNodes->getCellInfoVecs().eCellTypeV2.begin()+allocPara_M.currentActiveCellCount,					eCellTypeVHost.begin()) ;
-	 	thrust::fill(infoVecs.nodeAdhereIndexHost.begin(),infoVecs.nodeAdhereIndexHost.end(), -1) ;  //Ali it is important to reset the values
+		
+		thrust :: copy (cellsSceNodes->getCellInfoVecs().eCellTypeV2.begin(),cellsSceNodes->getCellInfoVecs().eCellTypeV2.begin()+allocPara_M.currentActiveCellCount,eCellTypeVHost.begin()) ;
+	 	
+		thrust::fill(infoVecs.nodeAdhereIndexHost.begin(),infoVecs.nodeAdhereIndexHost.end(), -1) ;
+		
 	 	thrust::fill(infoVecs.nodeMemMirrorIndexHost.begin(),infoVecs.nodeMemMirrorIndexHost.end(), -1) ;  //Ali it is important to reset the values
+		
 	 	//thrust::fill(infoVecs.nodeIsLateralMemHost.begin(),infoVecs.nodeIsLateralMemHost.end(), false) ;  //Ali
 	 	thrust::fill(infoVecs.nodeAdhMinDist.begin(),infoVecs.nodeAdhMinDist.end(), 10000) ;  //Ali
+		
+		// std::cout<<"AdhUpdate ERROR 1"<<std::endl;
+
         int totalActiveNodes = allocPara_M.currentActiveCellCount* allocPara_M.maxAllNodePerCell; // Ali
 	  	int maxMembNode=    allocPara_M.maxMembrNodePerCell ; 
+		
 	  	int maxNodePerCell= allocPara_M.maxAllNodePerCell ; 
       	double  distMinP2,distP2 ;
 	  	int indexAdhNode ; 
@@ -2331,37 +2372,52 @@ void SceNodes::applySceForcesDisc_M() {
 		int cellRank, iNext, jJunction ;
 		std::vector <SubApicalInfoEachCell> subApicalInfo ; 
 		
+		// std::cout<<"AdhUpdate ERROR 2"<<std::endl;
 
 		//setup required basic parameters 
         for (int i=0 ; i< allocPara_M.currentActiveCellCount ; i++ ){
 			activeMemCount[i] = 0 ; 
 		}
+		// std::cout<<"AdhUpdate ERROR 3"<<std::endl;
 
 		for (int i=0 ; i<totalActiveNodes ;  i++) {
 			infoVecs.isSubApicalJunctionHost[i]=false ; 
 		}
+		// std::cout<<"AdhUpdate ERROR 3"<<std::endl;
 		for (int i=0 ; i<totalActiveNodes ;  i++) {
 			if (infoVecs.nodeIsActiveHost[i]==true && (i%maxNodePerCell)<maxMembNode){
 				cellRank=i/maxNodePerCell ; 
 				activeMemCount [cellRank]=activeMemCount [cellRank]+1 ; 
 			}
 		}
-	
+	// std::cout<<"AdhUpdate ERROR 4"<<std::endl;
 		subApicalInfo.clear() ; 
+		
 
 		//Find the subapical nodes in front of the cell
 		int cellRankOld=-1 ; 
+	
 		for (int i=0 ; i<totalActiveNodes ;  i++) {
+			if (i == totalActiveNodes-1){
+				// std::cout<<"I am at the last step of this loop 1"<<std::endl;
+			}
+			// if (i/maxNodePerCell == 31 || i/maxNodePerCell==86){
+			// 	std::cout<<"i/maxNodePerCell for subapical front = "<<i/maxNodePerCell<<std::endl;
+			// 	std::cout<<"infoVecs.nodeIsActiveHost["<<i<<"] = "<<infoVecs.nodeIsActiveHost[i]<<std::endl;
+			// 	std::cout<<"i%maxNodePerCell = "<< (i%maxNodePerCell)<<std::endl;
+			// }
 				if (infoVecs.nodeIsActiveHost[i]==true && (i%maxNodePerCell)<maxMembNode){ // check active and membrane
+					// std::cout<<"IF "<<i<<std::endl;
 					cellRank=i/maxNodePerCell ;
-					
+
 					eCellTypeTmp=eCellTypeVHost[cellRank];
 					iNext=i+1 ; 
 					if ( (i%maxNodePerCell)==(activeMemCount[cellRank]-1)) {  // if the node is the last node of cell's membrane
 						iNext=iNext-activeMemCount [cellRank] ;
 					}
-					if ( infoVecs.memNodeType1Host[i]==lateralA && infoVecs.memNodeType1Host[iNext]==apical1 ) { // find the apical junction
+					if ( (infoVecs.memNodeType1Host[i]==lateralA && infoVecs.memNodeType1Host[iNext]==apical1) ) { // find the apical junction
 						firstApiLat[cellRank]=i ; // lateral node 
+						// std::cout<<"1cellRank["<<cellRank<<"], condition met for 1st adhesion joints"<<std::endl;
 						for (int j=0 ; j<NumAdhAfter(cellRank,eCellTypeTmp) ; j++) {   //find junction nodes // 
 							jJunction=firstApiLat[cellRank]-j ; 
 							if (jJunction <(cellRank*maxNodePerCell)) {
@@ -2378,72 +2434,246 @@ void SceNodes::applySceForcesDisc_M() {
 								cellRankOld=cellRank ; 
 							}
 							subApicalInfo[cellRank].nodeIdFront[j]=jJunction ; 
+							// if (cellRank >= 85){
+							// 	std::cout<<"subApicalInfo["<<cellRank<<"].nodeIdBehind["<<j<<"] = "<<subApicalInfo[cellRank].nodeIdBehind[j]<<std::endl;
+							// }
 
 						}
 
 					}
+					else if (infoVecs.memNodeType1Host[iNext]==lateralA && infoVecs.memNodeType1Host[i]==apical1){
+						// std::cout<<"ELSE IF "<<i<<std::endl;
+						// std::cout<<"2cellRank["<<cellRank<<"], condition met for 1st adhesion joints"<<std::endl;
+						// firstApiLat[cellRank]=i ; // lateral node
+						firstApiLat[cellRank]=iNext ; // lateral node 
+						for (int j=0 ; j<NumAdhAfter(cellRank,eCellTypeTmp) ; j++) {   //find junction nodes // 
+							// jJunction=firstApiLat[cellRank]-j ;
+							jJunction=firstApiLat[cellRank]+j ; 
+							// if (jJunction <(cellRank*maxNodePerCell)) {
+							// if (jJunction >= (cellRank*maxNodePerCell + activeMemCount[cellRank])) {
+							if (jJunction >= ((cellRank)*maxNodePerCell + activeMemCount[cellRank])) {
+								// jJunction=jJunction + activeMemCount [cellRank] ;
+								jJunction=jJunction - activeMemCount [cellRank] ;
+								//cout << " The subApicalNodes of cell rank " << cellRank << " passed the first node ID" << endl ; 
+							}
+						
+		 					infoVecs.isSubApicalJunctionHost[jJunction]=true ;
+
+							if (cellRank !=cellRankOld) {
+
+						//		cout << " for cell rank= " << cellRank << " subapicalInfo has been created." << endl ;
+								SubApicalInfoEachCell subApicalInfoEachCell(maxNumAdh); 
+								subApicalInfo.push_back(subApicalInfoEachCell); 
+								cellRankOld=cellRank ; 
+							}
+							subApicalInfo[cellRank].nodeIdFront[j]=jJunction ; 
+							// if (cellRank >= 85){
+							// 	std::cout<<"subApicalInfo["<<cellRank<<"].nodeIdBehind["<<j<<"] = "<<subApicalInfo[cellRank].nodeIdBehind[j]<<std::endl;
+							// }
+
+						}
+					}
 				
 				}
 		}
-		//cout << "first set of adhesion joints are found" << endl ; 
+		// std::cout << "     >>> 14 <<<" << endl;
+		// cout << "first set of adhesion joints are found" << endl ; 
+		// if (cellRank == 86){
+		// 	for (int j = 0; j < maxNumAdh; j++){
+		// 		std::cout<<"subApicalInfo["<<cellRank<<"].nodeIdFront["<<j<<"] = "<<subApicalInfo[cellRank].nodeIdFront[j]<<std::endl;
+		// 	}
+		// 	for (int j = 0; j < maxNumAdh; j++){
+		// 		std::cout<<"subApicalInfo["<<cellRank<<"].nodeIdBehind["<<j<<"] = "<<subApicalInfo[cellRank].nodeIdBehind[j]<<std::endl;
+		// 	}
+		// }
 		
 		//Find the subapical nodes supposingly behind (Before) the cell
+		
 		for (int i=0 ; i<totalActiveNodes ;  i++) {
+			if (i == totalActiveNodes-1){
+				// std::cout<<"I am at the last step of this loop 2"<<std::endl;
+			}
+			// if (i/maxNodePerCell > 86){
+			// 	std::cout<<"cellRank index exceed 86, that's it"<<std::endl;
+			// }
 				if (infoVecs.nodeIsActiveHost[i]==true && (i%maxNodePerCell)<maxMembNode){
 					cellRank=i/maxNodePerCell ;
+					// if (cellRank == 86){
+					// 	std::cout<<"i/maxNodePerCell = "<< i/maxNodePerCell<<" cellRank = "<<cellRank<<std::endl;
+					// }
 					//eCellType= eCellTypeV2Host[cellRank];
 					eCellTypeTmp= eCellTypeVHost [cellRank];
+					// if (cellRank == 31 || cellRank == 86){
+					// 	std::cout<<"2nd eCellTypeTmp["<<cellRank<<"] = "<<eCellTypeTmp<<std::endl;
+					// }
 					iNext=i+1 ; 
+					// if (cellRank == 86){// || cellRank == 31){
+					// 	std::cout<<"i = "<<i<<", iNext = "<<iNext<<std::endl;
+					// 	std::cout<<"i%maxNodePerCell = "<<i%maxNodePerCell<<std::endl;
+					// 	std::cout<<"activeMemCount["<<cellRank<<"] = "<<activeMemCount[cellRank]<<std::endl;
+					// }
 					if ( (i%maxNodePerCell)==(activeMemCount [cellRank]-1)) {
 						iNext=iNext-activeMemCount [cellRank]  ; 
+						// if (cellRank >= 85){
+						// 	std::cout<<"activeMemCount[cellRank] = "<<activeMemCount[cellRank]<<" altered iNext = "<<iNext<<std::endl;
+						// }
 					}
-					if (infoVecs.memNodeType1Host[i]==apical1 && ( infoVecs.memNodeType1Host[iNext]==lateralB ) ) {
+					// if (cellRank == 86){
+					// 	std::cout<<" ^^^ 1 ^^^"<<std::endl;
+					// 	for (int j = 0; j < maxNumAdh; j++){
+					// 		std::cout<<"subApicalInfo["<<cellRank<<"].nodeIdFront["<<j<<"] = "<<subApicalInfo[cellRank].nodeIdFront[j]<<std::endl;
+					// 	}
+					// 	for (int j = 0; j < maxNumAdh; j++){
+					// 		std::cout<<"subApicalInfo["<<cellRank<<"].nodeIdBehind["<<j<<"] = "<<subApicalInfo[cellRank].nodeIdBehind[j]<<std::endl;
+					// 	}
+					// }
+					// if (cellRank == 86|| cellRank == 31){
+					// 	std::cout<<"cellRank["<<cellRank<<"], infoVecs.memNodeType1Host["<<i<<"] = "<<infoVecs.memNodeType1Host[i]<<std::endl;
+					// 	std::cout<<"cellRank["<<cellRank<<"], infoVecs.memNodeType1Host["<<iNext<<"] = "<<infoVecs.memNodeType1Host[iNext]<<std::endl;
+					// 	// if (infoVecs.memNodeType1Host[i]==apical1 && infoVecs.memNodeType1Host[iNext]==lateralB
+					// 	// 	|| (infoVecs.memNodeType1Host[iNext]==apical1 && ( infoVecs.memNodeType1Host[i]==lateralB ))){
+					// 	// 	std::cout<<"condition met (secondApiLat)"<<std::endl;
+					// 	// } 
+					// 	// else{
+					// 	// 	std::cout<<"condition not met (secondApiLat)"<<std::endl;
+					// 	// }
+					// }
+					// if (infoVecs.memNodeType1Host[i]==apical1 && ( infoVecs.memNodeType1Host[iNext]==lateralB ) ) {
+
+						
+					if ((infoVecs.memNodeType1Host[i]==apical1 && ( infoVecs.memNodeType1Host[iNext]==lateralB )) ) {
+						// std::cout<<"Cell Rank = "<<cellRank<<" This If?"<<std::endl;
+						// std::cout<<"1cellRank["<<cellRank<<"], condition met for 2nd adhesion joints"<<std::endl;
 						secondApiLat[cellRank]=iNext ; 
+						// if (cellRank >= 85){
+						// 	std::cout<<"secondApiLat["<<cellRank<<"] = "<<secondApiLat[cellRank]<<std::endl;
+						// 	std::cout<<"NumAdhBefore = "<<NumAdhBefore(cellRank, eCellTypeTmp)<<std::endl;
+						// }
 						for (int j=0 ; j<NumAdhBefore(cellRank,eCellTypeTmp) ; j++) {   //find junction nodes
 							jJunction=secondApiLat[cellRank]+j ; 
+							// if (cellRank >= 85){
+							// 	std::cout<<"j = "<<j<<" jJunction - activeMemCount["<<cellRank<<"] = "<<jJunction - activeMemCount[cellRank]<<std::endl;
+							// }
 							if (jJunction>=(cellRank*maxNodePerCell+activeMemCount [cellRank]) ) {
 								jJunction=jJunction - activeMemCount [cellRank];
 
 								//cout << " The subApicalNodes of cell rank " << cellRank << " passed the last node ID" << endl ; 
 							}
 		 					infoVecs.isSubApicalJunctionHost[jJunction]=true ;
+							//  if (cellRank >= 85){
+							//  	std::cout<<"infoVecs.isSubApicalJunctionHost["<<jJunction<<"] = "<<infoVecs.isSubApicalJunctionHost[jJunction]<<std::endl;
+							//  }
+							//  if (cellRank >= 85){
+							// 	std::cout<<"subApicalInfo dimension = "<<subApicalInfo.size()<<std::endl;
+							// 	std::cout<<"subApicalInfo["<<cellRank<<"].nodeIdBehind["<<j<<"] = "<<subApicalInfo[cellRank].nodeIdBehind[j]<<std::endl;
+							// }
 							subApicalInfo[cellRank].nodeIdBehind[j]=jJunction ; // the vector of structures for active cells has already been generated.
+							// std::cout<<"subApicalInfo["<<cellRank<<"].nodeIdBehind["<<j<<"] = "<<subApicalInfo[cellRank].nodeIdBehind[j]<<std::endl;
+	
 						}
 				
 					}
-				}
-		}
+					else if ( (infoVecs.memNodeType1Host[iNext]==apical1 && ( infoVecs.memNodeType1Host[i]==lateralB ))){
+						// std::cout<<"Cell Rank = "<<cellRank<<" Or This Else If?"<<std::endl;
+						// secondApiLat[cellRank]=iNext ;
+						// std::cout<<"2cellRank["<<cellRank<<"], condition met for 2nd adhesion joints"<<std::endl;
+						secondApiLat[cellRank]=i ; 
+						// if (cellRank >= 85){
+						// 	std::cout<<"secondApiLat["<<cellRank<<"] = "<<secondApiLat[cellRank]<<std::endl;
+						// 	std::cout<<"NumAdhBefore = "<<NumAdhBefore(cellRank, eCellTypeTmp)<<std::endl;
+						// }
+						for (int j=0 ; j<NumAdhBefore(cellRank,eCellTypeTmp) ; j++) {   //find junction nodes
+							jJunction=secondApiLat[cellRank]-j ; 
+							// if (cellRank >= 85){
+							// 	std::cout<<"j = "<<j<<" jJunction - activeMemCount["<<cellRank<<"] = "<<jJunction - activeMemCount[cellRank]<<std::endl;
+							// }
+							if (jJunction < (cellRank*maxNodePerCell) ) {
+								jJunction=jJunction + activeMemCount [cellRank];
 
-		cout << "Second set of adhesion joints are found" << endl ; 
+								//cout << " The subApicalNodes of cell rank " << cellRank << " passed the last node ID" << endl ; 
+							}
+							// std::cout<<"jJunction = "<<jJunction<<std::endl;
+		 					infoVecs.isSubApicalJunctionHost[jJunction]=true ;
+							//  if (cellRank == 86){
+							// 	std::cout<<"j = "<<j<<std::endl;
+							//  	std::cout<<"infoVecs.isSubApicalJunctionHost["<<jJunction<<"] = "<<infoVecs.isSubApicalJunctionHost[jJunction]<<std::endl;
+							// 	std::cout<<"subApicalInfo["<<cellRank<<"].nodeIdBehind["<<j<<"] = "<<subApicalInfo[cellRank].nodeIdBehind[j]<<std::endl;
+							//  }
+							//  if (cellRank >= 85){
+							// 	std::cout<<"subApicalInfo dimension = "<<subApicalInfo.size()<<std::endl;
+							// 	std::cout<<"subApicalInfo["<<cellRank<<"].nodeIdBehind["<<j<<"] = "<<subApicalInfo[cellRank].nodeIdBehind[j]<<std::endl;
+							// }
+							subApicalInfo[cellRank].nodeIdBehind[j]=jJunction ; // the vector of structures for active cells has already been generated.
+							// std::cout<<"subApicalInfo["<<cellRank<<"].nodeIdBehind["<<j<<"] = "<<subApicalInfo[cellRank].nodeIdBehind[j]<<std::endl;
+	
+						}
+					}
+				}
+				
+		}
+		// std::cout << "     >>> 15 <<<" << endl;
+
+		// cout << "Second set of adhesion joints are found" << endl ; 
 		//for (int i=0 ; i<totalActiveNodes ;  i++) {
 		//	if (infoVecs.isSubApicalJunctionHost[i]) {
 		//		cout << "for cell with rank  "	<<int(i/maxNodePerCell) << "node rank of subApical junction is " << i << endl ;  
 		 //	}
 	//	}
 
-		//cout << " size of vector storing information of apical junctions is " << subApicalInfo.size() << endl ; 
+		// cout << " size of vector storing information of apical junctions is " << subApicalInfo.size() << endl ; 
 		if (subApicalInfo.size() != 0 ) {  // to pass the first time step in which the membrane node type is not defined.
 			for ( int i= 0 ; i<allocPara_M.currentActiveCellCount ; i++) {
 				
 				for ( int j=0 ; j<maxNumAdh ; j++) {
+			
 					int idFront=subApicalInfo[i].nodeIdFront[j] ;
+					// if (i == 31){
+					// 	std::cout<<"ERROR 1"<<std::endl;
+					// }	
 					int idBehind=subApicalInfo[i].nodeIdBehind[j] ;
-					int cellRankFront=infoVecs.nodeCellRankFrontHost[i] ; 
+					// if (i == 31){
+					// 	std::cout<<"ERROR 2"<<std::endl;
+					// }	
+					int cellRankFront=infoVecs.nodeCellRankFrontHost[i] ;
+					// if (i == 31){
+					// 	std::cout<<"ERROR 3"<<std::endl;
+					// }	 
 					int cellRankBehind=infoVecs.nodeCellRankBehindHost[i] ;
+					// if (i == 31){
+					// 	std::cout<<"ERROR 4"<<std::endl;
+					// 	std::cout<<subApicalInfo[cellRankFront].nodeIdBehind.size()<<std::endl;
+					// }	
 					if (idFront != -1 && cellRankFront != -1) {
 						infoVecs.nodeAdhereIndexHost[idFront]=subApicalInfo[cellRankFront].nodeIdBehind[j] ;
 					}
+					// if (i == 31){
+					// 	std::cout<<"ERROR 5"<<std::endl;
+					// }	
 					if (idBehind !=-1 && cellRankBehind != -1) {
 						infoVecs.nodeAdhereIndexHost[idBehind]=subApicalInfo[cellRankBehind].nodeIdFront[j] ;
 					}
+					// if (i == 31){
+					// 	std::cout<<"ERROR 6"<<std::endl;
+					// }	
 					if ( eCellTypeVHost[i]==pouch && NumAdhBefore(i,pouch)==NumAdhAfter(i,pouch) ) {
 						infoVecs.nodeMemMirrorIndexHost[idFront]=idBehind ;
 						infoVecs.nodeMemMirrorIndexHost[idBehind]=idFront ;
 					};
+					// if (i == 31){
+					// 	std::cout<<"ERROR 7"<<std::endl;
+					// }	
+					// if (i == 86 || i == 31){
+					// 	std::cout<<"idFront["<<j<<"] = "<<idFront<<", loc = "<<infoVecs.nodeLocX[idFront]<<" "<<infoVecs.nodeLocY[idFront]<<", nodeAdhereIndexHost loc = "<<infoVecs.nodeLocX[infoVecs.nodeAdhereIndexHost[idFront]]
+					// 			<<" "<<infoVecs.nodeLocY[infoVecs.nodeAdhereIndexHost[idFront]]<<" "<<infoVecs.nodeLocZ[infoVecs.nodeAdhereIndexHost[idFront]]<<std::endl;
+					// 	std::cout<<"idBehind["<<j<<"] = "<<idBehind<<", loc = "<<infoVecs.nodeLocX[idBehind]<<" "<<infoVecs.nodeLocY[idBehind]<<", nodeAdhereIndexHost loc = "<<infoVecs.nodeLocX[infoVecs.nodeAdhereIndexHost[idBehind]]
+					// 			<<" "<<infoVecs.nodeLocY[infoVecs.nodeAdhereIndexHost[idBehind]]<<" "<<infoVecs.nodeLocZ[infoVecs.nodeAdhereIndexHost[idBehind]]<<std::endl;
+					// }
 				}
+
+				
 			}
 
-
+// std::cout << "     >>> 16 <<<" << endl;
 	
 /////////////////////////////////// start adhesion for apical nodes of pouch cells with apical nodes of peripodial cells ///////////////////////
 			
@@ -2484,15 +2714,25 @@ void SceNodes::applySceForcesDisc_M() {
 
 		 	}
 		
-		  	cout << " I am ready to copy the data in adhesion function to the GPU " << endl ; 
+		  	// cout << " I am ready to copy the data in adhesion function to the GPU " << endl ; 
 	
 /////////////////////////////////// start adhesion for apical nodes of pouch cells with apical nodes of peripodial cells ///////////////////////
   		} // finish if of bypassing the first time
 		// copy back to GPU 
+		
 		thrust::copy(infoVecs.nodeAdhereIndexHost.begin(),infoVecs.nodeAdhereIndexHost.end(), infoVecs.nodeAdhereIndex.begin()) ;  //Ali
+		
 		thrust::copy(infoVecs.nodeMemMirrorIndexHost.begin(),infoVecs.nodeMemMirrorIndexHost.end(), infoVecs.nodeMemMirrorIndex.begin()) ;  //Ali
+		
     	thrust::copy(infoVecs.isSubApicalJunctionHost.begin(),infoVecs.isSubApicalJunctionHost.end(), infoVecs.isSubApicalJunction.begin()) ;  //Ali
- 
+		// std::cout << "     >>> 17 <<<" << endl;// std::cout << "     >>> 16 <<<" << endl;
+		for (int i = 0; i < infoVecs.nodeAdhereIndex.size(); i++){
+			uint cellRank=i/maxNodePerCell ;
+			if (cellRank >= allocPara.currentActiveCellCount){
+				continue;
+			}
+			// std::cout<<"i = "<<i<<" node loc = "<<infoVecs.nodeLocX[i]<<" "<<infoVecs.nodeLocY[i]<<" "<<cellRank<<" "<<infoVecs.nodeMemMirrorIndex[i]<<" "<<infoVecs.nodeAdhereIndex[i]<<" "<<infoVecs.nodeCellType[i]<<" " <<infoVecs.memNodeType1[i]<<" "<<infoVecs.nodeIsActive[i]<< std::endl;
+		}
 
 	} // finish the if condition for finding the pair node
 
@@ -2639,7 +2879,8 @@ void SceNodes::sceForcesDisc() {
 	applySceForcesDisc();
 }
 
-void SceNodes::sceForcesDisc_M() {
+//Node velocity is reset back to zero in this function at the beginning of every new time step
+void SceNodes::sceForcesDisc_M(double timeRatio, double timeRatio_Crit_Division, int cycle) {
 #ifdef DebugMode
 	cudaEvent_t start1, start2, start3, stop;
 	float elapsedTime1, elapsedTime2, elapsedTime3;
@@ -2649,7 +2890,7 @@ void SceNodes::sceForcesDisc_M() {
 	cudaEventCreate(&stop);
 	cudaEventRecord(start1, 0);
 #endif
-	// cout << " confirm   --- 1 ---" << endl;
+	// cout << " confirm--- 1 ---" << endl;
 	cout.flush();
 	prepareSceForceComputation_M(); //buckets for optimization of searching algorithm
 
@@ -2658,7 +2899,126 @@ void SceNodes::sceForcesDisc_M() {
 	cudaEventSynchronize(start2);
 	cudaEventElapsedTime(&elapsedTime1, start1, start2);
 #endif
-	//cout << "     --- 2 ---" << endl;
+	if (timeRatio == 0 && cycle <= 0){
+		std::cout<<"Setting the anisotropic contractility profile"<<std::endl;
+		std::cout<<"This message should only appear once, if more than once is shown, something is wrong!"<<std::endl;
+		std::vector<double> contractActomyo_multip;
+		//Starting from cell 0 to cell 62
+		contractActomyo_multip.push_back(0.000000000);
+		contractActomyo_multip.push_back(0.000000000);
+		contractActomyo_multip.push_back(0.556793614);
+		contractActomyo_multip.push_back(0.547314153);
+		contractActomyo_multip.push_back(0.608514884);
+		contractActomyo_multip.push_back(0.658905704);
+		contractActomyo_multip.push_back(0.663562282);
+		contractActomyo_multip.push_back(0.716780309);
+		contractActomyo_multip.push_back(0.731082654);
+		contractActomyo_multip.push_back(0.848993847);
+		contractActomyo_multip.push_back(0.856643938);
+		contractActomyo_multip.push_back(0.862797273);
+		contractActomyo_multip.push_back(0.821553301);
+		contractActomyo_multip.push_back(0.877265924);
+		contractActomyo_multip.push_back(1.000000000);
+		contractActomyo_multip.push_back(0.985198736);
+		contractActomyo_multip.push_back(0.806752037);
+		contractActomyo_multip.push_back(0.826209879);
+		contractActomyo_multip.push_back(0.812572759);
+		contractActomyo_multip.push_back(0.841510062);
+		contractActomyo_multip.push_back(0.813237984);
+		contractActomyo_multip.push_back(0.679195077);
+		contractActomyo_multip.push_back(0.655912190);
+		contractActomyo_multip.push_back(0.762514552);
+		contractActomyo_multip.push_back(0.678030933);
+		contractActomyo_multip.push_back(0.692333278);
+		contractActomyo_multip.push_back(0.678363546);
+		contractActomyo_multip.push_back(0.712955264);
+		contractActomyo_multip.push_back(0.617661733);
+		contractActomyo_multip.push_back(0.660735074);
+		contractActomyo_multip.push_back(0.585897223);
+		contractActomyo_multip.push_back(0.680192915);
+		contractActomyo_multip.push_back(0.675203725);
+		contractActomyo_multip.push_back(0.824713122);
+		contractActomyo_multip.push_back(0.689339764);
+		contractActomyo_multip.push_back(0.719274904);
+		contractActomyo_multip.push_back(0.700814901);
+		contractActomyo_multip.push_back(0.646931648);
+		contractActomyo_multip.push_back(0.687843007);
+		contractActomyo_multip.push_back(0.556959920);
+		contractActomyo_multip.push_back(0.582571096);
+		contractActomyo_multip.push_back(0.728255447);
+		contractActomyo_multip.push_back(0.636953268);
+		contractActomyo_multip.push_back(0.671877599);
+		contractActomyo_multip.push_back(0.625311824);
+		contractActomyo_multip.push_back(0.722434725);
+		contractActomyo_multip.push_back(0.686678862);
+		contractActomyo_multip.push_back(0.723432563);
+		contractActomyo_multip.push_back(0.760352569);
+		contractActomyo_multip.push_back(0.694495260);
+		contractActomyo_multip.push_back(0.659570930);
+		contractActomyo_multip.push_back(0.649592549);
+		contractActomyo_multip.push_back(0.656577416);
+		contractActomyo_multip.push_back(0.728089140);
+		contractActomyo_multip.push_back(0.739065358);
+		contractActomyo_multip.push_back(0.825544653);
+		contractActomyo_multip.push_back(0.829203393);
+		contractActomyo_multip.push_back(0.870447364);
+		contractActomyo_multip.push_back(0.806752037);
+		contractActomyo_multip.push_back(0.719441211);
+		contractActomyo_multip.push_back(0.672043905);
+		contractActomyo_multip.push_back(0.655912190);
+		contractActomyo_multip.push_back(0.634957592);
+
+		for (int i = 0; i < allocPara_M.maxTotalNodeCount; i++){
+			uint cellRank = i/allocPara_M.maxAllNodePerCell;
+			// if (cellRank >= 2 && cellRank <= 21){
+			if (cellRank >= 2 && cellRank <= 15){
+				infoVecs.contractActomyo_multip[i] = 1.25;//pow(contractActomyo_multip[cellRank], 3.0);////1.0;
+				infoVecs.contractActomyo_multip_apical[i] = 0.25;
+				if (i == 2*allocPara_M.maxAllNodePerCell || i == 21*allocPara_M.maxAllNodePerCell){
+					std::cout<<"infoVecs.contractActomyo_multip["<<i<<"] = "<<infoVecs.contractActomyo_multip[i]<<std::endl;
+					std::cout<<"infoVecs.contractActomyo_multip_apical["<<i<<"] = "<<infoVecs.contractActomyo_multip_apical[i]<<std::endl;
+				}
+				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[cellRank] = infoVecs.contractActomyo_multip[i];
+				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[cellRank] = infoVecs.contractActomyo_multip_apical[i];
+			}
+			// else if (cellRank >= 22 && cellRank <= 42){
+			else if (cellRank >= 16 && cellRank <= 48){
+				infoVecs.contractActomyo_multip[i] = 1.0;//pow(contractActomyo_multip[cellRank], 3.0);//0.25;//1.0;
+				infoVecs.contractActomyo_multip_apical[i] = 1.5;
+				// if (cellRank >=29 && cellRank <=35){
+				// 	infoVecs.contractActomyo_multip_apical[i] = 2.0;
+				// }
+				if (i == 22*allocPara_M.maxAllNodePerCell || i == 42*allocPara_M.maxAllNodePerCell){
+					std::cout<<"infoVecs.contractActomyo_multip["<<i<<"] = "<<infoVecs.contractActomyo_multip[i]<<std::endl;
+					std::cout<<"infoVecs.contractActomyo_multip_apical["<<i<<"] = "<<infoVecs.contractActomyo_multip_apical[i]<<std::endl;
+				}
+				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[cellRank] = infoVecs.contractActomyo_multip[i];
+				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[cellRank] = infoVecs.contractActomyo_multip_apical[i];
+			}
+			// else if (cellRank >= 43 && cellRank <= 62){
+			else if (cellRank >= 49 && cellRank <= 62){
+				infoVecs.contractActomyo_multip[i] = 1.25;//pow(contractActomyo_multip[cellRank], 3.0);//1.0;
+				infoVecs.contractActomyo_multip_apical[i] = 0.25;
+				if (i == 43*allocPara_M.maxAllNodePerCell || i == 62*allocPara_M.maxAllNodePerCell){
+					std::cout<<"infoVecs.contractActomyo_multip["<<i<<"] = "<<infoVecs.contractActomyo_multip[i]<<std::endl;
+					std::cout<<"infoVecs.contractActomyo_multip_apical["<<i<<"] = "<<infoVecs.contractActomyo_multip_apical[i]<<std::endl;
+				}
+				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[cellRank] = infoVecs.contractActomyo_multip[i];
+				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[cellRank] = infoVecs.contractActomyo_multip_apical[i];
+			}
+			else{
+				infoVecs.contractActomyo_multip[i] = 0.0;
+				infoVecs.contractActomyo_multip_apical[i] = 0.0;
+				// std::cout<<"infoVecs.contractActomyo_multip["<<i<<"] = "<<infoVecs.contractActomyo_multip[i]<<std::endl;
+				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[cellRank] = infoVecs.contractActomyo_multip[i];
+				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[cellRank] = infoVecs.contractActomyo_multip_apical[i];
+			}
+		}
+		for (int j = 0; j < allocPara_M.maxCellCount; j++){
+			std::cout<<"contractActomyo_multip_perCell["<<j<<"] = "<<cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[j]<<", and multip_apical_perCell = "<<cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[j]<<std::endl;
+		}
+	}
+	// cout << " confirm--- 2 ---" << endl;
 	cout.flush();
 	applySceForcesDisc_M(); // compate the MMD forces and also finds the nearset neighbor for applying the adhesion
 
@@ -2668,15 +3028,16 @@ void SceNodes::sceForcesDisc_M() {
 	cudaEventSynchronize(start3);
 	cudaEventElapsedTime(&elapsedTime2, start2, start3);
 #endif
-	//cout << "     --- 3 ---" << endl;
+	// cout << " confirm--- 3 ---" << endl;
 	cout.flush();
-	processMembrAdh_M(); //applying the adhesion force 
+	processMembrAdh_M(timeRatio, timeRatio_Crit_Division, cycle); //applying the adhesion force 
 
-	//cout << "     --- 4 ---" << endl;
+	// cout << " confirm--- 4 ---" << endl;
 	cout.flush();
 
 	copyInterCellForces_M();//AAMIRI	
 
+// cout << " confirm--- 5 ---" << endl;
 
 #ifdef DebugMode
 	cudaEventRecord(stop, 0);
@@ -2751,6 +3112,10 @@ void SceNodes::allocSpaceForNodes(uint maxTotalNodeCount,uint maxNumCells, uint 
 	infoVecs.nodeVelZ.resize(maxTotalNodeCount);
 	infoVecs.basalContractPair.resize(maxTotalNodeCount,-1); // Ali
 
+	infoVecs.nodeActomyosinMultip_basal.resize(maxTotalNodeCount);
+	infoVecs.nodeActomyosinMultip_apical.resize(maxTotalNodeCount);
+	infoVecs.nodeIntegrinMultip.resize(maxTotalNodeCount);
+
 	//infoVecs.nodeContractLevel.resize(maxTotalNodeCount,0.0);// Ali
 	infoVecs.nodeF_MM_C_X.resize(maxTotalNodeCount,0.0);// Ali
 	infoVecs.nodeF_MM_C_Y.resize(maxTotalNodeCount,0.0);// Ali
@@ -2778,6 +3143,10 @@ void SceNodes::allocSpaceForNodes(uint maxTotalNodeCount,uint maxNumCells, uint 
 	//infoVecs.nodeIsLateralMemHost.resize(maxTotalNodeCount,false); //Ali
 	infoVecs.nodeCellType.resize(maxTotalNodeCount);
 	infoVecs.nodeCellRank.resize(maxTotalNodeCount);
+	infoVecs.contractActomyo_multip.resize(maxTotalNodeCount, 1.0);
+	infoVecs.contractActomyo_multip_apical.resize(maxTotalNodeCount, 0.0);
+	infoVecs.nodesIsEnteringMitotic.resize(maxTotalNodeCount, false);
+	infoVecs.nodesContractileSpringGrowthProgress.resize(maxTotalNodeCount, 0.0);
 	infoVecs.nodeIsActive.resize(maxTotalNodeCount);
 	infoVecs.nodeIsActiveHost.resize(maxTotalNodeCount); // Ali
 	infoVecs.nodeAdhMinDist.resize(maxTotalNodeCount); // Ali
@@ -2785,6 +3154,8 @@ void SceNodes::allocSpaceForNodes(uint maxTotalNodeCount,uint maxNumCells, uint 
 	infoVecs.nodeCellRankBehind.resize(maxNumCells,-1); // Ali
 	infoVecs.nodeCellRankFrontHost.resize(maxNumCells,-1); // Ali
 	infoVecs.nodeCellRankBehindHost.resize(maxNumCells,-1); // Ali
+	infoVecs.nodeCellRankFrontOld.resize(maxNumCells,-1); // Ali
+	infoVecs.nodeCellRankBehindOld.resize(maxNumCells,-1); // Ali
 	if (controlPara.simuType == Disc
 			|| controlPara.simuType == SingleCellTest) {
 		infoVecs.nodeGrowPro.resize(maxTotalNodeCount);
@@ -2959,19 +3330,27 @@ void SceNodes::removeNodes(int cellRank, vector<uint> &removeSeq) {
 			infoVecs.nodeLocY.begin() + cellBeginIndex);
 }
 
-void SceNodes::processMembrAdh_M() {
-	keepAdhIndxCopyInHost_M();
+void SceNodes::processMembrAdh_M(double timeRatio, double timeRatio_Crit_Division, int cycle) {
+	keepAdhIndxCopyInHost_M(timeRatio, timeRatio_Crit_Division, cycle);
 	// cout << " I am before applyMembrAdh_M" << endl ; 
 	applyMembrAdh_M();
 	//removeInvalidPairs_M();  //Ali changed position 
 }
 
-void SceNodes::keepAdhIndxCopyInHost_M() {
+void SceNodes::keepAdhIndxCopyInHost_M(double timeRatio, double timeRatio_Crit_Division, int cycle) {
 	uint maxTotalNode = allocPara_M.currentActiveCellCount
 			* allocPara_M.maxAllNodePerCell;
-	thrust::copy(infoVecs.nodeAdhereIndex.begin(),
-			infoVecs.nodeAdhereIndex.begin() + maxTotalNode,
-			infoVecs.nodeAdhIndxHostCopy.begin());
+			// std::cout<<"maxTotalNode = "<<maxTotalNode<<std::endl;
+			// std::cout<<infoVecs.nodeAdhereIndex.size()<<std::endl;
+			// std::cout<<infoVecs.nodeAdhIndxHostCopy.size()<<std::endl;
+			// if (cycle == 1 && timeRatio == timeRatio_Crit_Division){
+			// 	for (int i = 0 ; i < infoVecs.nodeAdhIndxHostCopy.size(); i++){
+			// 		std::cout<<"nodeAdhIndxHostCopy at 2nd division = "<<infoVecs.nodeAdhIndxHostCopy[i]<<std::endl;
+			// 	}
+			// }
+	// thrust::copy(infoVecs.nodeAdhereIndex.begin(),
+	// 		infoVecs.nodeAdhereIndex.begin() + maxTotalNode,
+	// 		infoVecs.nodeAdhIndxHostCopy.begin());
 }
 
 void SceNodes::removeInvalidPairs_M() {

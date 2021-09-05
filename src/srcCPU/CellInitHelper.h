@@ -63,11 +63,14 @@ public:
 class CellInitHelper {
 	SimulationType simuType;
     vector<vector<CVector> > readResumeIntnlNodes (int numCells, int maxIntnlNodeCountPerCell, string intnlFileName); 
-	// vector<vector<CVector> > readMembNodes        (int numCells, int maxMembrNodeCountPerCell,
-    //                                                        vector<vector<MembraneType1> >& mTypeV2,vector<vector<double> >& mDppV2, string membFilename); 
 	vector<vector<CVector> > readMembNodes        (int numCells, int maxMembrNodeCountPerCell,
-                                                           vector<vector<MembraneType1> >& mTypeV2,vector<vector<double> >& mDppV2, string membFilename, vector<double>multip_info);  
-
+                                                           vector<vector<MembraneType1> >& mTypeV2,vector<vector<double> >& mDppV2, string membFilename); 
+	// vector<vector<CVector> > readMembNodes_multip_info        (int numCells, int maxMembrNodeCountPerCell,
+                                                        //    vector<vector<MembraneType1> >& mTypeV2,vector<vector<double> >& mDppV2, string membFilename, vector<double>multip_info, vector<double>multip_info_ECM, vector<double>multip_info_ECM_apical);  
+	vector<vector<CVector> > readMembNodes_multip_actomyo(int numCells,int maxMembrNodeCountPerCell,
+                                                           vector<vector<MembraneType1> >& mTypeV2,vector<vector<double> >& mDppV2, string membFileName, vector<double> multip_info, vector<double> multip_info2);
+	vector<vector<CVector> > readMembNodes_multip_integrin(int numCells,int maxMembrNodeCountPerCell,
+                                                           vector<vector<MembraneType1> >& mTypeV2,vector<vector<double> >& mDppV2, string membFileName, vector<double> multip_info_ECM, vector<double> multip_info_ECM_apical);
 	vector<CVector> internalBdryPts;
 
 	CVector getPointGivenAngle(double currentAngle, double r,
@@ -78,6 +81,8 @@ class CellInitHelper {
 	void generateCellInitNodeInfo_v3(vector<CVector>& initCenters,
 			vector<double>& initGrowProg, vector<vector<CVector> >& initBdryPos,
 			vector<vector<CVector> >& initInternalPos, 
+			vector<vector<CVector> >& initMembrMultip_actomyo,
+			vector<vector<CVector> >& initMembrMultip_integrin,
 			vector<vector<double> >& mDppV2, 
 			vector<vector<MembraneType1> >& mTypeV2);
 	void generateECMInitNodeInfo(vector<CVector> &initECMNodePoss,

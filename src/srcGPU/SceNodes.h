@@ -71,6 +71,7 @@ typedef thrust::tuple<double, double, int> CVec2Int; //Ali
 typedef thrust::tuple<double, uint> DUi;
 typedef thrust::tuple<double, uint, double, double> DUiDD;
 typedef thrust::tuple<double, uint, double, double,double> DUiDDD;  //Ali 
+typedef thrust::tuple<double, uint, double, double, double, MembraneType1> DUiDDDT; //Kevin T.
 typedef thrust::tuple<bool, double> BoolD;
 typedef thrust::tuple<double, double, double, uint> DDDUi;//AAMIRI
 typedef thrust::tuple<bool, int> BoolInt;
@@ -974,6 +975,10 @@ struct AddLinkForces: public thrust::unary_function<uint, CVec3> {
  */
 struct NodeInfoVecs {
 public:
+	thrust::device_vector<bool> nodesIsEnteringMitotic;
+	thrust::device_vector<double> nodesContractileSpringGrowthProgress;
+	thrust::device_vector<double> contractActomyo_multip;
+	thrust::device_vector<double> contractActomyo_multip_apical;
 // this vector is used to indicate whether a node is active or not.
 // E.g, max number of nodes of a cell is 100 maybe the first 75 nodes are active.
 // The value of this vector will be changed by external process.
@@ -989,6 +994,17 @@ public:
 // Z locations of nodes
 	thrust::device_vector<double> nodeLocZ;
 	thrust::host_vector<double> nodeLocZHost; // Kevin (11/16/2020)
+
+	thrust::device_vector<double> nodeActomyosinMultip_basal;
+	thrust::device_vector<double> nodeActomyosinMultip_apical;
+	thrust::host_vector<double> nodeActomyosinMultipHost_basal;
+	thrust::host_vector<double> nodeActomyosinMultipHost_apical;
+	thrust::device_vector<double> nodeIntegrinMultip;
+	// thrust::device_vector<double> nodeIntegrinMultip_basal;
+	// thrust::device_vector<double> nodeIntegrinMultip_apical;
+	// thrust::host_vector<double> nodeIntegrinMultipHost_basal;
+	// thrust::host_vector<double> nodeIntegrinMultipHost_apical;
+
 // X velocities of nodes
 	thrust::device_vector<double> nodeVelX;
 // Y velocities of nodes
@@ -1232,8 +1248,8 @@ class SceNodes {
 
 	void debugNAN();
 
-	void keepAdhIndxCopyInHost_M();
-	void processMembrAdh_M();
+	void keepAdhIndxCopyInHost_M(double timeRatio, double timeRatio_Crit_Division, int cycle);
+	void processMembrAdh_M(double timeRatio, double timeRatio_Crit_Division, int cycle);
 	void removeInvalidPairs_M();
 	void applyMembrAdh_M();
 	
@@ -1252,6 +1268,12 @@ public:
 	bool adhUpdate ; //Ali 
 	bool isInitPhase ; //Ali 
 	bool isMemNodeTypeAssigned ; 
+	bool isMemNodeTypeAssigned_postCellDivision ; 
+	bool isMemNodeTypeAssigned_postAddNode;
+	bool isActinLevelDisplayed;
+	bool isECMPairPrinted;
+	bool isCellAreaDisplayed;
+	bool isBucketValuesIncludingNeighborPrinted;
 
 	NodeInfoVecs infoVecs; //Ali 
 	/**
@@ -1296,6 +1318,8 @@ public:
 	 */
 	void initValues_M(std::vector<bool>& initIsActive,
 			std::vector<CVector> &initCellNodePos,
+			std::vector<CVector>& initCellNodeMultip_actomyo,
+			std::vector<CVector>& initCellNodeMultip_integrin,
 			std::vector<SceNodeType>& nodeTypes,
 			std::vector<double>& mDppV,
 			std::vector<MembraneType1>& mTypeV);
@@ -1333,7 +1357,7 @@ public:
 	 */
 	void sceForcesDisc();
 
-	void sceForcesDisc_M();
+	void sceForcesDisc_M(double timeRatio, double timeRatio_Crit_Division, int cycle);
 
 	/**
 	 * add maxNodeOfOneCell

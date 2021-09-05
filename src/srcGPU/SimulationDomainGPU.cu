@@ -20,7 +20,7 @@ SimulationDomainGPU::SimulationDomainGPU() {
 }
 
 void SimulationDomainGPU::initializeNodes_M(std::vector<SceNodeType> &nodeTypes,
-		std::vector<bool> &nodeIsActive, std::vector<CVector> &initNodesVec,
+		std::vector<bool> &nodeIsActive, std::vector<CVector> &initNodesVec, std::vector<CVector> &initNodeMultip_actomyo, std::vector<CVector> &initNodeMultip_integrin,
 		std::vector<uint> &initActiveMembrNodeCounts,
 		std::vector<uint> &initActiveIntnlNodeCounts,
 		std::vector<double> &initGrowProgVec, 
@@ -60,7 +60,7 @@ void SimulationDomainGPU::initializeNodes_M(std::vector<SceNodeType> &nodeTypes,
 	nodes.setAllocParaM(para);
 
 	cout << " I am above initValues_M " << endl ; 
-	nodes.initValues_M(nodeIsActive, initNodesVec, nodeTypes, mDppV,mTypeV);  // it copies the infomration of nodes such as locations from CPU to GPU
+	nodes.initValues_M(nodeIsActive, initNodesVec, initNodeMultip_actomyo, initNodeMultip_integrin, nodeTypes, mDppV,mTypeV);  // it copies the infomration of nodes such as locations from CPU to GPU
 	cout << " I paased initValues_M " << endl ; 
 
 	double simulationTotalTime =
@@ -90,7 +90,7 @@ void SimulationDomainGPU::initialize_v2_M(SimulationInitData_V2_M& initData, dou
 	std::cout << "Start initializing simulation domain ......" << std::endl;
 	memPara.isStab = initData.isStab;
 	initializeNodes_M(initData.nodeTypes, initData.initIsActive,
-			initData.initNodeVec, initData.initActiveMembrNodeCounts,
+			initData.initNodeVec,initData.initNodeMultip_actomyo, initData.initNodeMultip_integrin, initData.initActiveMembrNodeCounts,
 			initData.initActiveIntnlNodeCounts, initData.initGrowProgVec, 
 			initData.eCellTypeV1,initData.mDppV,initData.mTypeV, InitTimeStage);  // Ali
 	std::cout << "Finished initializing nodes positions" << std::endl;
@@ -124,7 +124,18 @@ void SimulationDomainGPU::runAllLogic(double dt) {
 }
 
 //Ali void SimulationDomainGPU::runAllLogic_M(double dt) {
-void SimulationDomainGPU::runAllLogic_M(double & dt, double Damp_Coef, double InitTimeStage) {                          //Ali
+// void SimulationDomainGPU::runAllLogic_M(double & dt, double Damp_Coef, double InitTimeStage, 
+// 											double timeRatio, double timeRatio_Crit_actomyo, double timeRatio_Crit_ECM, double timeRatio_Crit_Division,
+// 												double volume_Increase_Target_Ratio, double volume_Increase_Scale, double postDivision_restorationRateScale, int cycle,
+// 												double distFromNucleus_max, double distFromNucleus_min, double distFromNucleus_normalMax, double distFromNucleus_normalMax_apical, double percentage_before_timeRatio_Crit_Division_scaling,
+// 												double growthProgressSpeed, int maxApicalBasalNodeNum, int minApicalBasalNodeNum, double maxLengthToAddMemNodes) {                          //Ali
+
+void SimulationDomainGPU::runAllLogic_M(double & dt, double Damp_Coef, double InitTimeStage, 
+											double timeRatio, double timeRatio_Crit_actomyo, double timeRatio_Crit_ECM, double timeRatio_Crit_Division,
+												double volume_Increase_Target_Ratio, double volume_Increase_Scale, double postDivision_restorationRateScale, int cycle,
+												double distFromNucleus_max, double distFromNucleus_min, double distFromNucleus_normalMax, double distFromNucleus_normalMax_apical, double percentage_before_timeRatio_Crit_Division_scaling,
+												double growthProgressSpeed, int maxApicalBasalNodeNum, double maxLengthToAddMemNodes, double mitoRndActomyoStrengthScaling, double thresholdToIntroduceNewCell) {   
+
 #ifdef DebugModeDomain
 	cudaEvent_t start1, start2, stop;
 	float elapsedTime1, elapsedTime2;
@@ -135,7 +146,7 @@ void SimulationDomainGPU::runAllLogic_M(double & dt, double Damp_Coef, double In
 #endif
 	// cout << "--- 1 ---" << endl;
 	cout.flush();
-	nodes.sceForcesDisc_M();
+	nodes.sceForcesDisc_M(timeRatio, timeRatio_Crit_Division, cycle); //node velocity is reset here.
 	// cout << "--- 2 ---" << endl;
 	cout.flush();
 #ifdef DebugModeDomain
@@ -145,7 +156,12 @@ void SimulationDomainGPU::runAllLogic_M(double & dt, double Damp_Coef, double In
 #endif
 	// cout << "--- 3 ---" << endl;
 	cout.flush();
-	cells.runAllCellLogicsDisc_M(dt,Damp_Coef,InitTimeStage);
+	// cells.runAllCellLogicsDisc_M(dt,Damp_Coef,InitTimeStage, timeRatio, timeRatio_Crit_actomyo, timeRatio_Crit_ECM, timeRatio_Crit_Division, volume_Increase_Target_Ratio, volume_Increase_Scale, postDivision_restorationRateScale, cycle,
+	// 								distFromNucleus_max, distFromNucleus_min, distFromNucleus_normalMax, distFromNucleus_normalMax_apical, percentage_before_timeRatio_Crit_Division_scaling, growthProgressSpeed, maxApicalBasalNodeNum, minApicalBasalNodeNum, maxLengthToAddMemNodes);
+	cells.runAllCellLogicsDisc_M(dt,Damp_Coef,InitTimeStage, timeRatio, timeRatio_Crit_actomyo, timeRatio_Crit_ECM, timeRatio_Crit_Division, volume_Increase_Target_Ratio, volume_Increase_Scale, postDivision_restorationRateScale, cycle,
+									distFromNucleus_max, distFromNucleus_min, distFromNucleus_normalMax, distFromNucleus_normalMax_apical, 
+									percentage_before_timeRatio_Crit_Division_scaling, growthProgressSpeed, maxApicalBasalNodeNum,
+									 maxLengthToAddMemNodes, mitoRndActomyoStrengthScaling, thresholdToIntroduceNewCell);
 	// cout << "--- 4 ---" << endl;
 	cout.flush();
 #ifdef DebugModeDomain

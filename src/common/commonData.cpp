@@ -221,7 +221,8 @@ void VtkAnimationData::outputVtkAni(std::string scriptNameBase, int rank) {
 	for (uint i = 0; i < pointsAniData.size(); i++) {
 		fs << pointsAniData[i].colorScale3 << endl;
 	}
-	fs << "SCALARS Actinomysoin float" << endl;
+	// fs << "SCALARS Actinomysoin float" << endl;
+	fs << "SCALARS NodeVelocityMag  float" << endl;
 	fs << "LOOKUP_TABLE default" << endl;
 	for (uint i = 0; i < pointsAniData.size(); i++) {
 		fs << pointsAniData[i].colorScale4 << endl;
@@ -368,6 +369,35 @@ std:: string WriteResumeData::printCellsEnum( ECellType  cellType) {
 
 
 
+std::vector<double> getArrayXActomyosin(std::vector<CVector>& nodeMultip) {
+	std::vector<double> result;
+	for (uint i = 0; i < nodeMultip.size(); i++) {
+		result.push_back(nodeMultip[i].GetX());
+	}
+	return result;
+}
+std::vector<double> getArrayYActomyosin(std::vector<CVector>& nodeMultip) {
+	std::vector<double> result;
+	for (uint i = 0; i < nodeMultip.size(); i++) {
+		result.push_back(nodeMultip[i].GetY());
+	}
+	return result;
+}
+
+std::vector<double> getArrayXIntegrin(std::vector<CVector>& nodeMultip) {
+	std::vector<double> result;
+	for (uint i = 0; i < nodeMultip.size(); i++) {
+		result.push_back(nodeMultip[i].GetX());
+	}
+	return result;
+}
+std::vector<double> getArrayYIntegrin(std::vector<CVector>& nodeMultip) {
+	std::vector<double> result;
+	for (uint i = 0; i < nodeMultip.size(); i++) {
+		result.push_back(nodeMultip[i].GetY());
+	}
+	return result;
+}
 
 std::vector<double> getArrayXComp(std::vector<CVector>& nodePosVec) {
 	std::vector<double> result;
@@ -528,27 +558,79 @@ AblationEvent readAblationEvent(std::string inputName) {
 	return ablaEvent;
 }
 
+// std::vector<CVector> obtainPtsBetween(CVector& start, CVector& end,
+// 		double& spacing, uint maxNodeCount) {
+// 	std::vector<CVector> result;
+// 	double spacingNew = spacing;
+// 	CVector ptVec = end - start;
+// 	CVector unitVec = ptVec.getUnitVector();
+// 	double edgeLength = ptVec.getModul();
+// 	uint numNewMemNodes = edgeLength / spacing;
+// 	if (edgeLength - numNewMemNodes * spacing < 0.5 * spacing) {
+// 		numNewMemNodes--;
+// 	}
+// 	numNewMemNodes--;
+// 	if (numNewMemNodes > maxNodeCount) {
+// 		spacingNew = edgeLength / (maxNodeCount + 1);
+// 		numNewMemNodes = maxNodeCount;
+// 	}
+// 	CVector nodeOld = start, nodeNew;
+// 	for (uint j = 0; j < numNewMemNodes; j++) {
+// 		nodeNew = nodeOld + spacingNew * unitVec;
+// 		result.push_back(nodeNew);
+// 		nodeOld = nodeNew;
+// 	}
+// 	return result;
+// }
+
+// The above obtainPtsBetween function works well if we do not have the 1-1 correspondence
+// requirement between lateralA and lateralB nodes. Since we need the correspondence, we will
+// rewrite this function to address the issue.
 std::vector<CVector> obtainPtsBetween(CVector& start, CVector& end,
-		double& spacing, uint maxNodeCount) {
+		uint num_of_NewPts, uint maxNodeCount) {
 	std::vector<CVector> result;
-	double spacingNew = spacing;
+	// double spacingNew = spacing;
 	CVector ptVec = end - start;
 	CVector unitVec = ptVec.getUnitVector();
 	double edgeLength = ptVec.getModul();
-	uint numNewMemNodes = edgeLength / spacing;
-	if (edgeLength - numNewMemNodes * spacing < 0.5 * spacing) {
-		numNewMemNodes--;
-	}
-	numNewMemNodes--;
-	if (numNewMemNodes > maxNodeCount) {
-		spacingNew = edgeLength / (maxNodeCount + 1);
-		numNewMemNodes = maxNodeCount;
-	}
+	uint numNewMemNodes = num_of_NewPts;//edgeLength / spacing;
+	double spacingNew = edgeLength/(numNewMemNodes+1);
+	// if (edgeLength - numNewMemNodes * spacing < 0.5 * spacing) {
+	// 	numNewMemNodes--;
+	// }
+	// numNewMemNodes--;
+	// if (numNewMemNodes > maxNodeCount) {
+	// 	spacingNew = edgeLength / (maxNodeCount + 1);
+	// 	numNewMemNodes = maxNodeCount;
+	// }
 	CVector nodeOld = start, nodeNew;
 	for (uint j = 0; j < numNewMemNodes; j++) {
 		nodeNew = nodeOld + spacingNew * unitVec;
 		result.push_back(nodeNew);
 		nodeOld = nodeNew;
+	}
+	return result;
+}
+
+std::vector<CVector> obtainPtsBetween_cellCenterLine(CVector& start, CVector& end,
+		std::vector<CVector>& cellCenterLine,
+		std::vector<CVector>& cellCenterLine_shift,
+		std::vector<double>& cellCenterLine_MirrorLength) {
+	std::vector<CVector> result;
+	// double spacingNew = spacing;
+	
+	CVector nodeOld = start, nodeNew;
+	for (uint j = 0; j < cellCenterLine.size(); j++) {
+		nodeNew.x = cellCenterLine[j].x + 0.1*cellCenterLine_MirrorLength[j]*cellCenterLine_shift[j].x;
+		if (0.1*cellCenterLine_MirrorLength[j] >= 0.12){
+			nodeNew.x = cellCenterLine[j].x + 0.12*cellCenterLine_shift[j].x;
+		}
+		nodeNew.y = cellCenterLine[j].y + 0.1*cellCenterLine_MirrorLength[j]*cellCenterLine_shift[j].y;
+		if (0.1*cellCenterLine_MirrorLength[j] >= 0.12){
+			nodeNew.y = cellCenterLine[j].y + 0.12*cellCenterLine_shift[j].y;
+		}
+		result.push_back(nodeNew);
+		// std::cout<<"nodeNew = "<<nodeNew.x<<" "<<nodeNew.y<<std::endl;
 	}
 	return result;
 }

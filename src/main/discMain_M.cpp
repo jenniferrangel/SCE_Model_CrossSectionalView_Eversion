@@ -111,7 +111,7 @@ int main(int argc, char* argv[]) {
 
         cout<< "I am in main file after initInput_M creation"<<endl; 
 	simuDomain.initialize_v2_M(initData,mainPara.InitTimeStage);
-
+	
         cout<< "I am in main file after initInput_v2_M creation"<<endl; 
 	std::string polyStatFileNameBase = globalConfigVars.getConfigValue(
 			"PolygonStatFileName").toString();
@@ -136,46 +136,159 @@ int main(int argc, char* argv[]) {
 	// main simulation steps.
     std::string stressStrainFileNameBase="StressStrain" ;
     std::string stressStrainFileName=stressStrainFileNameBase +uniqueSymbol+ ".CSV" ; 
-    SingleCellData singleCellData(stressStrainFileName); 
-	for (uint i = 0; i <= (uint) (mainPara.totalTimeSteps); i++) {
-		// this if is just for output data// 
-		if (i % mainPara.aniAuxVar == 0) {
+    SingleCellData singleCellData(stressStrainFileName);
+	double current_Time;
+	double total_Time = mainPara.totalTimeSteps*mainPara.dt;
+	std::cout<<"mainPara.totalTimeStpes = "<<mainPara.totalTimeSteps<<std::endl;
+	std::cout<<"mainPara.dt = "<<mainPara.dt<<std::endl;
+	double timeRatio;
+	double timeRatio_Crit_actomyo = 2.0;
+	// std::cout<<"Critical timeRatio for actomyosin strength reduction = "<<timeRatio_Crit_actomyo<<std::endl;
+	bool reduced_actomyo_triggered = false;
+	double timeRatio_Crit_ECM = 2.0;
+	// std::cout<<"Critical timeRatio for ecm strength reduction = "<<timeRatio_Crit_ECM<<std::endl;
+	double timeRatio_Crit_Division = 0.2;
+	// std::cout<<"Critical timeRatio for growth and cell division = "<<timeRatio_Crit_Division<<std::endl;
+	bool reduced_ecm_triggered = false;
+	bool Division_triggered = false;
+	double volume_Increase_Target_Ratio = 1.41;
+	std::cout<<"Target ratio for cell volume increase = "<<volume_Increase_Target_Ratio<<std::endl;
+	double volume_Increase_Scale = 1.0;
+	std::cout<<"How fast is the volume increase happening = x"<<volume_Increase_Scale<<" rate of change"<<std::endl;
+	double postDivision_restorationRateScale = 1.0;//0.5;//0.1;
+	//I changed postDivision_restorationRateScale to 2.0 due to extended simulation steps (1000/0.002), make sure this is changed back
+	//later when using a smaller number of simulation time steps.
+	std::cout<<"How fast is the volume restoration happening post division = x"<<postDivision_restorationRateScale<<" rate of change"<<std::endl;
+	bool volume_restoration_rate_restore = false;
 
-            double curTime=i*mainPara.dt + mainPara.InitTimeStage;  //Ali - Abu
-			updateDivThres(curDivThred, i, curTime, decayCoeff,divThreshold);
+	double thresholdToIntroduceNewCell = 0.25;//-1.0;
+	std::cout<<"The likelihood (probability) a new cell will be introduced in the same cross section after cell division = "<<thresholdToIntroduceNewCell<<std::endl;
 
-			std::cout << "substep 1" << std::flush;
+	double distFromNucleus_max = 0.0;//4.0;
+	double distFromNucleus_min = 0.3;//-14.0;
+	double distFromNucleus_normalMax = 0.20;//0.355;//-8.0;
+	double distFromNucleus_normalMax_apical = 0.20;//0.295;//7.5;
+	double percentage_before_timeRatio_Crit_Division_scaling = 4.0; //No longer in use, but don't delete yet since it is still passed into several functions. //Kevin
+	double mitoRndActomyoStrengthScaling = 5.0; //Please consult SceNodes.cu to see what are the scaling applied to non-dividing cells and disc_NXX_X.cfg file to see what is the corresponding default spring constant. //Kevin
+	std::cout<<"Cell division requires the contractile spring to increase strength by "<<percentage_before_timeRatio_Crit_Division_scaling<<" fold."<<std::endl;
+	std::cout<<"Contractile spring minimum at "<<distFromNucleus_min<<" and maximum at "<<distFromNucleus_max<<" away from the cell center."<<std::endl;
+	std::cout<<"But under non-growth (stationary) circumstances, the basal contractile spring is set at "<<distFromNucleus_normalMax<<"*cellheight away from the cell center."<<std::endl;
+	std::cout<<"But under non-growth (stationary) circumstances, the apical contractile spring is set at "<<distFromNucleus_normalMax_apical<<"*cellheight away from the cell center."<<std::endl;
 
-	 		CellsStatsData polyData = simuDomain.outputPolyCountData();  //Ali comment
-			singleCellData=simuDomain.OutputStressStrain() ;              
-            singleCellData.printStressStrainToFile(stressStrainFileName,curTime) ;
- 						
+	double growthProgressSpeed = 3.84e-7;//3.84e-7;//(0.02)*0.25*(0.001*0.002); // 0.002 is the default time step of the simulation.
+	std::cout<<"Growth speed for cell cycle per time step is = "<<growthProgressSpeed<<std::endl;
 
-			std::cout << "substep 2 " << std::endl;
-			// prints brief polygon counting statistics to file
-			polyData.printPolyCountToFile(polyStatFileName, curDivThred);
-			// prints detailed individual cell statistics to file
-			polyData.printDetailStatsToFile(detailStatFileNameBase, aniFrame);
-			// prints the animation frames to file. They can be open by Paraview
+	int maxApicalBasalNodeNum = 18;//9999;
+	std::cout<<"Max number of apical and basal nodes, respectively, for columnar cells = "<<maxApicalBasalNodeNum<<std::endl;
+	// int minApicalBasalNodeNum = 21;
+	// std::cout<<"Min number of apical and basal nodes, respectively, for columnar cells = "<<minApicalBasalNodeNum<<std::endl;
 
-			//std::cout << "substep 4 " << std::endl;
-			//if (i != 0) {
-				//simuDomain.processT1Info(maxStepTraceBack, polyData);
-			//}
+	double maxLengthToAddMemNodes = 0.195;//0.26;
+	std::cout<<"Max length for each edge to qualify for new node additions = "<<maxLengthToAddMemNodes<<std::endl;
 
-			std::cout << "substep 3 " << std::endl;
-			//simuDomain.outputVtkFilesWithCri_M(mainPara.animationNameBase,
-			//		aniFrame, mainPara.aniCri);
-			//simuDomain.outputVtkColorByCell_T1(mainPara.animationNameBase,
-			//		aniFrame, mainPara.aniCri);
-			simuDomain.outputVtkColorByCell_polySide(mainPara.animationNameBase,
-					aniFrame, mainPara.aniCri);
-			// std::cout << "in ani step " << aniFrame << std::endl;
-			std::cout << "substep 4 " << std::endl;
-			simuDomain.outputResumeData(aniFrame) ; 
-			aniFrame++;
+	std::vector<int> cycle_vec;
+	cycle_vec.push_back(-1);
+	// uint maxNumCycle = 10;
+
+	// for (int k = 0; k < maxNumCycle; k++){
+	// 	cycle_vec.push_back(k);
+	// }
+	// if (maxNumCycle == 0){
+	// 	cycle_vec.push_back(-1);
+	// }
+	// cycle_vec.push_back(0);
+	// cycle_vec.push_back(1);
+	// cycle_vec.push_back(2);
+	int cycle;
+
+	double fixed_dt = mainPara.dt;
+	for (int i = 0; i < cycle_vec.size(); i++){	
+		Division_triggered = false;
+		cycle = cycle_vec[i];
+		for (uint i = 0; i <= (uint) (mainPara.totalTimeSteps); i++) {
+			
+			// current_Time = i*mainPara.dt + mainPara.InitTimeStage;
+			current_Time = i*fixed_dt + mainPara.InitTimeStage;
+			timeRatio = current_Time/total_Time;
+			// if (timeRatio > timeRatio_Crit_actomyo && reduced_actomyo_triggered == false){
+			// 	std::cout<<"Reduced actomyosin strength in the tissue midsection triggered."<<std::endl;
+			// 	std::cout<<"Current timeRatio for reduced actomyosin ="<<timeRatio<<std::endl;
+			// 	reduced_actomyo_triggered = true;
+			// }
+			// if (timeRatio > timeRatio_Crit_ECM && reduced_ecm_triggered == false){
+			// 	std::cout<<"Reduced ECM strength in the tissue midsection triggered."<<std::endl;
+			// 	std::cout<<"Current timeRatio for reduced ecm ="<<timeRatio<<std::endl;
+			// 	reduced_ecm_triggered = true;
+			// }
+			// if (timeRatio == timeRatio_Crit_Division && Division_triggered == false){
+			// 	std::cout<<"Division triggered in discMain.cpp"<<std::endl;
+			// 	std::cout<<"Current timeRatio for division ="<<timeRatio<<std::endl;
+			// 	Division_triggered = true;
+			// 	// mainPara.dt = 1e-6;
+			// 	volume_restoration_rate_restore = false;
+			// }
+			// if (timeRatio > (timeRatio_Crit_Division+0.05)){
+			// 	mainPara.dt = fixed_dt;
+			// 	// if (volume_restoration_rate_restore == false){
+			// 	// 	std::cout<<"Volume restoration rate restored to normal speed"<<std::endl;
+			// 	// }
+			// 	// volume_restoration_rate_restore = true;
+			// 	// postDivision_restorationRateScale = 0.2;
+			// 	// break;
+			// }
+			// this if is just for output data// 
+			if (i % mainPara.aniAuxVar == 0) {
+				// if (i == 0 && cycle != 0){
+
+				// }
+				// else{
+					double curTime=i*mainPara.dt + mainPara.InitTimeStage;  //Ali - Abu
+					updateDivThres(curDivThred, i, curTime, decayCoeff,divThreshold);
+
+					// std::cout << "substep 1" << std::flush;
+
+					CellsStatsData polyData = simuDomain.outputPolyCountData();  //Ali comment
+					std::cout<<"survived outputPolyCountData()?"<<std::endl;
+					singleCellData=simuDomain.OutputStressStrain() ;              
+					singleCellData.printStressStrainToFile(stressStrainFileName,curTime) ;
+								
+
+					// std::cout << "substep 2 " << std::endl;
+					// prints brief polygon counting statistics to file
+					polyData.printPolyCountToFile(polyStatFileName, curDivThred);
+					// prints detailed individual cell statistics to file
+					polyData.printDetailStatsToFile(detailStatFileNameBase, aniFrame);
+					// prints the animation frames to file. They can be open by Paraview
+
+					
+					//if (i != 0) {
+						//simuDomain.processT1Info(maxStepTraceBack, polyData);
+					//}
+
+					// std::cout << "substep 3 " << std::endl;
+					//simuDomain.outputVtkFilesWithCri_M(mainPara.animationNameBase,
+					//		aniFrame, mainPara.aniCri);
+					//simuDomain.outputVtkColorByCell_T1(mainPara.animationNameBase,
+					//		aniFrame, mainPara.aniCri);
+					simuDomain.outputVtkColorByCell_polySide(mainPara.animationNameBase,
+							aniFrame, mainPara.aniCri);
+					// std::cout << "in ani step " << aniFrame << std::endl;
+					// std::cout << "substep 4 " << std::endl;
+					simuDomain.outputResumeData(aniFrame) ; 
+					aniFrame++;
+				// }
+			}
+			simuDomain.runAllLogic_M(mainPara.dt,mainPara.Damp_Coef,mainPara.InitTimeStage,
+									timeRatio, timeRatio_Crit_actomyo, timeRatio_Crit_ECM, timeRatio_Crit_Division,
+										volume_Increase_Target_Ratio, volume_Increase_Scale, postDivision_restorationRateScale, cycle,
+										distFromNucleus_max, distFromNucleus_min, distFromNucleus_normalMax, distFromNucleus_normalMax_apical,
+										percentage_before_timeRatio_Crit_Division_scaling, growthProgressSpeed, maxApicalBasalNodeNum, maxLengthToAddMemNodes,mitoRndActomyoStrengthScaling, thresholdToIntroduceNewCell);  //Ali //Kevin
+			// simuDomain.runAllLogic_M(mainPara.dt,mainPara.Damp_Coef,mainPara.InitTimeStage,
+			// 						timeRatio, timeRatio_Crit_actomyo, timeRatio_Crit_ECM, timeRatio_Crit_Division,
+			// 							volume_Increase_Target_Ratio, volume_Increase_Scale, postDivision_restorationRateScale, cycle,
+			// 							distFromNucleus_max, distFromNucleus_min, distFromNucleus_normalMax, distFromNucleus_normalMax_apical,
+			// 							percentage_before_timeRatio_Crit_Division_scaling, growthProgressSpeed, maxApicalBasalNodeNum, minApicalBasalNodeNum, maxLengthToAddMemNodes);  //Ali //Kevin
 		}
-		simuDomain.runAllLogic_M(mainPara.dt,mainPara.Damp_Coef,mainPara.InitTimeStage);  //Ali
 	}
 
 	return 0;
