@@ -1,7 +1,19 @@
 For compilation on UCR hpcc:
-module load cmake; module load CGAL
+  module load cmake; module load CGAL
 are needed for "cmake ."
 
-module load extra; module load GCC; module load cuda
+Module loading:
+  module load extra; module load GCC; module load cuda
 are needed for "make" compilation.
+Compilation must be done on an interactive GPU session otherwise the there is insufficient 
+computing power to compile the code.
 
+Please refer to UCR HPCC "managing jobs" section for job submission.
+
+================================================================================================
+How to manipulate specific parameters?
+1. Membrane stiffness is found in disc_M.cfg file in /resources
+2. Default contractile spring coefficient is found in disc_NXX_X.cfg in /resources
+3. Contractile spring coefficient multiplier is found in SceNodes.cu by searching : "infoVecs.contractActomyo_multip[i] ="
+4. Equilibrium area, speed of increase in the number of contractile spring, and population of nucleus particles are found in SceCells.cu. These be found by searching : "ssspeed =" 
+5. discMain_M.cpp also contains many parameters used in the simulations. Too many to be listed out and explained here effectively.
