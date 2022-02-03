@@ -91,6 +91,7 @@ typedef thrust::tuple<double, double, double, double> CVec4;
 typedef thrust::tuple<double, double, double, double, bool> CVec4Bool;
 typedef thrust::tuple<double, double, double, double, double> CVec5;
 typedef thrust::tuple<double, double, double, double, double, double> CVec6;
+typedef thrust::tuple<uint, double, double, double, double, double, double> CVec7;
 typedef thrust::tuple<double, double, double, double, double, double, double,
 		double, double, double> CVec10;
 typedef thrust::tuple<double, double, double, double, double, double, bool> CVec6Bool;
@@ -1357,7 +1358,9 @@ public:
 	 */
 	void sceForcesDisc();
 
-	void sceForcesDisc_M(double timeRatio, double timeRatio_Crit_Division, int cycle);
+	void sceForcesDisc_M(double timeRatio, double timeRatio_Crit_Division, int cycle,
+								double contractActomyo_multip_perCell1, double contractActomyo_multip_perCell2, double contractActomyo_multip_perCell3,
+								double contractActomyo_multip_perCell_apical1, double contractActomyo_multip_perCell_apical2, double contractActomyo_multip_perCell_apical3);
 
 	/**
 	 * add maxNodeOfOneCell

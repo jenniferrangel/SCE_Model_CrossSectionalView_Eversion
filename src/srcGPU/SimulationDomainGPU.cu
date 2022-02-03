@@ -133,8 +133,12 @@ void SimulationDomainGPU::runAllLogic(double dt) {
 void SimulationDomainGPU::runAllLogic_M(double & dt, double Damp_Coef, double InitTimeStage, 
 											double timeRatio, double timeRatio_Crit_actomyo, double timeRatio_Crit_ECM, double timeRatio_Crit_Division,
 												double volume_Increase_Target_Ratio, double volume_Increase_Scale, double postDivision_restorationRateScale, int cycle,
-												double distFromNucleus_max, double distFromNucleus_min, double distFromNucleus_normalMax, double distFromNucleus_normalMax_apical, double percentage_before_timeRatio_Crit_Division_scaling,
-												double growthProgressSpeed, int maxApicalBasalNodeNum, double maxLengthToAddMemNodes, double mitoRndActomyoStrengthScaling, double thresholdToIntroduceNewCell) {   
+												double distFromNucleus_max, double distFromNucleus_min, double distFromNucleus_normalMax1, double distFromNucleus_normalMax2, double distFromNucleus_normalMax3, 
+												double distFromNucleus_normalMax_apical1, double distFromNucleus_normalMax_apical2, double distFromNucleus_normalMax_apical3, 
+												double percentage_before_timeRatio_Crit_Division_scaling,
+												double growthProgressSpeed, int maxApicalBasalNodeNum, double maxLengthToAddMemNodes, double mitoRndActomyoStrengthScaling, double thresholdToIntroduceNewCell, 
+												double contractActomyo_multip_perCell1, double contractActomyo_multip_perCell2, double contractActomyo_multip_perCell3,
+												double contractActomyo_multip_perCell_apical1, double contractActomyo_multip_perCell_apical2, double contractActomyo_multip_perCell_apical3, double mitoticThreshold) {   
 
 #ifdef DebugModeDomain
 	cudaEvent_t start1, start2, stop;
@@ -146,7 +150,14 @@ void SimulationDomainGPU::runAllLogic_M(double & dt, double Damp_Coef, double In
 #endif
 	// cout << "--- 1 ---" << endl;
 	cout.flush();
-	nodes.sceForcesDisc_M(timeRatio, timeRatio_Crit_Division, cycle); //node velocity is reset here.
+	// nodes.sceForcesDisc_M(timeRatio, timeRatio_Crit_Division, cycle); //node velocity is reset here.
+	// nodes.sceForcesDisc_M(timeRatio, timeRatio_Crit_Division, cycle,
+	// 							contractActomyo_multip_perCell1, contractActomyo_multip_perCell2, contractActomyo_multip_perCell3,
+	// 							contractActomyo_multip_perCell_apical1, contractActomyo_multip_perCell_apical2, contractActomyo_multip_perCell_apical3);
+	nodes.sceForcesDisc_M(timeRatio, timeRatio_Crit_Division, cycle,
+								contractActomyo_multip_perCell1, contractActomyo_multip_perCell2, contractActomyo_multip_perCell3,
+								contractActomyo_multip_perCell_apical1, contractActomyo_multip_perCell_apical2, contractActomyo_multip_perCell_apical3,
+								mitoticThreshold);
 	// cout << "--- 2 ---" << endl;
 	cout.flush();
 #ifdef DebugModeDomain
@@ -159,9 +170,10 @@ void SimulationDomainGPU::runAllLogic_M(double & dt, double Damp_Coef, double In
 	// cells.runAllCellLogicsDisc_M(dt,Damp_Coef,InitTimeStage, timeRatio, timeRatio_Crit_actomyo, timeRatio_Crit_ECM, timeRatio_Crit_Division, volume_Increase_Target_Ratio, volume_Increase_Scale, postDivision_restorationRateScale, cycle,
 	// 								distFromNucleus_max, distFromNucleus_min, distFromNucleus_normalMax, distFromNucleus_normalMax_apical, percentage_before_timeRatio_Crit_Division_scaling, growthProgressSpeed, maxApicalBasalNodeNum, minApicalBasalNodeNum, maxLengthToAddMemNodes);
 	cells.runAllCellLogicsDisc_M(dt,Damp_Coef,InitTimeStage, timeRatio, timeRatio_Crit_actomyo, timeRatio_Crit_ECM, timeRatio_Crit_Division, volume_Increase_Target_Ratio, volume_Increase_Scale, postDivision_restorationRateScale, cycle,
-									distFromNucleus_max, distFromNucleus_min, distFromNucleus_normalMax, distFromNucleus_normalMax_apical, 
+									distFromNucleus_max, distFromNucleus_min, distFromNucleus_normalMax1, distFromNucleus_normalMax2,distFromNucleus_normalMax3,
+									distFromNucleus_normalMax_apical1,distFromNucleus_normalMax_apical2,distFromNucleus_normalMax_apical3, 
 									percentage_before_timeRatio_Crit_Division_scaling, growthProgressSpeed, maxApicalBasalNodeNum,
-									 maxLengthToAddMemNodes, mitoRndActomyoStrengthScaling, thresholdToIntroduceNewCell);
+									 maxLengthToAddMemNodes, mitoRndActomyoStrengthScaling, thresholdToIntroduceNewCell, mitoticThreshold);
 	// cout << "--- 4 ---" << endl;
 	cout.flush();
 #ifdef DebugModeDomain

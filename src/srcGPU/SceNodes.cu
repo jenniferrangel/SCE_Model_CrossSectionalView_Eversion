@@ -2628,32 +2628,32 @@ void SceNodes::applySceForcesDisc_M() {
 			
 					int idFront=subApicalInfo[i].nodeIdFront[j] ;
 					// if (i == 31){
-					// 	std::cout<<"ERROR 1"<<std::endl;
+						// std::cout<<"ERROR 1"<<std::endl;
 					// }	
 					int idBehind=subApicalInfo[i].nodeIdBehind[j] ;
 					// if (i == 31){
-					// 	std::cout<<"ERROR 2"<<std::endl;
+						// std::cout<<"ERROR 2"<<std::endl;
 					// }	
 					int cellRankFront=infoVecs.nodeCellRankFrontHost[i] ;
 					// if (i == 31){
-					// 	std::cout<<"ERROR 3"<<std::endl;
+						// std::cout<<"ERROR 3"<<std::endl;
 					// }	 
 					int cellRankBehind=infoVecs.nodeCellRankBehindHost[i] ;
 					// if (i == 31){
-					// 	std::cout<<"ERROR 4"<<std::endl;
+						// std::cout<<"ERROR 4"<<std::endl;
 					// 	std::cout<<subApicalInfo[cellRankFront].nodeIdBehind.size()<<std::endl;
 					// }	
 					if (idFront != -1 && cellRankFront != -1) {
 						infoVecs.nodeAdhereIndexHost[idFront]=subApicalInfo[cellRankFront].nodeIdBehind[j] ;
 					}
 					// if (i == 31){
-					// 	std::cout<<"ERROR 5"<<std::endl;
+						// std::cout<<"ERROR 5"<<std::endl;
 					// }	
 					if (idBehind !=-1 && cellRankBehind != -1) {
 						infoVecs.nodeAdhereIndexHost[idBehind]=subApicalInfo[cellRankBehind].nodeIdFront[j] ;
 					}
 					// if (i == 31){
-					// 	std::cout<<"ERROR 6"<<std::endl;
+						// std::cout<<"ERROR 6"<<std::endl;
 					// }	
 					if ( eCellTypeVHost[i]==pouch && NumAdhBefore(i,pouch)==NumAdhAfter(i,pouch) ) {
 						infoVecs.nodeMemMirrorIndexHost[idFront]=idBehind ;
@@ -2880,7 +2880,9 @@ void SceNodes::sceForcesDisc() {
 }
 
 //Node velocity is reset back to zero in this function at the beginning of every new time step
-void SceNodes::sceForcesDisc_M(double timeRatio, double timeRatio_Crit_Division, int cycle) {
+void SceNodes::sceForcesDisc_M(double timeRatio, double timeRatio_Crit_Division, int cycle,
+								double contractActomyo_multip_perCell1, double contractActomyo_multip_perCell2, double contractActomyo_multip_perCell3,
+								double contractActomyo_multip_perCell_apical1, double contractActomyo_multip_perCell_apical2, double contractActomyo_multip_perCell_apical3) {
 #ifdef DebugMode
 	cudaEvent_t start1, start2, start3, stop;
 	float elapsedTime1, elapsedTime2, elapsedTime3;
@@ -2904,107 +2906,189 @@ void SceNodes::sceForcesDisc_M(double timeRatio, double timeRatio_Crit_Division,
 		std::cout<<"This message should only appear once, if more than once is shown, something is wrong!"<<std::endl;
 		std::vector<double> contractActomyo_multip;
 		//Starting from cell 0 to cell 62
-		contractActomyo_multip.push_back(0.000000000);
-		contractActomyo_multip.push_back(0.000000000);
-		contractActomyo_multip.push_back(0.556793614);
-		contractActomyo_multip.push_back(0.547314153);
-		contractActomyo_multip.push_back(0.608514884);
-		contractActomyo_multip.push_back(0.658905704);
-		contractActomyo_multip.push_back(0.663562282);
-		contractActomyo_multip.push_back(0.716780309);
-		contractActomyo_multip.push_back(0.731082654);
-		contractActomyo_multip.push_back(0.848993847);
-		contractActomyo_multip.push_back(0.856643938);
-		contractActomyo_multip.push_back(0.862797273);
-		contractActomyo_multip.push_back(0.821553301);
-		contractActomyo_multip.push_back(0.877265924);
-		contractActomyo_multip.push_back(1.000000000);
-		contractActomyo_multip.push_back(0.985198736);
-		contractActomyo_multip.push_back(0.806752037);
-		contractActomyo_multip.push_back(0.826209879);
-		contractActomyo_multip.push_back(0.812572759);
-		contractActomyo_multip.push_back(0.841510062);
-		contractActomyo_multip.push_back(0.813237984);
-		contractActomyo_multip.push_back(0.679195077);
-		contractActomyo_multip.push_back(0.655912190);
-		contractActomyo_multip.push_back(0.762514552);
-		contractActomyo_multip.push_back(0.678030933);
-		contractActomyo_multip.push_back(0.692333278);
-		contractActomyo_multip.push_back(0.678363546);
-		contractActomyo_multip.push_back(0.712955264);
-		contractActomyo_multip.push_back(0.617661733);
-		contractActomyo_multip.push_back(0.660735074);
-		contractActomyo_multip.push_back(0.585897223);
-		contractActomyo_multip.push_back(0.680192915);
-		contractActomyo_multip.push_back(0.675203725);
-		contractActomyo_multip.push_back(0.824713122);
-		contractActomyo_multip.push_back(0.689339764);
-		contractActomyo_multip.push_back(0.719274904);
-		contractActomyo_multip.push_back(0.700814901);
-		contractActomyo_multip.push_back(0.646931648);
-		contractActomyo_multip.push_back(0.687843007);
-		contractActomyo_multip.push_back(0.556959920);
-		contractActomyo_multip.push_back(0.582571096);
-		contractActomyo_multip.push_back(0.728255447);
-		contractActomyo_multip.push_back(0.636953268);
-		contractActomyo_multip.push_back(0.671877599);
-		contractActomyo_multip.push_back(0.625311824);
-		contractActomyo_multip.push_back(0.722434725);
-		contractActomyo_multip.push_back(0.686678862);
-		contractActomyo_multip.push_back(0.723432563);
-		contractActomyo_multip.push_back(0.760352569);
-		contractActomyo_multip.push_back(0.694495260);
-		contractActomyo_multip.push_back(0.659570930);
-		contractActomyo_multip.push_back(0.649592549);
-		contractActomyo_multip.push_back(0.656577416);
-		contractActomyo_multip.push_back(0.728089140);
-		contractActomyo_multip.push_back(0.739065358);
-		contractActomyo_multip.push_back(0.825544653);
-		contractActomyo_multip.push_back(0.829203393);
-		contractActomyo_multip.push_back(0.870447364);
-		contractActomyo_multip.push_back(0.806752037);
-		contractActomyo_multip.push_back(0.719441211);
-		contractActomyo_multip.push_back(0.672043905);
-		contractActomyo_multip.push_back(0.655912190);
-		contractActomyo_multip.push_back(0.634957592);
+		contractActomyo_multip.push_back(0.0);//CellID0
+		contractActomyo_multip.push_back(0.0);
+		contractActomyo_multip.push_back(0.536452492);
+		contractActomyo_multip.push_back(0.52731934 );
+		contractActomyo_multip.push_back(0.586284249);
+		contractActomyo_multip.push_back(0.634834161);
+		contractActomyo_multip.push_back(0.639320622);
+		contractActomyo_multip.push_back(0.690594456);
+		contractActomyo_multip.push_back(0.704374299);
+		contractActomyo_multip.push_back(0.817977888);
+		contractActomyo_multip.push_back(0.825348502);
+		contractActomyo_multip.push_back(0.831277039);
+		contractActomyo_multip.push_back(0.791539817);
+		contractActomyo_multip.push_back(0.845217113);
+		contractActomyo_multip.push_back(0.963467393);
+		contractActomyo_multip.push_back(0.949206858);
+		contractActomyo_multip.push_back(0.777279282);
+		contractActomyo_multip.push_back(0.796026278);
+		contractActomyo_multip.push_back(0.782887358);
+		contractActomyo_multip.push_back(0.810767505);
+		contractActomyo_multip.push_back(0.783528281);
+		contractActomyo_multip.push_back(0.654382311);
+		contractActomyo_multip.push_back(0.631950008);
+		contractActomyo_multip.push_back(0.734657907);
+		contractActomyo_multip.push_back(0.653260695);
+		contractActomyo_multip.push_back(0.667040538);
+		contractActomyo_multip.push_back(0.653581157);
+		contractActomyo_multip.push_back(0.686909149);
+		contractActomyo_multip.push_back(0.59509694 );
+		contractActomyo_multip.push_back(0.636596699);
+		contractActomyo_multip.push_back(0.56449287 );
+		contractActomyo_multip.push_back(0.655343695);
+		contractActomyo_multip.push_back(0.650536773);
+		contractActomyo_multip.push_back(0.794584201);
+		contractActomyo_multip.push_back(0.664156385);
+		contractActomyo_multip.push_back(0.692997917);
+		contractActomyo_multip.push_back(0.675212306);
+		contractActomyo_multip.push_back(0.623297548);
+		contractActomyo_multip.push_back(0.662714309);
+		contractActomyo_multip.push_back(0.536612722);
+		contractActomyo_multip.push_back(0.561288255);
+		contractActomyo_multip.push_back(0.701650377);
+		contractActomyo_multip.push_back(0.613683705);
+		contractActomyo_multip.push_back(0.647332158);
+		contractActomyo_multip.push_back(0.602467553);
+		contractActomyo_multip.push_back(0.696042301);
+		contractActomyo_multip.push_back(0.661592693);
+		contractActomyo_multip.push_back(0.697003685);
+		contractActomyo_multip.push_back(0.732574908);
+		contractActomyo_multip.push_back(0.669123538);
+		contractActomyo_multip.push_back(0.635475084);
+		contractActomyo_multip.push_back(0.62586124 );
+		contractActomyo_multip.push_back(0.632590931);
+		contractActomyo_multip.push_back(0.701490146);
+		contractActomyo_multip.push_back(0.712065374);
+		contractActomyo_multip.push_back(0.795385355);
+		contractActomyo_multip.push_back(0.798910431);
+		contractActomyo_multip.push_back(0.838647653);
+		contractActomyo_multip.push_back(0.777279282);
+		contractActomyo_multip.push_back(0.693158148);
+		contractActomyo_multip.push_back(0.647492389);
+		contractActomyo_multip.push_back(0.631950008);
+		contractActomyo_multip.push_back(0.611760936);
+
+
+		std::vector<double> contractActomyo_multip_apical;
+		contractActomyo_multip_apical.push_back(0.0);//CellID0
+		contractActomyo_multip_apical.push_back(0.0);
+		contractActomyo_multip_apical.push_back(0.563851947);
+		contractActomyo_multip_apical.push_back(0.617529242);
+		contractActomyo_multip_apical.push_back(0.626502163);
+		contractActomyo_multip_apical.push_back(0.623938471);
+		contractActomyo_multip_apical.push_back(0.623137318);
+		contractActomyo_multip_apical.push_back(0.669764461);
+		contractActomyo_multip_apical.push_back(0.63675693 );
+		contractActomyo_multip_apical.push_back(0.672808845);
+		contractActomyo_multip_apical.push_back(0.686268226);
+		contractActomyo_multip_apical.push_back(0.679858997);
+		contractActomyo_multip_apical.push_back(0.708059606);
+		contractActomyo_multip_apical.push_back(0.7002083  );
+		contractActomyo_multip_apical.push_back(0.791059125);
+		contractActomyo_multip_apical.push_back(0.752123057);
+		contractActomyo_multip_apical.push_back(0.770549591);
+		contractActomyo_multip_apical.push_back(0.756609518);
+		contractActomyo_multip_apical.push_back(0.786412434);
+		contractActomyo_multip_apical.push_back(0.76814613 );
+		contractActomyo_multip_apical.push_back(0.683544304);
+		contractActomyo_multip_apical.push_back(0.701329915);
+		contractActomyo_multip_apical.push_back(0.721038295);
+		contractActomyo_multip_apical.push_back(0.798910431);
+		contractActomyo_multip_apical.push_back(0.745874059);
+		contractActomyo_multip_apical.push_back(0.767505207);
+		contractActomyo_multip_apical.push_back(0.787534049);
+		contractActomyo_multip_apical.push_back(0.823746195);
+		contractActomyo_multip_apical.push_back(0.835603269);
+		contractActomyo_multip_apical.push_back(0.873257491);
+		contractActomyo_multip_apical.push_back(0.822945041);
+		contractActomyo_multip_apical.push_back(1          );
+		contractActomyo_multip_apical.push_back(0.834161192);
+		contractActomyo_multip_apical.push_back(0.783528281);
+		contractActomyo_multip_apical.push_back(0.830315655);
+		contractActomyo_multip_apical.push_back(0.778240667);
+		contractActomyo_multip_apical.push_back(0.795064893);
+		contractActomyo_multip_apical.push_back(0.775516744);
+		contractActomyo_multip_apical.push_back(0.756289056);
+		contractActomyo_multip_apical.push_back(0.714148374);
+		contractActomyo_multip_apical.push_back(0.692517225);
+		contractActomyo_multip_apical.push_back(0.750841211);
+		contractActomyo_multip_apical.push_back(0.785130588);
+		contractActomyo_multip_apical.push_back(0.714949527);
+		contractActomyo_multip_apical.push_back(0.675372536);
+		contractActomyo_multip_apical.push_back(0.71126422 );
+		contractActomyo_multip_apical.push_back(0.656785772);
+		contractActomyo_multip_apical.push_back(0.658227848);
+		contractActomyo_multip_apical.push_back(0.655023233);
+		contractActomyo_multip_apical.push_back(0.616567858);
+		contractActomyo_multip_apical.push_back(0.62810447 );
+		contractActomyo_multip_apical.push_back(0.629065855);
+		contractActomyo_multip_apical.push_back(0.638679699);
+		contractActomyo_multip_apical.push_back(0.660471078);
+		contractActomyo_multip_apical.push_back(0.667521231);
+		contractActomyo_multip_apical.push_back(0.568017946);
+		contractActomyo_multip_apical.push_back(0.633231854);
+		contractActomyo_multip_apical.push_back(0.564332639);
+		contractActomyo_multip_apical.push_back(0.548309566);
+		contractActomyo_multip_apical.push_back(0.584842173);
+		contractActomyo_multip_apical.push_back(0.550552796);
+		contractActomyo_multip_apical.push_back(0.539817337);
+		contractActomyo_multip_apical.push_back(0.529722801);
 
 		for (int i = 0; i < allocPara_M.maxTotalNodeCount; i++){
 			uint cellRank = i/allocPara_M.maxAllNodePerCell;
-			// if (cellRank >= 2 && cellRank <= 21){
-			if (cellRank >= 2 && cellRank <= 15){
-				infoVecs.contractActomyo_multip[i] = 1.25;//pow(contractActomyo_multip[cellRank], 3.0);////1.0;
-				infoVecs.contractActomyo_multip_apical[i] = 0.25;
+			if (cellRank >= 2 && cellRank <= 21){
+			// if (cellRank >= 2 && cellRank <= 15){
+				// infoVecs.contractActomyo_multip[i] = pow(contractActomyo_multip[cellRank], 1.0);////1.0;
+				// infoVecs.contractActomyo_multip_apical[i] = pow(contractActomyo_multip_apical[cellRank], 1.0);//0.25;
+				infoVecs.contractActomyo_multip[i] = contractActomyo_multip_perCell1;//pow(contractActomyo_multip[cellRank], 3.0);////1.0;
+				infoVecs.contractActomyo_multip_apical[i] = contractActomyo_multip_perCell_apical1;//0.25;
 				if (i == 2*allocPara_M.maxAllNodePerCell || i == 21*allocPara_M.maxAllNodePerCell){
 					std::cout<<"infoVecs.contractActomyo_multip["<<i<<"] = "<<infoVecs.contractActomyo_multip[i]<<std::endl;
 					std::cout<<"infoVecs.contractActomyo_multip_apical["<<i<<"] = "<<infoVecs.contractActomyo_multip_apical[i]<<std::endl;
 				}
-				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[cellRank] = infoVecs.contractActomyo_multip[i];
-				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[cellRank] = infoVecs.contractActomyo_multip_apical[i];
+				// cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[cellRank] = pow(contractActomyo_multip[cellRank], 1.0);//infoVecs.contractActomyo_multip[i];
+				// cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[cellRank] = pow(contractActomyo_multip_apical[cellRank], 1.0);//0.25;//infoVecs.contractActomyo_multip_apical[i];
+				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[cellRank] = contractActomyo_multip_perCell1;//infoVecs.contractActomyo_multip[i];
+				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[cellRank] = contractActomyo_multip_perCell_apical1;//0.25;//infoVecs.contractActomyo_multip_apical[i];
 			}
-			// else if (cellRank >= 22 && cellRank <= 42){
-			else if (cellRank >= 16 && cellRank <= 48){
-				infoVecs.contractActomyo_multip[i] = 1.0;//pow(contractActomyo_multip[cellRank], 3.0);//0.25;//1.0;
-				infoVecs.contractActomyo_multip_apical[i] = 1.5;
-				// if (cellRank >=29 && cellRank <=35){
+			else if (cellRank >= 22 && cellRank <= 42){
+			// else if (cellRank >= 16 && cellRank <= 48){
+				// infoVecs.contractActomyo_multip[i] = pow(contractActomyo_multip[cellRank], 1.0);////1.0;
+				// infoVecs.contractActomyo_multip_apical[i] = pow(contractActomyo_multip_apical[cellRank], 1.0);//0.25;
+				infoVecs.contractActomyo_multip[i] = contractActomyo_multip_perCell2;//1.5;//pow(contractActomyo_multip[cellRank], 3.0);//0.25;//1.0;
+				infoVecs.contractActomyo_multip_apical[i] = contractActomyo_multip_perCell_apical2;//1.5;
+				// if (cellRank >=28 && cellRank <=34){
 				// 	infoVecs.contractActomyo_multip_apical[i] = 2.0;
 				// }
 				if (i == 22*allocPara_M.maxAllNodePerCell || i == 42*allocPara_M.maxAllNodePerCell){
 					std::cout<<"infoVecs.contractActomyo_multip["<<i<<"] = "<<infoVecs.contractActomyo_multip[i]<<std::endl;
 					std::cout<<"infoVecs.contractActomyo_multip_apical["<<i<<"] = "<<infoVecs.contractActomyo_multip_apical[i]<<std::endl;
 				}
-				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[cellRank] = infoVecs.contractActomyo_multip[i];
-				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[cellRank] = infoVecs.contractActomyo_multip_apical[i];
+				// cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[cellRank] = pow(contractActomyo_multip[cellRank], 1.0);//infoVecs.contractActomyo_multip[i];
+				// cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[cellRank] = pow(contractActomyo_multip_apical[cellRank], 1.0);
+				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[cellRank] = contractActomyo_multip_perCell2;//1.5;//infoVecs.contractActomyo_multip[i];
+				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[cellRank] = contractActomyo_multip_perCell_apical2;//1.5;//infoVecs.contractActomyo_multip_apical[i];
+				if (cellRank >=28 && cellRank <=34){
+					cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[cellRank] = contractActomyo_multip_perCell2*1.125;
+					cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[cellRank] = contractActomyo_multip_perCell_apical2*1.0;
+				}
 			}
-			// else if (cellRank >= 43 && cellRank <= 62){
-			else if (cellRank >= 49 && cellRank <= 62){
-				infoVecs.contractActomyo_multip[i] = 1.25;//pow(contractActomyo_multip[cellRank], 3.0);//1.0;
-				infoVecs.contractActomyo_multip_apical[i] = 0.25;
+			else if (cellRank >= 43 && cellRank <= 62){
+			// else if (cellRank >= 49 && cellRank <= 62){
+				// infoVecs.contractActomyo_multip[i] = pow(contractActomyo_multip[cellRank], 1.0);////1.0;
+				// infoVecs.contractActomyo_multip_apical[i] = pow(contractActomyo_multip_apical[cellRank], 1.0);//0.25;
+				infoVecs.contractActomyo_multip[i] = contractActomyo_multip_perCell3;//pow(contractActomyo_multip[cellRank], 3.0);//1.0;
+				infoVecs.contractActomyo_multip_apical[i] = contractActomyo_multip_perCell_apical3;//0.25;
 				if (i == 43*allocPara_M.maxAllNodePerCell || i == 62*allocPara_M.maxAllNodePerCell){
 					std::cout<<"infoVecs.contractActomyo_multip["<<i<<"] = "<<infoVecs.contractActomyo_multip[i]<<std::endl;
 					std::cout<<"infoVecs.contractActomyo_multip_apical["<<i<<"] = "<<infoVecs.contractActomyo_multip_apical[i]<<std::endl;
 				}
-				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[cellRank] = infoVecs.contractActomyo_multip[i];
-				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[cellRank] = infoVecs.contractActomyo_multip_apical[i];
+				// cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[cellRank] = pow(contractActomyo_multip[cellRank], 1.0);//infoVecs.contractActomyo_multip[i];
+				// cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[cellRank] = pow(contractActomyo_multip_apical[cellRank], 1.0);
+				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[cellRank] = contractActomyo_multip_perCell3;//infoVecs.contractActomyo_multip[i];
+				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[cellRank] = contractActomyo_multip_perCell_apical3;//0.25;//infoVecs.contractActomyo_multip_apical[i];
 			}
 			else{
 				infoVecs.contractActomyo_multip[i] = 0.0;
@@ -3016,6 +3100,11 @@ void SceNodes::sceForcesDisc_M(double timeRatio, double timeRatio_Crit_Division,
 		}
 		for (int j = 0; j < allocPara_M.maxCellCount; j++){
 			std::cout<<"contractActomyo_multip_perCell["<<j<<"] = "<<cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[j]<<", and multip_apical_perCell = "<<cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[j]<<std::endl;
+		}
+
+		for (int i = 0; i < allocPara_M.currentActiveCellCount; i++){
+			std::cout<<"basal actomyo contractility for cell["<<i<<"] : "<<cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[i] <<std::endl;
+			std::cout<<"apical actomyo contractility for cell["<<i<<"] : "<<cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[i]<<std::endl;
 		}
 	}
 	// cout << " confirm--- 2 ---" << endl;
@@ -3102,25 +3191,35 @@ void SceNodes::setInfoVecs(const NodeInfoVecs& infoVecs) {
 }
 
 void SceNodes::allocSpaceForNodes(uint maxTotalNodeCount,uint maxNumCells, uint currentActiveCellCount) {
+	std::cout<<"DID IT EVEN MAKE IT?"<<std::endl;
+	std::cout<<"maxTotalNodeCount: "<<maxTotalNodeCount<<std::endl;
 	infoVecs.nodeLocX.resize(maxTotalNodeCount);
+	std::cout<<"nodeLocX.size() : "<<infoVecs.nodeLocX.size()<<std::endl;
+	std::cout<<"FAILED 1?"<<std::endl;
 	infoVecs.nodeLocXHost.resize(maxTotalNodeCount); //Ali 
+	std::cout<<"FAILED 2?"<<std::endl;
 	infoVecs.nodeLocY.resize(maxTotalNodeCount);
+	std::cout<<"FAILED 3?"<<std::endl;
 	infoVecs.nodeLocYHost.resize(maxTotalNodeCount); // Ali
+	std::cout<<"FAILED 4?"<<std::endl;
 	infoVecs.nodeLocZ.resize(maxTotalNodeCount);
+	std::cout<<"FAILED 5?"<<std::endl;
 	infoVecs.nodeVelX.resize(maxTotalNodeCount);
+	std::cout<<"FAILED 6?"<<std::endl;
 	infoVecs.nodeVelY.resize(maxTotalNodeCount);
+	std::cout<<"FAILED 7?"<<std::endl;
 	infoVecs.nodeVelZ.resize(maxTotalNodeCount);
 	infoVecs.basalContractPair.resize(maxTotalNodeCount,-1); // Ali
-
+	std::cout<<"ERROR 1"<<std::endl;
 	infoVecs.nodeActomyosinMultip_basal.resize(maxTotalNodeCount);
 	infoVecs.nodeActomyosinMultip_apical.resize(maxTotalNodeCount);
 	infoVecs.nodeIntegrinMultip.resize(maxTotalNodeCount);
-
+	std::cout<<"ERROR 2"<<std::endl;
 	//infoVecs.nodeContractLevel.resize(maxTotalNodeCount,0.0);// Ali
 	infoVecs.nodeF_MM_C_X.resize(maxTotalNodeCount,0.0);// Ali
 	infoVecs.nodeF_MM_C_Y.resize(maxTotalNodeCount,0.0);// Ali
 	infoVecs.nodeContractEnergyT.resize(maxTotalNodeCount,0.0);// Ali
-
+	std::cout<<"ERROR 3"<<std::endl;
 	infoVecs.nodeF_MI_M_x.resize(maxTotalNodeCount);  //Ali
 	infoVecs.nodeF_MI_M_y.resize(maxTotalNodeCount);  //Ali
 	infoVecs.nodeF_MI_M_T.resize(maxTotalNodeCount);  //Ali
@@ -3156,6 +3255,7 @@ void SceNodes::allocSpaceForNodes(uint maxTotalNodeCount,uint maxNumCells, uint 
 	infoVecs.nodeCellRankBehindHost.resize(maxNumCells,-1); // Ali
 	infoVecs.nodeCellRankFrontOld.resize(maxNumCells,-1); // Ali
 	infoVecs.nodeCellRankBehindOld.resize(maxNumCells,-1); // Ali
+	std::cout<<"ERROR 4"<<std::endl;
 	if (controlPara.simuType == Disc
 			|| controlPara.simuType == SingleCellTest) {
 		infoVecs.nodeGrowPro.resize(maxTotalNodeCount);
@@ -3164,6 +3264,7 @@ void SceNodes::allocSpaceForNodes(uint maxTotalNodeCount,uint maxNumCells, uint 
 		infoVecs.nodeInterForceZ.resize(maxTotalNodeCount);
 
 	}
+	std::cout<<"ERROR 5"<<std::endl;
 	if (controlPara.simuType == Disc_M) {
 		infoVecs.nodeAdhereIndex.resize(maxTotalNodeCount);
 		infoVecs.nodeMemMirrorIndex.resize(maxTotalNodeCount);  //Ali 
@@ -3192,7 +3293,7 @@ void SceNodes::allocSpaceForNodes(uint maxTotalNodeCount,uint maxNumCells, uint 
 		infoVecs.memNodeType1.resize(maxTotalNodeCount, notAssigned1); //Ali 
 		infoVecs.memNodeType1Host.resize(maxTotalNodeCount, notAssigned1); //Ali 
 		infoVecs.isSubApicalJunction.resize(maxTotalNodeCount, false); //Ali
-
+		std::cout<<"ERROR 6"<<std::endl;
 		//host vectors
 	    infoVecs.nodeIsActiveH.resize(maxTotalNodeCount, 0.0);  ; //for solver
 	    infoVecs.locXOldHost.resize(maxTotalNodeCount, 0.0);   ; //for solver
@@ -3202,7 +3303,7 @@ void SceNodes::allocSpaceForNodes(uint maxTotalNodeCount,uint maxNumCells, uint 
 	    infoVecs.hCoefD.resize(maxTotalNodeCount, 0.0); 
 		infoVecs.hCoefUd.resize(maxTotalNodeCount, 0.0); 
 		infoVecs.hCoefLd.resize(maxTotalNodeCount, 0.0);  ; // for solver
-
+		std::cout<<"ERROR 7"<<std::endl;
 	    infoVecs.isSubApicalJunctionHost.resize(maxTotalNodeCount, false); //Ali 
 
 		auxVecs.bucketKeys.resize(maxTotalNodeCount);
@@ -3210,6 +3311,7 @@ void SceNodes::allocSpaceForNodes(uint maxTotalNodeCount,uint maxNumCells, uint 
 		auxVecs.bucketKeysExpanded.resize(maxTotalNodeCount * 9);
 		auxVecs.bucketValuesIncludingNeighbor.resize(maxTotalNodeCount * 9);
 	}
+	std::cout<<"ERROR 8"<<std::endl;
 	if (currentActiveCellCount != 1) {
 		thrust:: sequence (infoVecs.nodeCellRankFront.begin() ,infoVecs.nodeCellRankFront.begin() +currentActiveCellCount) ; //Ali
 		thrust:: sequence (infoVecs.nodeCellRankBehind.begin(),infoVecs.nodeCellRankBehind.begin()+currentActiveCellCount) ; //Ali
@@ -3230,6 +3332,7 @@ void SceNodes::allocSpaceForNodes(uint maxTotalNodeCount,uint maxNumCells, uint 
 
 
 	}
+	std::cout<<"ERROR 9"<<std::endl;
 }
 void SceNodes::initNodeAllocPara(uint totalBdryNodeCount,
 		uint maxProfileNodeCount, uint maxCartNodeCount, uint maxTotalECMCount,

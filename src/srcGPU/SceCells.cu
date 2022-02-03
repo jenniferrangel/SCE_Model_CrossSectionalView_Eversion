@@ -1544,9 +1544,10 @@ void SceCells::runAllCellLevelLogicsDisc(double dt) {
 void SceCells::runAllCellLogicsDisc_M(double & dt, double Damp_Coef, double InitTimeStage, 
 										double timeRatio, double timeRatio_Crit_actomyo, double timeRatio_Crit_ECM, double timeRatio_Crit_Division,
 											double volume_Increase_Target_Ratio, double volume_Increase_Scale, double postDivision_restorationRateScale, int cycle,
-											double distFromNucleus_max, double distFromNucleus_min, double distFromNucleus_normalMax, double distFromNucleus_normalMax_apical,
+											double distFromNucleus_max, double distFromNucleus_min, double distFromNucleus_normalMax1,double distFromNucleus_normalMax2,double distFromNucleus_normalMax3,
+											double distFromNucleus_normalMax_apical1, double distFromNucleus_normalMax_apical2, double distFromNucleus_normalMax_apical3,
 											double percentage_before_timeRatio_Crit_Division_scaling, double growthProgressSpeed,
-											int maxApicalBasalNodeNum, double maxLengthToAddMemNodes, double mitoRndActomyoStrengthScaling, double thresholdToIntroduceNewCell) {   //Ali
+											int maxApicalBasalNodeNum, double maxLengthToAddMemNodes, double mitoRndActomyoStrengthScaling, double thresholdToIntroduceNewCell, double mitoticThreshold) {   //Ali
 
 // double time_Ratio = current_Time/total_Time;
 // if (timeRatio == timeRatio_Crit_Division){
@@ -1883,7 +1884,7 @@ growthProgressReinitialize.push_back( -1.1015);
 growthProgressReinitialize.push_back( 0.0612);
 growthProgressReinitialize.push_back( -2.2057);
 growthProgressReinitialize.push_back( -1.1241);
-growthProgressReinitialize.push_back( 0.1693);
+growthProgressReinitialize.push_back( 0.8000);
 growthProgressReinitialize.push_back( -2.2458);
 growthProgressReinitialize.push_back( -1.2208);
 growthProgressReinitialize.push_back( -0.1874);
@@ -1949,119 +1950,160 @@ growthProgressReinitialize.push_back(   -9999.9);
 			}
 		}
 	// Adding actin level (number of contractile springs) information here
-		std::vector<double> distFromNucleus_normalVec;
-		distFromNucleus_normalVec.push_back(-99999.9);
-		distFromNucleus_normalVec.push_back(-99999.9);
-		//For cell 2 ~ 62
-		distFromNucleus_normalVec.push_back(0.65945098);
-		distFromNucleus_normalVec.push_back(0.659607843);
-		distFromNucleus_normalVec.push_back(0.721411765);
-		distFromNucleus_normalVec.push_back(0.749333333);
-		distFromNucleus_normalVec.push_back(0.745411765);
-		distFromNucleus_normalVec.push_back(0.829176471);
-		distFromNucleus_normalVec.push_back(0.839058824);
-		distFromNucleus_normalVec.push_back(0.939294118);
-		distFromNucleus_normalVec.push_back(0.947764706);
-		distFromNucleus_normalVec.push_back(0.946980392);
-		distFromNucleus_normalVec.push_back(0.942588235);
-		distFromNucleus_normalVec.push_back(0.989333333);
-		distFromNucleus_normalVec.push_back(0.997647059);
-		distFromNucleus_normalVec.push_back(1);
-		distFromNucleus_normalVec.push_back(0.975529412);
-		distFromNucleus_normalVec.push_back(0.974431373);
-		distFromNucleus_normalVec.push_back(0.949490196);
-		distFromNucleus_normalVec.push_back(0.975215686);
-		distFromNucleus_normalVec.push_back(0.916078431);
-		distFromNucleus_normalVec.push_back(0.809254902);
-		distFromNucleus_normalVec.push_back(0.825098039);
-		distFromNucleus_normalVec.push_back(0.848941176);
-		distFromNucleus_normalVec.push_back(0.748862745);
-		distFromNucleus_normalVec.push_back(0.782588235);
-		distFromNucleus_normalVec.push_back(0.877019608);
-		distFromNucleus_normalVec.push_back(0.789960784);
-		distFromNucleus_normalVec.push_back(0.721411765);
-		distFromNucleus_normalVec.push_back(0.802196078);
-		distFromNucleus_normalVec.push_back(0.656470588);
-		distFromNucleus_normalVec.push_back(0.728);
-		distFromNucleus_normalVec.push_back(0.773647059);
-		distFromNucleus_normalVec.push_back(0.793568627);
-		distFromNucleus_normalVec.push_back(0.827764706);
-		distFromNucleus_normalVec.push_back(0.815372549);
-		distFromNucleus_normalVec.push_back(0.766901961);
-		distFromNucleus_normalVec.push_back(0.738039216);
-		distFromNucleus_normalVec.push_back(0.784);
-		distFromNucleus_normalVec.push_back(0.661019608);
-		distFromNucleus_normalVec.push_back(0.671843137);
-		distFromNucleus_normalVec.push_back(0.725333333);
-		distFromNucleus_normalVec.push_back(0.703215686);
-		distFromNucleus_normalVec.push_back(0.776941176);
-		distFromNucleus_normalVec.push_back(0.760470588);
-		distFromNucleus_normalVec.push_back(0.78854902);
-		distFromNucleus_normalVec.push_back(0.813803922);
-		distFromNucleus_normalVec.push_back(0.744);
-		distFromNucleus_normalVec.push_back(0.765803922);
-		distFromNucleus_normalVec.push_back(0.736156863);
-		distFromNucleus_normalVec.push_back(0.713882353);
-		distFromNucleus_normalVec.push_back(0.707921569);
-		distFromNucleus_normalVec.push_back(0.729568627);
-		distFromNucleus_normalVec.push_back(0.817098039);
-		distFromNucleus_normalVec.push_back(0.769882353);
-		distFromNucleus_normalVec.push_back(0.840156863);
-		distFromNucleus_normalVec.push_back(0.811921569);
-		distFromNucleus_normalVec.push_back(0.849568627);
-		distFromNucleus_normalVec.push_back(0.819921569);
-		distFromNucleus_normalVec.push_back(0.697568627);
-		distFromNucleus_normalVec.push_back(0.651764706);
-		distFromNucleus_normalVec.push_back(0.648627451);
-		distFromNucleus_normalVec.push_back(0.71827451);
+	std::vector<double> distFromNucleus_normalMaxVec;
+	distFromNucleus_normalMaxVec.push_back(-9999.9999);//CellID0
+	distFromNucleus_normalMaxVec.push_back(-9999.9999);//CellID1
+	distFromNucleus_normalMaxVec.push_back(0.197835294);
+	distFromNucleus_normalMaxVec.push_back(0.197882353);
+	distFromNucleus_normalMaxVec.push_back(0.216423529);
+	distFromNucleus_normalMaxVec.push_back(0.2248     );
+	distFromNucleus_normalMaxVec.push_back(0.223623529);
+	distFromNucleus_normalMaxVec.push_back(0.248752941);
+	distFromNucleus_normalMaxVec.push_back(0.251717647);
+	distFromNucleus_normalMaxVec.push_back(0.281788235);
+	distFromNucleus_normalMaxVec.push_back(0.284329412);
+	distFromNucleus_normalMaxVec.push_back(0.284094118);
+	distFromNucleus_normalMaxVec.push_back(0.282776471);
+	distFromNucleus_normalMaxVec.push_back(0.2968     );
+	distFromNucleus_normalMaxVec.push_back(0.299294118);
+	distFromNucleus_normalMaxVec.push_back(0.3        );
+	distFromNucleus_normalMaxVec.push_back(0.292658824);
+	distFromNucleus_normalMaxVec.push_back(0.292329412);
+	distFromNucleus_normalMaxVec.push_back(0.284847059);
+	distFromNucleus_normalMaxVec.push_back(0.292564706);
+	distFromNucleus_normalMaxVec.push_back(0.274823529);
+	distFromNucleus_normalMaxVec.push_back(0.242776471);
+	distFromNucleus_normalMaxVec.push_back(0.247529412);
+	distFromNucleus_normalMaxVec.push_back(0.254682353);
+	distFromNucleus_normalMaxVec.push_back(0.224658824);
+	distFromNucleus_normalMaxVec.push_back(0.234776471);
+	distFromNucleus_normalMaxVec.push_back(0.263105882);
+	distFromNucleus_normalMaxVec.push_back(0.236988235);
+	distFromNucleus_normalMaxVec.push_back(0.216423529);
+	distFromNucleus_normalMaxVec.push_back(0.240658824);
+	distFromNucleus_normalMaxVec.push_back(0.196941176);
+	distFromNucleus_normalMaxVec.push_back(0.2184     );
+	distFromNucleus_normalMaxVec.push_back(0.232094118);
+	distFromNucleus_normalMaxVec.push_back(0.238070588);
+	distFromNucleus_normalMaxVec.push_back(0.248329412);
+	distFromNucleus_normalMaxVec.push_back(0.244611765);
+	distFromNucleus_normalMaxVec.push_back(0.230070588);
+	distFromNucleus_normalMaxVec.push_back(0.221411765);
+	distFromNucleus_normalMaxVec.push_back(0.2352     );
+	distFromNucleus_normalMaxVec.push_back(0.198305882);
+	distFromNucleus_normalMaxVec.push_back(0.201552941);
+	distFromNucleus_normalMaxVec.push_back(0.2176     );
+	distFromNucleus_normalMaxVec.push_back(0.210964706);
+	distFromNucleus_normalMaxVec.push_back(0.233082353);
+	distFromNucleus_normalMaxVec.push_back(0.228141176);
+	distFromNucleus_normalMaxVec.push_back(0.236564706);
+	distFromNucleus_normalMaxVec.push_back(0.244141176);
+	distFromNucleus_normalMaxVec.push_back(0.2232     );
+	distFromNucleus_normalMaxVec.push_back(0.229741176);
+	distFromNucleus_normalMaxVec.push_back(0.220847059);
+	distFromNucleus_normalMaxVec.push_back(0.214164706);
+	distFromNucleus_normalMaxVec.push_back(0.212376471);
+	distFromNucleus_normalMaxVec.push_back(0.218870588);
+	distFromNucleus_normalMaxVec.push_back(0.245129412);
+	distFromNucleus_normalMaxVec.push_back(0.230964706);
+	distFromNucleus_normalMaxVec.push_back(0.252047059);
+	distFromNucleus_normalMaxVec.push_back(0.243576471);
+	distFromNucleus_normalMaxVec.push_back(0.254870588);
+	distFromNucleus_normalMaxVec.push_back(0.245976471);
+	distFromNucleus_normalMaxVec.push_back(0.209270588);
+	distFromNucleus_normalMaxVec.push_back(0.195529412);
+	distFromNucleus_normalMaxVec.push_back(0.194588235);
+	distFromNucleus_normalMaxVec.push_back(0.215482353);//CellID62
 
-		//For remainder of the cells
-		distFromNucleus_normalVec.push_back(-9999.9);
-		distFromNucleus_normalVec.push_back(-9999.9);
-		distFromNucleus_normalVec.push_back(-9999.9);
-		distFromNucleus_normalVec.push_back(-9999.9);
-		distFromNucleus_normalVec.push_back(-9999.9);
-		distFromNucleus_normalVec.push_back(-9999.9);
-		distFromNucleus_normalVec.push_back(-9999.9);
-		distFromNucleus_normalVec.push_back(-9999.9);
-		distFromNucleus_normalVec.push_back(-9999.9);
-		distFromNucleus_normalVec.push_back(-9999.9);
-		distFromNucleus_normalVec.push_back(-9999.9);
-		distFromNucleus_normalVec.push_back(-9999.9);
-		distFromNucleus_normalVec.push_back(-9999.9);
-		distFromNucleus_normalVec.push_back(-9999.9);
-		distFromNucleus_normalVec.push_back(-9999.9);
-		distFromNucleus_normalVec.push_back(-9999.9);
-		distFromNucleus_normalVec.push_back(-9999.9);
-		distFromNucleus_normalVec.push_back(-9999.9);
-		distFromNucleus_normalVec.push_back(-9999.9);
-		distFromNucleus_normalVec.push_back(-9999.9);
-		distFromNucleus_normalVec.push_back(-9999.9);
-		distFromNucleus_normalVec.push_back(-9999.9);
-		distFromNucleus_normalVec.push_back(-9999.9);
+	std::vector<double> distFromNucleus_normalMaxVec_apical;
+	distFromNucleus_normalMaxVec_apical.push_back(-9999.9999);//CellID0
+	distFromNucleus_normalMaxVec_apical.push_back(-9999.9999);//CellID1
+	distFromNucleus_normalMaxVec_apical.push_back(0.260141176);
+	distFromNucleus_normalMaxVec_apical.push_back(0.255152941);
+	distFromNucleus_normalMaxVec_apical.push_back(0.236658824);
+	distFromNucleus_normalMaxVec_apical.push_back(0.236470588);
+	distFromNucleus_normalMaxVec_apical.push_back(0.242776471);
+	distFromNucleus_normalMaxVec_apical.push_back(0.2408     );
+	distFromNucleus_normalMaxVec_apical.push_back(0.245835294);
+	distFromNucleus_normalMaxVec_apical.push_back(0.250211765);
+	distFromNucleus_normalMaxVec_apical.push_back(0.257741176);
+	distFromNucleus_normalMaxVec_apical.push_back(0.248423529);
+	distFromNucleus_normalMaxVec_apical.push_back(0.251058824);
+	distFromNucleus_normalMaxVec_apical.push_back(0.247623529);
+	distFromNucleus_normalMaxVec_apical.push_back(0.279058824);
+	distFromNucleus_normalMaxVec_apical.push_back(0.276235294);
+	distFromNucleus_normalMaxVec_apical.push_back(0.261505882);
+	distFromNucleus_normalMaxVec_apical.push_back(0.266117647);
+	distFromNucleus_normalMaxVec_apical.push_back(0.245788235);
+	distFromNucleus_normalMaxVec_apical.push_back(0.249270588);
+	distFromNucleus_normalMaxVec_apical.push_back(0.253082353);
+	distFromNucleus_normalMaxVec_apical.push_back(0.253694118);
+	distFromNucleus_normalMaxVec_apical.push_back(0.277223529);
+	distFromNucleus_normalMaxVec_apical.push_back(0.261270588);
+	distFromNucleus_normalMaxVec_apical.push_back(0.252376471);
+	distFromNucleus_normalMaxVec_apical.push_back(0.259341176);
+	distFromNucleus_normalMaxVec_apical.push_back(0.245223529);
+	distFromNucleus_normalMaxVec_apical.push_back(0.251435294);
+	distFromNucleus_normalMaxVec_apical.push_back(0.262635294);
+	distFromNucleus_normalMaxVec_apical.push_back(0.297552941);
+	distFromNucleus_normalMaxVec_apical.push_back(0.276564706);
+	distFromNucleus_normalMaxVec_apical.push_back(0.283529412);
+	distFromNucleus_normalMaxVec_apical.push_back(0.289552941);
+	distFromNucleus_normalMaxVec_apical.push_back(0.272141176);
+	distFromNucleus_normalMaxVec_apical.push_back(0.2424     );
+	distFromNucleus_normalMaxVec_apical.push_back(0.243623529);
+	distFromNucleus_normalMaxVec_apical.push_back(0.188235294);
+	distFromNucleus_normalMaxVec_apical.push_back(0.257835294);
+	distFromNucleus_normalMaxVec_apical.push_back(0.245223529);
+	distFromNucleus_normalMaxVec_apical.push_back(0.226682353);
+	distFromNucleus_normalMaxVec_apical.push_back(0.208282353);
+	distFromNucleus_normalMaxVec_apical.push_back(0.211388235);
+	distFromNucleus_normalMaxVec_apical.push_back(0.192470588);
+	distFromNucleus_normalMaxVec_apical.push_back(0.1944     );
+	distFromNucleus_normalMaxVec_apical.push_back(0.194117647);
+	distFromNucleus_normalMaxVec_apical.push_back(0.227623529);
+	distFromNucleus_normalMaxVec_apical.push_back(0.224894118);
+	distFromNucleus_normalMaxVec_apical.push_back(0.242917647);
+	distFromNucleus_normalMaxVec_apical.push_back(0.215152941);
+	distFromNucleus_normalMaxVec_apical.push_back(0.208423529);
+	distFromNucleus_normalMaxVec_apical.push_back(0.208941176);
+	distFromNucleus_normalMaxVec_apical.push_back(0.195717647);
+	distFromNucleus_normalMaxVec_apical.push_back(0.204094118);
+	distFromNucleus_normalMaxVec_apical.push_back(0.183764706);
+	distFromNucleus_normalMaxVec_apical.push_back(0.217223529);
+	distFromNucleus_normalMaxVec_apical.push_back(0.222870588);
+	distFromNucleus_normalMaxVec_apical.push_back(0.226917647);
+	distFromNucleus_normalMaxVec_apical.push_back(0.213223529);
+	distFromNucleus_normalMaxVec_apical.push_back(0.221458824);
+	distFromNucleus_normalMaxVec_apical.push_back(0.207011765);
+	distFromNucleus_normalMaxVec_apical.push_back(0.201035294);
+	distFromNucleus_normalMaxVec_apical.push_back(0.191858824);
+	distFromNucleus_normalMaxVec_apical.push_back(0.191576471);//CellID62
+
+
 
 		for (int cellRank = 0; cellRank < allocPara_m.maxCellCount; cellRank++){
 			if (cellRank < allocPara_m.currentActiveCellCount){
 				// cellInfoVecs.distFromNucleus_normal[cellRank] = distFromNucleus_normalMax;//(distFromNucleus_normalMax) - (distFromNucleus_normalMax - (-14.0))*(1.0 - pow(distFromNucleus_normalVec[cellRank], 3.0));
 				if (cellRank >= 2 && cellRank <= 21){
-					// cellInfoVecs.distFromNucleus_normal[cellRank] = 1.0*distFromNucleus_normalMax;
-					// cellInfoVecs.distFromNucleus_normal_apical[cellRank] = 1.0*distFromNucleus_normalMax_apical;
+					cellInfoVecs.distFromNucleus_normal[cellRank] = 1.0*distFromNucleus_normalMaxVec[cellRank];
+					cellInfoVecs.distFromNucleus_normal_apical[cellRank] = 1.0*distFromNucleus_normalMaxVec_apical[cellRank];
 					if (cellRank == 2){
 						std::cout<<"cellInfoVecs.distFromNucleus_normal["<<cellRank<<"] = "<<cellInfoVecs.distFromNucleus_normal[cellRank]<<std::endl;
 						std::cout<<"cellInfoVecs.distFromNucleus_normal_apical["<<cellRank<<"] = "<<cellInfoVecs.distFromNucleus_normal_apical[cellRank]<<std::endl;
 					}
 				}
 				else if (cellRank >= 22 && cellRank <= 42){
-					// cellInfoVecs.distFromNucleus_normal[cellRank] = (1.0)*distFromNucleus_normalMax;
-					// cellInfoVecs.distFromNucleus_normal_apical[cellRank] = 1.0*distFromNucleus_normalMax_apical;
+					cellInfoVecs.distFromNucleus_normal[cellRank] = (1.0)*distFromNucleus_normalMaxVec[cellRank];
+					cellInfoVecs.distFromNucleus_normal_apical[cellRank] = 1.0*distFromNucleus_normalMaxVec_apical[cellRank];
 					if (cellRank == 22){
 						std::cout<<"cellInfoVecs.distFromNucleus_normal["<<cellRank<<"] = "<<cellInfoVecs.distFromNucleus_normal[cellRank]<<std::endl;
 						std::cout<<"cellInfoVecs.distFromNucleus_normal_apical["<<cellRank<<"] = "<<cellInfoVecs.distFromNucleus_normal_apical[cellRank]<<std::endl;
 					}
 				}
 				else if (cellRank >= 43 && cellRank <= 62){
-					// cellInfoVecs.distFromNucleus_normal[cellRank] = 1.0*distFromNucleus_normalMax;
-					// cellInfoVecs.distFromNucleus_normal_apical[cellRank] = 1.0*distFromNucleus_normalMax_apical;
+					cellInfoVecs.distFromNucleus_normal[cellRank] = 1.0*distFromNucleus_normalMaxVec[cellRank];
+					cellInfoVecs.distFromNucleus_normal_apical[cellRank] = 1.0*distFromNucleus_normalMaxVec_apical[cellRank];
 					if (cellRank == 43){
 						std::cout<<"cellInfoVecs.distFromNucleus_normal["<<cellRank<<"] = "<<cellInfoVecs.distFromNucleus_normal[cellRank]<<std::endl;
 						std::cout<<"cellInfoVecs.distFromNucleus_normal_apical["<<cellRank<<"] = "<<cellInfoVecs.distFromNucleus_normal_apical[cellRank]<<std::endl;
@@ -2108,9 +2150,9 @@ growthProgressReinitialize.push_back(   -9999.9);
 	cudaEventElapsedTime(&elapsedTime1, start1, start2);
 #endif
 
-	double contractileSpringGrowthProgressSpeed = 9.3405e-5;//9.3405e-5;//For minM14max4 //5.7081e-5;//For minM7max4    //7.2649e-05;//For minM7max7
-	double cellAreaGrowthProgressSpeed = 9.984e-5;//9.984e-5;//0.00002088;//0.02*0.000075/(4.0);
-	double cellAreaGrowthProgressNonMitoticSpeed = 9.984e-5;//9.984e-5;//0.00002088;//0.02*0.000075/(4.0);
+	double contractileSpringGrowthProgressSpeed = 0.5*9.3405e-5;//9.3405e-5;//For minM14max4 //5.7081e-5;//For minM7max4    //7.2649e-05;//For minM7max7
+	double cellAreaGrowthProgressSpeed = 0.5*9.984e-5;//9.984e-5;//0.00002088;//0.02*0.000075/(4.0);
+	double cellAreaGrowthProgressNonMitoticSpeed = 0.5*9.984e-5;//9.984e-5;//0.00002088;//0.02*0.000075/(4.0);
 	double distFromBasalLocSpeed = 0.00005;
 	double distFromApicalLocSpeed = 0.00005;
 	if (timeRatio == 0){
@@ -2146,6 +2188,12 @@ growthProgressReinitialize.push_back(   -9999.9);
 			cellInfoVecs.cellAreaGrowthProgress[w] += cellAreaGrowthProgressSpeed;//0.00005;
 			cellInfoVecs.distFromBasalLoc[w] += distFromBasalLocSpeed;
 			cellInfoVecs.distFromApicalLoc[w] += distFromApicalLocSpeed;
+			// if (w == 86){
+			// 	std::cout<<"cellInfoVecs.distFromNucleus_normal[w] : " <<cellInfoVecs.distFromNucleus_normal[w]<<std::endl;
+			// 	std::cout<<"cellInfoVecs.distFromNucleus_normal_apical[w] : "<<cellInfoVecs.distFromNucleus_normal_apical[w]<<std::endl;
+			// 	std::cout<<"distFromNucleus_normal[w]*_individualCellHeight[w] : "<<cellInfoVecs.distFromNucleus_normal[w]*cellInfoVecs.individualCellHeight[w]<<std::endl;
+			// 	std::cout<<"distFromNucleus_normal_apical[w]*_individualCellHeight[w] : "<<cellInfoVecs.distFromNucleus_normal_apical[w]*cellInfoVecs.individualCellHeight[w]<<std::endl;
+			// }
 		}
 	}
 	
@@ -2246,8 +2294,13 @@ growthProgressReinitialize.push_back(   -9999.9);
 		computeApicalLoc(timeRatio, timeRatio_Crit_Division);
     	computeBasalLoc(); 
 	uint recalculateCellHeight = 4;
-	if (timeRatio == 0 || relaxCount%recalculateCellHeight == 0){	
-		computeIndividualCellHeight(distFromNucleus_normalMax, distFromNucleus_normalMax_apical);//This function does the above commented out computation.
+	if (timeRatio == 0){// || relaxCount%recalculateCellHeight == 0){	
+		computeIndividualCellHeight(distFromNucleus_normalMax1,distFromNucleus_normalMax2,distFromNucleus_normalMax3,
+							 distFromNucleus_normalMax_apical1,distFromNucleus_normalMax_apical2,distFromNucleus_normalMax_apical3);//This function does the above commented out computation.
+		// computeIndividualCellHeight_Ver2();//Ver2 does cell height calculation only, not manipulating the number of contractile springs.
+	}
+	else if (relaxCount%recalculateCellHeight == 0){
+		computeIndividualCellHeight_Ver2();//Ver2 does cell height calculation only, not manipulating the number of contractile springs.
 	}
 #ifdef debugModeECM
 	cudaEventRecord(start3, 0);
@@ -2256,19 +2309,23 @@ growthProgressReinitialize.push_back(   -9999.9);
 #endif
 
 	
-	eCMCellInteraction(cellPolar,subCellPolar,tmpIsInitPhase, timeRatio, timeRatio_Crit_ECM, timeRatio_Crit_Division);
+	eCMCellInteraction(cellPolar,subCellPolar,tmpIsInitPhase, timeRatio, timeRatio_Crit_ECM, timeRatio_Crit_Division, relaxCount);
 
 	if (cellInfoVecs.isOneTimeStepPostDivision != false){
+		std::cout<<"Condition ' cellInfoVecs.isOneTimeStepPostDivision != false ' is satisfied"<<std::endl;
 		std::cout<<"cellInfoVecs.isOneTimeStepPostDivision = "<<cellInfoVecs.isOneTimeStepPostDivision<<std::endl;
 		std::cout<<"cellInfoVecs.isPostDivision = "<<cellInfoVecs.isPostDivision<<std::endl;
-		for (int kk = 0; kk < cellInfoVecs.eCMNeighborId.size(); kk++){
+		/*for (int kk = 0; kk < cellInfoVecs.eCMNeighborId.size(); kk++){
 			std::cout<<"eCMNeighborId["<<kk<<"] after division= "<<cellInfoVecs.eCMNeighborId[kk]<<std::endl;
-		}
+		}*/
 	}
 
 	if (cellInfoVecs.isPostDivision == true){
 		cellInfoVecs.isOneTimeStepPostDivision = true;
 		cellInfoVecs.isPostDivision = false;
+		std::cout<<"Condition ' cellInfoVecs.isPostDivision == true ' is satisfied"<<std::endl;
+		std::cout<<"cellInfoVecs.isOneTimeStepPostDivision = "<<cellInfoVecs.isOneTimeStepPostDivision<<std::endl;
+		std::cout<<"cellInfoVecs.isPostDivision = "<<cellInfoVecs.isPostDivision<<std::endl;
 	}
 	else if (cellInfoVecs.isPostDivision == false && cellInfoVecs.isOneTimeStepPostDivision == true){
 		cellInfoVecs.isTwoTimeStepPostDivision = false;//true;
@@ -2488,7 +2545,7 @@ growthProgressReinitialize.push_back(   -9999.9);
 	if (relaxCount % checkForMitosisAndDivision == 0){
 		if (allocPara_m.currentActiveCellCount < allocPara_m.maxCellCount){
 			// std::cout<<"contractileSpringGrowthProgress[10] = "<<cellInfoVecs.contractileSpringGrowthProgress[10]<<std::endl;
-			enterMitoticCheckForDivAxisCal() ;
+			enterMitoticCheckForDivAxisCal(mitoticThreshold) ;
 			
 			divide2D_M(volume_Increase_Target_Ratio, timeRatio, thresholdToIntroduceNewCell);
 			// std::cout<<"	*** 4.25 *** "<<	std::endl;
@@ -3852,6 +3909,10 @@ void SceCells::copySecondCellArr_M(double quiescence2) {
 				std::cout<<"contractActomyo_multip for cellRank = "<<cellRank<<" is "<<nodes->getInfoVecs().contractActomyo_multip[j]<<", inherited from cellRank = "<<cellRankMother<<std::endl;
 				std::cout<<"contractActomyo_multip_apical for cellRank = "<<cellRank<<" is "<<nodes->getInfoVecs().contractActomyo_multip_apical[j]<<", inherited from cellRank = "<<cellRankMother<<std::endl;
 			}
+			if (j==nodeStartIndx+maxAllNodePerCell-1){
+				std::cout<<"contractActomyo_multip for cellRank = "<<cellRank<<" is "<<nodes->getInfoVecs().contractActomyo_multip[j]<<", inherited from cellRank = "<<cellRankMother<<std::endl;
+				std::cout<<"contractActomyo_multip_apical for cellRank = "<<cellRank<<" is "<<nodes->getInfoVecs().contractActomyo_multip_apical[j]<<", inherited from cellRank = "<<cellRankMother<<std::endl;
+			}
 		}
 		cellInfoVecs.activeIntnlNodeCounts[cellRank] =
 				divAuxData.tmp2InternalActiveCounts[i];
@@ -3876,6 +3937,10 @@ void SceCells::copySecondCellArr_M(double quiescence2) {
 		cellInfoVecs.distFromNucleus_normal_apical[cellRank] = cellInfoVecs.distFromNucleus_normal_apical[cellRankMother];
 		cellInfoVecs.distFromBasalLoc[cellRank] = 0.0;
 		cellInfoVecs.distFromApicalLoc[cellRank] = 0.0;
+		std::cout<<"New Cell "<<cellRank<<" introduced!"<<std::endl;
+		std::cout<<"distFromNucleus_normal : "<<cellInfoVecs.distFromNucleus_normal[cellRank]<<std::endl;
+		std::cout<<"distFromNucleus_normal_apical : "<<cellInfoVecs.distFromNucleus_normal_apical[cellRank]<<std::endl;
+		std::cout<<"isEnteringMitotic[cellRank] : "<<cellInfoVecs.isEnteringMitotic[cellRank]<<std::endl;
 //Ali
 		// std::cout<<"divAuxData.isMotherCellBehind["<<i<<"] = "<<divAuxData.isMotherCellBehind[i]<<std::endl;
 		if (divAuxData.isMotherCellBehind[i]==true) {
@@ -5338,19 +5403,22 @@ void SceCells::computeNucleusLoc() {
 
 }
 
-void SceCells::computeIndividualCellHeight(double distFromNucleus_normalMax, double distFromNucleus_normalMax_apical){
+void SceCells::computeIndividualCellHeight(double distFromNucleus_normalMax1,double distFromNucleus_normalMax2,double distFromNucleus_normalMax3,
+											 double distFromNucleus_normalMax_apical1, double distFromNucleus_normalMax_apical2, double distFromNucleus_normalMax_apical3){
 	// double* individualCellHeightPreMitotic = thrust::raw_pointer_cast(&(cellInfoVecs.individualCellHeight[0]));
 	thrust::counting_iterator<uint> iBegin(0);
 	thrust::transform(
 			thrust::make_zip_iterator(
-					thrust::make_tuple(cellInfoVecs.apicalLocX.begin(),
+					thrust::make_tuple(iBegin,
+									   cellInfoVecs.apicalLocX.begin(),
 							           cellInfoVecs.apicalLocY.begin(),
 									   cellInfoVecs.basalLocX.begin(),
 									   cellInfoVecs.basalLocY.begin(),
 									   cellInfoVecs.isEnteringMitotic.begin(),
 									   cellInfoVecs.individualCellHeight.begin())),
 			thrust::make_zip_iterator(
-					thrust::make_tuple(cellInfoVecs.apicalLocX.begin(),
+					thrust::make_tuple(iBegin,
+									   cellInfoVecs.apicalLocX.begin(),
 							           cellInfoVecs.apicalLocY.begin(),
 									   cellInfoVecs.basalLocX.begin(),
 									   cellInfoVecs.basalLocY.begin(),
@@ -5360,11 +5428,35 @@ void SceCells::computeIndividualCellHeight(double distFromNucleus_normalMax, dou
 			thrust::make_zip_iterator(
 					thrust::make_tuple(cellInfoVecs.individualCellHeight.begin(),
 							           cellInfoVecs.distFromNucleus_normal.begin(),
-									   cellInfoVecs.distFromNucleus_normal_apical.begin())), CalCellHeight(distFromNucleus_normalMax, distFromNucleus_normalMax_apical));
+									   cellInfoVecs.distFromNucleus_normal_apical.begin())), CalCellHeight( distFromNucleus_normalMax1, distFromNucleus_normalMax2, distFromNucleus_normalMax3,
+											 distFromNucleus_normalMax_apical1, distFromNucleus_normalMax_apical2, distFromNucleus_normalMax_apical3));
 
 }
 
+void SceCells::computeIndividualCellHeight_Ver2(){
+	// double* individualCellHeightPreMitotic = thrust::raw_pointer_cast(&(cellInfoVecs.individualCellHeight[0]));
+	thrust::counting_iterator<uint> iBegin(0);
+	thrust::transform(
+			thrust::make_zip_iterator(
+					thrust::make_tuple(iBegin,
+									   cellInfoVecs.apicalLocX.begin(),
+							           cellInfoVecs.apicalLocY.begin(),
+									   cellInfoVecs.basalLocX.begin(),
+									   cellInfoVecs.basalLocY.begin(),
+									   cellInfoVecs.isEnteringMitotic.begin(),
+									   cellInfoVecs.individualCellHeight.begin())),
+			thrust::make_zip_iterator(
+					thrust::make_tuple(iBegin,
+									   cellInfoVecs.apicalLocX.begin(),
+							           cellInfoVecs.apicalLocY.begin(),
+									   cellInfoVecs.basalLocX.begin(),
+									   cellInfoVecs.basalLocY.begin(),
+									   cellInfoVecs.isEnteringMitotic.begin(),
+									   cellInfoVecs.individualCellHeight.begin()))
+					+ allocPara_m.currentActiveCellCount,
+					cellInfoVecs.individualCellHeight.begin(), CalCellHeight_Ver2());
 
+}
 
 
 void SceCells::computeNucleusDesireLoc() {
@@ -5572,9 +5664,9 @@ void SceCells::growAtRandom_M(double growthProgressSpeed) {
 }
 
 //Ali
-void SceCells::enterMitoticCheckForDivAxisCal() {
+void SceCells::enterMitoticCheckForDivAxisCal(double mitoticThreshold) {
 
-    bool isEnteringMitotic = decideIfAnyCellEnteringMitotic() ; //A&A
+    bool isEnteringMitotic = decideIfAnyCellEnteringMitotic(mitoticThreshold) ; //A&A
 
         
         //A&A
@@ -5593,7 +5685,7 @@ void SceCells::divide2D_M(double volume_Increase_Target_Ratio, double timeRatio,
 			// std::cout<<"isDividing["<<19<<"] = "<<cellInfoVecs.isDividing[19]<<", isEnteringMitotic = "<<cellInfoVecs.isEnteringMitotic[19]<<", cellAreaGrowthProgress = "<<cellInfoVecs.cellAreaGrowthProgress[19]<<", cellAreaGrowthProgressNonMitotic = "<<cellInfoVecs.cellAreaGrowthProgressNonMitotic[19]<<std::endl;
 			// std::cout<<"isDividing["<<28<<"] = "<<cellInfoVecs.isDividing[28]<<", isEnteringMitotic = "<<cellInfoVecs.isEnteringMitotic[28]<<", cellAreaGrowthProgress = "<<cellInfoVecs.cellAreaGrowthProgress[28]<<", cellAreaGrowthProgressNonMitotic = "<<cellInfoVecs.cellAreaGrowthProgressNonMitotic[28]<<std::endl;
 	if (isDivisionPresent == false) {
-		std::cout<<"No cell division is present!"<<std::endl;
+		// std::cout<<"No cell division is present!"<<std::endl;
 		return;
 	}
 	
@@ -5670,15 +5762,32 @@ void SceCells::divide2D_M(double volume_Increase_Target_Ratio, double timeRatio,
 		//Ali 
 		nodes->isMemNodeTypeAssigned_postCellDivision = false;
 		cellInfoVecs.isPostDivision = true;
-		for (int k = 0; k < nodes->getInfoVecs().nodeCellRankFront.size(); k++){
+		// for (int k = 0; k < nodes->getInfoVecs().nodeCellRankFront.size(); k++){
+		for (int k = 0; k < allocPara_m.currentActiveCellCount; k++){
 			if (k == 0){
 				std::cout<<"Printing out order of cells in the tissue post growth"<<std::endl;
+				std::cout<<k<<" "<<nodes->getInfoVecs().nodeCellRankFront[k]<<" ";
 			}
-			if (k == allocPara_m.currentActiveCellCount){
-				std::cout<<nodes->getInfoVecs().nodeCellRankFront[k]<<" "<<std::endl;;
-			}
+			// if (k == allocPara_m.currentActiveCellCount){
+			// 	std::cout<<nodes->getInfoVecs().nodeCellRankFront[k]<<" "<<std::endl;;
+			// }
 			else{
-				std::cout<<nodes->getInfoVecs().nodeCellRankFront[k]<<" ";
+				std::cout<<nodes->getInfoVecs().nodeCellRankFront[nodes->getInfoVecs().nodeCellRankFront[k-1]]<<" ";
+			}
+			
+		}
+		// for (int k = 0; k < nodes->getInfoVecs().nodeCellRankFront.size(); k++){
+		for (int k = 0; k < allocPara_m.currentActiveCellCount; k++){
+			if (k == 0){
+				std::cout<<"Printing out associated multip of cells in the tissue post growth"<<std::endl;
+				std::cout<<nodes->getInfoVecs().contractActomyo_multip[k*allocPara_m.maxAllNodePerCell]<<" "<<nodes->getInfoVecs().contractActomyo_multip[nodes->getInfoVecs().nodeCellRankFront[k]*allocPara_m.maxAllNodePerCell]<<" ";
+			}
+			// if (k == allocPara_m.currentActiveCellCount){
+			// 	std::cout<<nodes->getInfoVecs().nodeCellRankFront[k]<<" "<<std::endl;;
+			// }
+			else{
+				// std::cout<<nodes->getInfoVecs().nodeCellRankFront[nodes->getInfoVecs().nodeCellRankFront[k-1]]<<" ";
+				std::cout<< nodes->getInfoVecs().contractActomyo_multip[nodes->getInfoVecs().nodeCellRankFront[k-1]*allocPara_m.maxAllNodePerCell]<<" ";
 			}
 			
 		}
@@ -5686,8 +5795,8 @@ void SceCells::divide2D_M(double volume_Increase_Target_Ratio, double timeRatio,
 			if (k == 0){
 				std::cout<<"Printing out number of cell daughter procued"<<std::endl;
 			}
-			if (k == allocPara_m.currentActiveCellCount){
-				std::cout<<"["<<k<<", "<<cellInfoVecs.daughterCellProduced[k]<<" "<<std::endl;;
+			if (k == allocPara_m.currentActiveCellCount-1){
+				std::cout<<"["<<k<<", "<<cellInfoVecs.daughterCellProduced[k]<<"] "<<std::endl;;
 			}
 			else{
 				std::cout<<"["<<k<<", "<<cellInfoVecs.daughterCellProduced[k]<<"] ";
@@ -5732,7 +5841,7 @@ void SceCells::divide2D_M(double volume_Increase_Target_Ratio, double timeRatio,
 				nodes->getInfoVecs().nodeIsActive[i + startIndex] = true;
 				activeNucNodeX += nodes->getInfoVecs().nodeLocX[i + startIndex];
 				activeNucNodeY += nodes->getInfoVecs().nodeLocY[i + startIndex];
-				std::cout<<"Saved nuc["<<i<<"] : "<<nodes->getInfoVecs().nodeLocX[i + startIndex]<<", "<<nodes->getInfoVecs().nodeLocY[i + startIndex]<<std::endl;
+				// std::cout<<"Saved nuc["<<i<<"] : "<<nodes->getInfoVecs().nodeLocX[i + startIndex]<<", "<<nodes->getInfoVecs().nodeLocY[i + startIndex]<<std::endl;
 				cellInfoVecs.activeIntnlNodeCounts[cellRank] += 1;
 			}
 			else{
@@ -5755,14 +5864,14 @@ void SceCells::divide2D_M(double volume_Increase_Target_Ratio, double timeRatio,
 			// std::cout<<"Resulting nuc["<<i<<"] : "<<nodes->getInfoVecs().nodeLocX[i + startIndex]<<", "<<nodes->getInfoVecs().nodeLocY[i + startIndex]<<std::endl;
 			}
 		}
-		std::cout<<"Current number of nucleus labeled as 'active' = "<<numOfNucleus<<", after reducing the number for out-of-plane cell division"<<std::endl;
+		// std::cout<<"Current number of nucleus labeled as 'active' = "<<numOfNucleus<<", after reducing the number for out-of-plane cell division"<<std::endl;
 	}
 }
 
-void SceCells::eCMCellInteraction(bool cellPolar,bool subCellPolar, bool isInitPhase, double timeRatio, double timeRatio_Crit_ECM, double timeRatio_Crit_Division) {
+void SceCells::eCMCellInteraction(bool cellPolar,bool subCellPolar, bool isInitPhase, double timeRatio, double timeRatio_Crit_ECM, double timeRatio_Crit_Division, int relaxCount) {
 	int totalNodeCountForActiveCellsECM = allocPara_m.currentActiveCellCount
 			* allocPara_m.maxAllNodePerCell;
-	eCMPointerCells->ApplyECMConstrain(allocPara_m.currentActiveCellCount,totalNodeCountForActiveCellsECM,curTime,dt,Damp_Coef,cellPolar,subCellPolar,isInitPhase, timeRatio, timeRatio_Crit_ECM, timeRatio_Crit_Division);
+	eCMPointerCells->ApplyECMConstrain(allocPara_m.currentActiveCellCount,totalNodeCountForActiveCellsECM,curTime,dt,Damp_Coef,cellPolar,subCellPolar,isInitPhase);//, timeRatio, timeRatio_Crit_ECM, timeRatio_Crit_Division, relaxCount);
    }
 
 
@@ -6280,14 +6389,14 @@ bool SceCells::decideIfGoingToDivide_M(double volume_Increase_Target_Ratio) {
 // 	}
 // }
 
-bool SceCells::decideIfAnyCellEnteringMitotic() {
+bool SceCells::decideIfAnyCellEnteringMitotic(double grthPrgrCriVal_M) {
 
     //    double grthPrgrCriVal_M = growthAuxData.grthProgrEndCPU
 	//		- growthAuxData.prolifDecay
 	//				* (growthAuxData.grthProgrEndCPU
 	//						- growthAuxData.grthPrgrCriVal_M_Ori);
 
-	double grthPrgrCriVal_M = 0.8973;//divAuxData.targetCellDividingArea; 
+	// double grthPrgrCriVal_M = 0.8973;//divAuxData.targetCellDividingArea; 
 	thrust::transform(
 			thrust::make_zip_iterator(
 					thrust::make_tuple(cellInfoVecs.growthProgress.begin(),
@@ -9590,6 +9699,7 @@ CellsStatsData SceCells::outputPolyCountData() {
 			centerCoordYHost.begin());
 /////////////
 
+// std::cout<<"ISOLATE 1"<<std::endl;
 
 ///////////////
 	thrust::host_vector<double> apicalLocXHost(
@@ -9607,6 +9717,8 @@ CellsStatsData SceCells::outputPolyCountData() {
 			apicalLocYHost.begin());
 
 ///////////
+
+// std::cout<<"ISOLATE 2"<<std::endl;
 
 ///////////////
 	thrust::host_vector<double> basalLocXHost(
@@ -9626,7 +9738,7 @@ CellsStatsData SceCells::outputPolyCountData() {
 ///////////
 
 
-
+// std::cout<<"ISOLATE 3"<<std::endl;
 
 //////
 	thrust::host_vector<double> InternalAvgXHost(
@@ -9653,7 +9765,7 @@ CellsStatsData SceCells::outputPolyCountData() {
 			InternalAvgYHost.begin());
 /////
 
-
+// std::cout<<"ISOLATE 4"<<std::endl;
 
 	thrust::host_vector<double> cellAreaHost(
 			allocPara_m.currentActiveCellCount);
@@ -9676,7 +9788,8 @@ CellsStatsData SceCells::outputPolyCountData() {
  			cellInfoVecs.cellPressure.begin()
 					+ allocPara_m.currentActiveCellCount, cellPressureHost.begin());//Ali
 
-
+// std::cout<<"ISOLATE 4"<<std::endl;
+//LOOKS LIKE AN ERROR POP UP IN THIS SECTION..............
         sumX=0 ; 
         sumY=0 ; 
 	for (uint i = 0; i < allocPara_m.currentActiveCellCount; i++) {
@@ -9689,7 +9802,7 @@ CellsStatsData SceCells::outputPolyCountData() {
                 int neighborStrength[10]; //Ali
 		int continousNoAdh = 0;
                 map <int, int> cellAndNeighborRank ;  //Ali
-		//std::cout << "printing adhesion indicies ";
+		// std::cout << "printing adhesion indicies ";
                 //for (int ii=0 ; ii<neighborStrength.size() ; ii++){
                 for (int ii=0 ; ii< 10; ii++){ //Ali
                       
@@ -9697,7 +9810,7 @@ CellsStatsData SceCells::outputPolyCountData() {
                 }
                           
                 cellAndNeighborRank.clear();  //Ali
-
+		// std::cout << "printing adhesion indicies 2";
 		for (uint j = 0; j < activeMembrNodeCountHost[i]; j++) {
 			uint index = i * allocPara_m.maxAllNodePerCell + j;
 			//std::cout << adhIndxHost[index] << ",";
@@ -9719,11 +9832,13 @@ CellsStatsData SceCells::outputPolyCountData() {
                                    neighborStrength[oldNeighborRank]=neighborStrength[oldNeighborRank]+1 ; //Ali
                                  }      
 				continousNoAdh = 0;
+				// std::cout << "printing adhesion indicies 3";
 			} else {
 				continousNoAdh = continousNoAdh + 1;
 				if (continousNoAdh > bdryCriteria) {
 					isBdry = true;
 				}
+				// std::cout << "printing adhesion indicies 4";
 			}
 			if (j == activeMembrNodeCountHost[i] - 1
 					&& adhIndxHost[index] == -1) {
@@ -9741,10 +9856,12 @@ CellsStatsData SceCells::outputPolyCountData() {
 						break;
 					}
 				}
+				// std::cout << "printing adhesion indicies 5";
 			}
 
 		}
-                 
+
+		// std::cout<<"ISOLATE 4.5"<<std::endl; 
                 
 		cellStatsData.isBdryCell = isBdry;
 		cellStatsData.numNeighbors = neighbors.size();
@@ -9778,6 +9895,8 @@ CellsStatsData SceCells::outputPolyCountData() {
                 sumY=sumY+cellStatsData.cellCenter.y ;
                 
 	}
+
+	// std::cout<<"ISOLATE 5"<<std::endl;
 //Ali
         if (BdryApproach==2) {  
           cout << "sumX=" << sumX << endl ; 
@@ -9811,6 +9930,7 @@ CellsStatsData SceCells::outputPolyCountData() {
             }
           }
         }
+		// std::cout<<"ISOLATE 6"<<std::endl;
         	return result;
 }
 
@@ -10184,10 +10304,14 @@ void SceCells::applyMembContraction2(double timeRatio, double timeRatio_Crit_act
 			&(nodes->getInfoVecs().memNodeType1[0]));
 	int* nodeMemMirrorIndexAddr = thrust::raw_pointer_cast(
 			&(nodes->getInfoVecs().nodeMemMirrorIndex[0]));
+	// double* contractActomyo_multip = thrust::raw_pointer_cast(
+	// 		&(nodes->getInfoVecs().contractActomyo_multip[0]));
+	// double* contractActomyo_multip_apical = thrust::raw_pointer_cast(
+	// 		&(nodes->getInfoVecs().contractActomyo_multip_apical[0]));
 	double* contractActomyo_multip = thrust::raw_pointer_cast(
-			&(nodes->getInfoVecs().contractActomyo_multip[0]));
+			&(cellInfoVecs.contractActomyo_multip_perCell[0]));
 	double* contractActomyo_multip_apical = thrust::raw_pointer_cast(
-			&(nodes->getInfoVecs().contractActomyo_multip_apical[0]));
+			&(cellInfoVecs.contractActomyo_multip_apical_perCell[0]));
 	bool* isEnteringMitotic = thrust::raw_pointer_cast(
 			&(cellInfoVecs.isEnteringMitotic[0]));
 	double* contractileSpringGrowthProgress = thrust::raw_pointer_cast(
