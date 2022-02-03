@@ -44,6 +44,11 @@ CVector CVector::rotateNintyDeg_XY_CC() {
 	double tmpY = x;
 	return CVector(tmpX, tmpY, z);
 }
+CVector CVector::rotateNegativeNintyDeg_XY_CC() {
+	double tmpX = y;
+	double tmpY = -x;
+	return CVector(tmpX, tmpY, z);
+}
 
 double CVector::getAngle2DPlane() {
 	double angle;

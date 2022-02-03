@@ -59,6 +59,7 @@ public:
 	 * rotate 90 degrees counter-clock wise in XY plane
 	 */
 	CVector rotateNintyDeg_XY_CC();
+	CVector rotateNegativeNintyDeg_XY_CC();
 
 	friend CVector operator+(const CVector& a, const CVector& b);
 	friend CVector operator-(const CVector& a, const CVector& b);
