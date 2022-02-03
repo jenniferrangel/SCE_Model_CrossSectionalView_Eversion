@@ -151,7 +151,7 @@ int main(int argc, char* argv[]) {
 	// std::cout<<"Critical timeRatio for growth and cell division = "<<timeRatio_Crit_Division<<std::endl;
 	bool reduced_ecm_triggered = false;
 	bool Division_triggered = false;
-	double volume_Increase_Target_Ratio = 1.41;
+	double volume_Increase_Target_Ratio = 1.4;
 	std::cout<<"Target ratio for cell volume increase = "<<volume_Increase_Target_Ratio<<std::endl;
 	double volume_Increase_Scale = 1.0;
 	std::cout<<"How fast is the volume increase happening = x"<<volume_Increase_Scale<<" rate of change"<<std::endl;
@@ -161,21 +161,39 @@ int main(int argc, char* argv[]) {
 	std::cout<<"How fast is the volume restoration happening post division = x"<<postDivision_restorationRateScale<<" rate of change"<<std::endl;
 	bool volume_restoration_rate_restore = false;
 
-	double thresholdToIntroduceNewCell = 0.25;//-1.0;
+	double thresholdToIntroduceNewCell = 0.5;//-1.0;//0.25;//-1.0;
 	std::cout<<"The likelihood (probability) a new cell will be introduced in the same cross section after cell division = "<<thresholdToIntroduceNewCell<<std::endl;
+	double mitoticThreshold = 0.8973;
 
 	double distFromNucleus_max = 0.0;//4.0;
 	double distFromNucleus_min = 0.3;//-14.0;
-	double distFromNucleus_normalMax = 0.20;//0.355;//-8.0;
-	double distFromNucleus_normalMax_apical = 0.20;//0.295;//7.5;
+	double distFromNucleus_normalMax1 = 0.3;//0.275;//0.20;//0.355;//-8.0;
+	double distFromNucleus_normalMax2 = 0.2645;//0.275;//0.20;//0.355;//-8.0;
+	double distFromNucleus_normalMax3 = 0.2615;//0.275;//0.20;//0.355;//-8.0;
+	double distFromNucleus_normalMax_apical1 = 0.2918;//0.175;//0.20;//0.295;//7.5;
+	double distFromNucleus_normalMax_apical2 = 0.2883;//0.175;//0.20;//0.295;//7.5;
+	double distFromNucleus_normalMax_apical3 = 0.2429;//0.175;//0.20;//0.295;//7.5;
 	double percentage_before_timeRatio_Crit_Division_scaling = 4.0; //No longer in use, but don't delete yet since it is still passed into several functions. //Kevin
 	double mitoRndActomyoStrengthScaling = 5.0; //Please consult SceNodes.cu to see what are the scaling applied to non-dividing cells and disc_NXX_X.cfg file to see what is the corresponding default spring constant. //Kevin
 	std::cout<<"Cell division requires the contractile spring to increase strength by "<<percentage_before_timeRatio_Crit_Division_scaling<<" fold."<<std::endl;
 	std::cout<<"Contractile spring minimum at "<<distFromNucleus_min<<" and maximum at "<<distFromNucleus_max<<" away from the cell center."<<std::endl;
-	std::cout<<"But under non-growth (stationary) circumstances, the basal contractile spring is set at "<<distFromNucleus_normalMax<<"*cellheight away from the cell center."<<std::endl;
-	std::cout<<"But under non-growth (stationary) circumstances, the apical contractile spring is set at "<<distFromNucleus_normalMax_apical<<"*cellheight away from the cell center."<<std::endl;
+	std::cout<<"But under non-growth (stationary) circumstances, the basal contractile spring is set at "<<distFromNucleus_normalMax1<<", "<<distFromNucleus_normalMax2<<", "<<distFromNucleus_normalMax3<<"*cellheight away from the cell center."<<std::endl;
+	std::cout<<"But under non-growth (stationary) circumstances, the apical contractile spring is set at "<<distFromNucleus_normalMax_apical1<<", "<<distFromNucleus_normalMax_apical2<<", "<<distFromNucleus_normalMax_apical3<<"*cellheight away from the cell center."<<std::endl;
 
-	double growthProgressSpeed = 3.84e-7;//3.84e-7;//(0.02)*0.25*(0.001*0.002); // 0.002 is the default time step of the simulation.
+	double contractActomyo_multip_perCell1 = 1.5;
+	double contractActomyo_multip_perCell2 = 1.5;
+	double contractActomyo_multip_perCell3 = 1.5;
+	double contractActomyo_multip_perCell_apical1 = 0.0625;
+	double contractActomyo_multip_perCell_apical2 = 1.5;//0.0625;
+	double contractActomyo_multip_perCell_apical3 = 0.0625;
+	std::cout<<"Basal_left_actomyo_weight = "<<contractActomyo_multip_perCell1<<std::endl;
+	std::cout<<"Basal_mid_actomyo_weight = "<<contractActomyo_multip_perCell2<<std::endl;
+	std::cout<<"Basal_right_actomyo_weight = "<<contractActomyo_multip_perCell3<<std::endl;
+	std::cout<<"Apical_left_actomyo_weight = "<<contractActomyo_multip_perCell_apical1<<std::endl;
+	std::cout<<"Apical_mid_actomyo_weight = "<<contractActomyo_multip_perCell_apical2<<std::endl;
+	std::cout<<"Apical_right_actomyo_weight = "<<contractActomyo_multip_perCell_apical3<<std::endl;
+
+	double growthProgressSpeed = 0.5*3.84e-7;//3.84e-7;//(0.02)*0.25*(0.001*0.002); // 0.002 is the default time step of the simulation.
 	std::cout<<"Growth speed for cell cycle per time step is = "<<growthProgressSpeed<<std::endl;
 
 	int maxApicalBasalNodeNum = 18;//9999;
@@ -281,8 +299,11 @@ int main(int argc, char* argv[]) {
 			simuDomain.runAllLogic_M(mainPara.dt,mainPara.Damp_Coef,mainPara.InitTimeStage,
 									timeRatio, timeRatio_Crit_actomyo, timeRatio_Crit_ECM, timeRatio_Crit_Division,
 										volume_Increase_Target_Ratio, volume_Increase_Scale, postDivision_restorationRateScale, cycle,
-										distFromNucleus_max, distFromNucleus_min, distFromNucleus_normalMax, distFromNucleus_normalMax_apical,
-										percentage_before_timeRatio_Crit_Division_scaling, growthProgressSpeed, maxApicalBasalNodeNum, maxLengthToAddMemNodes,mitoRndActomyoStrengthScaling, thresholdToIntroduceNewCell);  //Ali //Kevin
+										distFromNucleus_max, distFromNucleus_min, distFromNucleus_normalMax1, distFromNucleus_normalMax2, distFromNucleus_normalMax3,
+										distFromNucleus_normalMax_apical1, distFromNucleus_normalMax_apical2,distFromNucleus_normalMax_apical3,
+										percentage_before_timeRatio_Crit_Division_scaling, growthProgressSpeed, maxApicalBasalNodeNum, maxLengthToAddMemNodes,mitoRndActomyoStrengthScaling, thresholdToIntroduceNewCell,
+										contractActomyo_multip_perCell1, contractActomyo_multip_perCell2, contractActomyo_multip_perCell3,
+										contractActomyo_multip_perCell_apical1, contractActomyo_multip_perCell_apical2, contractActomyo_multip_perCell_apical3, mitoticThreshold);  //Ali //Kevin
 			// simuDomain.runAllLogic_M(mainPara.dt,mainPara.Damp_Coef,mainPara.InitTimeStage,
 			// 						timeRatio, timeRatio_Crit_actomyo, timeRatio_Crit_ECM, timeRatio_Crit_Division,
 			// 							volume_Increase_Target_Ratio, volume_Increase_Scale, postDivision_restorationRateScale, cycle,
