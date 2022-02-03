@@ -64,5 +64,3 @@ How to manipulate specific parameters?
       b. Strenght of contractile spring for generating a narrow basal section when a cell undergoes mitotic rounding.
       c. Max number of apical and basal node per columnar cells.
       d. Max extending of each edge needed before a new node needs to be inserted.
-
-Known issue: When the apical contractility is sufficiently strong (basal ratio: 0.25, apical ratio: 1.25 for instance), the simulation can run into seg fault after a significant duration of simulation.
