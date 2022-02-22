@@ -14,6 +14,7 @@ To compile:
  (1) In project root folder, type "cmake ." ("sudo cmake ." preferred)
  (2) type "make" 
 Please note that CMake, CUDA, CGAL, Thrust, are all required for compilation.  
+%%% During this process, make sure SET(BUILD_DOCUMENTATION OFF) is set to OFF in the CMakeLists.txt to avoid compile error.
 
 To run unit test from project root folder:
  Option 1: Simple run: type "make test"
