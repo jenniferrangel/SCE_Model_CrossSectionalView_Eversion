@@ -1,7 +1,0 @@
-*
-/CMakeFiles
-!.gitignore
-!*.cu
-!*.h
-!*.cpp
-!CMakeLists.txt
