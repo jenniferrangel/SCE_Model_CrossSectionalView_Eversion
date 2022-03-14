@@ -44,10 +44,10 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /bigdata/operations/pkgadmin/opt/linux/centos/7.x/x86_64/pkgs/cmake/3.21.0/bin/cmake
+CMAKE_COMMAND = /opt/linux/centos/7.x/x86_64/pkgs/cmake/3.21.0/bin/cmake
 
 # The command to remove a file.
-RM = /bigdata/operations/pkgadmin/opt/linux/centos/7.x/x86_64/pkgs/cmake/3.21.0/bin/cmake -E rm -f
+RM = /opt/linux/centos/7.x/x86_64/pkgs/cmake/3.21.0/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
