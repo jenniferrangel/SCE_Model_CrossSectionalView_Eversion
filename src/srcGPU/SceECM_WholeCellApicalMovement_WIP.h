@@ -21,7 +21,7 @@ typedef thrust ::tuple<double,double,bool> DDB ;
 typedef thrust ::tuple<double,double,int,double,double> DDIDD ; 
 typedef thrust ::tuple<double,double,double,double,double,double> DDDDDD ;
 typedef thrust ::tuple<double,double,double,double,double> DDDDD ; 
-typedef thrust::tuple<double, EType> DT ;
+typedef thrust ::tuple<int,int,int,double,double,bool,MembraneType1,double> IIIDDBTD ; 
 
 
 struct MechPara_ECM {
@@ -33,7 +33,6 @@ struct MechPara_ECM {
 
 class SceCells ; // forward declaration
 class SceECM {
-	bool isECMAddingNode;
 //	SceNodes* nodes;
     double dampBasal,dampBC,dampApical ; 
 	vector<bool> nodeIsActive ; 
@@ -46,16 +45,14 @@ class SceECM {
 	vector <double> tmpHostNodeECMLocY;
 	thrust::device_vector<double> dampCoef ; 
 
-	int decideIfAddECMNode_M(uint numECMNodes);
-	void AddECMNode(int indx, uint numECMNodes);
 	bool   eCMRemoved ; 
 	bool   isECMNeighborSet ;
 	bool isECMNeighborResetPostDivision;
 	void   FindNeighborCandidateForCellsAndECMNodes(); 
-	void MoveCellNodesByECMForces(int totalNodeCountForActiveCellsECM,int currentActiveCellCount, double dt, double Damp_CoefCell, double mitoticThreshold);  
-	void CalLinSpringForce() ; 
+	void MoveCellNodesByECMForces(int totalNodeCountForActiveCellsECM,int currentActiveCellCount, double dt, double Damp_CoefCell);  
+	void CalLinSpringForce(double timeRatio, double timeRatio_Crit) ; 
 	void CalBendSpringForce() ; 
-	void CalCellForcesOnECM(double mitoticThreshold) ; 
+	void CalCellForcesOnECM() ; 
 	void CalSumForcesOnECM() ; 
 	void MoveNodesBySumAllForces(double dt); 
 	void CalSumOnlyExplicitForcesOnECM(); 
@@ -84,7 +81,8 @@ public:
 		const { return eCMRemoved  ;}  
 	AniResumeData obtainResumeData(); 
 
-    void ApplyECMConstrain(int currentActiveCellCount, int totalNodeCountForActiveCellsECM, double curTime, double dt, double Damp_CoefCell, bool cellPolar, bool subCellPolar, bool isInitPhase, double mitoticThreshold) ; 
+    void ApplyECMConstrain(int currentActiveCellCount, int totalNodeCountForActiveCellsECM, double curTime, double dt, double Damp_CoefCell, bool cellPolar, bool subCellPolar, bool isInitPhase, 
+								double timeRatio, double timeRatio_Crit_ECM, double timeRatio_Crit_Division) ; 
 	void Initialize(uint maxAllNodePerCellECM, uint maxMembrNodePerCellECM, uint maxTotalNodesECM, int freqPlotData, string uniqueSymbol); 
 		EType ConvertStringToEType (string eNodeRead) ;
 	void PrintECM(double curTime);
@@ -122,7 +120,6 @@ thrust::device_vector<double> nodeECMLocX ;
 thrust::device_vector<double> nodeECMLocY ; 
 thrust::device_vector<double> nodeECMVelX ; 
 thrust::device_vector<double> nodeECMVelY ;
-// thrust::device_vector<bool> isActiveECM ;
 
 thrust::device_vector<double> nodeECMTmpLocX ; 
 thrust::device_vector<double> nodeECMTmpLocY ; 
@@ -131,6 +128,8 @@ thrust::device_vector<double> nodeECMTmpLocY ;
 //thrust::device_vector<double> nodeDeviceLocY ; 
 thrust::device_vector<double> nodeCellLocXOld ; 
 thrust::device_vector<double> nodeCellLocYOld ;
+thrust::device_vector<double> integrinMultipOld ;
+// thrust::device_vector<double> nodeCellLocZOld ;
 //thrust::device_vector<MembraneType1> memNodeType ;
 thrust::device_vector<int>   adhPairECM_Cell ;
  
@@ -185,9 +184,6 @@ class Solver{
 
 __device__
 double calMorse_ECM (const double & linkLength); 
-
-__device__
-double calMorse_ECM_mitotic (const double & linkLength, double scaling); 
 
 __device__
 double calMorseEnergy_ECM (const double & linkLength); 
@@ -301,20 +297,17 @@ struct FindCellNeighborPerECMNode: public thrust::unary_function<DD,int> {
 	__device__ int  operator() (const DD  & dD) const {
 		double  eCMLocX=	thrust::get<0>(dD) ; 
 		double  eCMLocY=    thrust::get<1>(dD) ; 
-		// bool	isActiveECM= thrust::get<2>(dDB) ; 
 		double  distMin= 1000000 ;  // large number
 		int idMin=-1 ;
 		double dist ; 
-		// if (isActiveECM == true){
-			for ( int i=0 ;  i<_numCells ; i++) { 
-				dist=sqrt((eCMLocX-_basalCellLocX[i])*(eCMLocX-_basalCellLocX[i])+
-						(eCMLocY-_basalCellLocY[i])*(eCMLocY-_basalCellLocY[i])) ;
-				if (dist <distMin) {
-					idMin=i ;
-					distMin=dist ; 
-				}
+		for ( int i=0 ;  i<_numCells ; i++) { 
+			dist=sqrt((eCMLocX-_basalCellLocX[i])*(eCMLocX-_basalCellLocX[i])+
+		    	      (eCMLocY-_basalCellLocY[i])*(eCMLocY-_basalCellLocY[i])) ;
+			if (dist <distMin) {
+				idMin=i ;
+				distMin=dist ; 
 			}
-		// }
+		}
 
 		return idMin ; 
 	}
@@ -325,9 +318,8 @@ struct FindECMNeighborPerCell: public thrust::unary_function<DD,int> {
 	double * _eCMLocX;
 	double * _eCMLocY;
 	int _numECMNodes ; 
-	// bool * _isActiveECM ;
 
-	__host__ __device__ FindECMNeighborPerCell(double * eCMLocX, double * eCMLocY, int numECMNodes/*, bool * isActiveECM*/): _eCMLocX(eCMLocX), _eCMLocY(eCMLocY), _numECMNodes (numECMNodes)/*, _isActiveECM(isActiveECM)*/  {
+	__host__ __device__ FindECMNeighborPerCell(double * eCMLocX, double * eCMLocY, int numECMNodes): _eCMLocX(eCMLocX), _eCMLocY(eCMLocY), _numECMNodes (numECMNodes)  {
 	}
 
 	__device__ int  operator() (const DD  & dD) const {
@@ -337,14 +329,12 @@ struct FindECMNeighborPerCell: public thrust::unary_function<DD,int> {
 		int idMin=-1 ;
 		double dist ; 
 		for ( int i=0 ;  i<_numECMNodes ; i++) { 
-			// if (_isActiveECM[i] == true){
-				dist=sqrt((basalCellLocX-_eCMLocX[i])*(basalCellLocX-_eCMLocX[i])+
-						(basalCellLocY-_eCMLocY[i])*(basalCellLocY-_eCMLocY[i])) ;
-				if (dist <distMin) {
-					idMin=i ;
-					distMin=dist ; 
-				}
-			// }
+			dist=sqrt((basalCellLocX-_eCMLocX[i])*(basalCellLocX-_eCMLocX[i])+
+		    	      (basalCellLocY-_eCMLocY[i])*(basalCellLocY-_eCMLocY[i])) ;
+			if (dist <distMin) {
+				idMin=i ;
+				distMin=dist ; 
+			}
 		}
 
 		return idMin ; 
@@ -356,7 +346,7 @@ struct FindECMNeighborPerCell: public thrust::unary_function<DD,int> {
 
 
 
-struct MoveNodes2_Cell: public thrust::unary_function<IIIDDBT,DDIDD> {
+struct MoveNodes2_Cell: public thrust::unary_function<IIIDDBTD,DDIDD> {
 	 double  *_locXAddr_ECM; 
          double  *_locYAddr_ECM; 
         uint _maxMembrNodePerCell ; 
@@ -365,21 +355,21 @@ struct MoveNodes2_Cell: public thrust::unary_function<IIIDDBT,DDIDD> {
 	 double _Damp_Coef ;
 	 EType*  _peripORexcmAddr ;
 	 int _activeCellCount ; 
-	 double* _cellGrowthProgress;
-	double _mitoticThreshold;
-	//  bool* _isActiveECM;
-	__host__ __device__ MoveNodes2_Cell (double * locXAddr_ECM, double * locYAddr_ECM, uint maxMembrNodePerCell, int numNodes_ECM, double dt, double Damp_Coef,EType * peripORexcmAddr, int activeCellCount, double* cellGrowthProgress, double mitoticThreshold/*, bool* isActiveECM*/) :
+	 bool* _isEnteringMitotic;
+	__host__ __device__ MoveNodes2_Cell (double * locXAddr_ECM, double * locYAddr_ECM, uint maxMembrNodePerCell, int numNodes_ECM, double dt, double Damp_Coef,EType * peripORexcmAddr, int activeCellCount, bool* isEnteringMitotic) :
 				_locXAddr_ECM(locXAddr_ECM),_locYAddr_ECM(locYAddr_ECM),_maxMembrNodePerCell(maxMembrNodePerCell),_numNodes_ECM(numNodes_ECM),_dt(dt),
-			    _Damp_Coef(Damp_Coef), _peripORexcmAddr(peripORexcmAddr), _activeCellCount (activeCellCount), _cellGrowthProgress(cellGrowthProgress), _mitoticThreshold(mitoticThreshold)/*, _isActiveECM(isActiveECM)*/	{
+			    _Damp_Coef(Damp_Coef), _peripORexcmAddr(peripORexcmAddr), _activeCellCount (activeCellCount), _isEnteringMitotic(isEnteringMitotic)	{
 	}
-	__device__ DDIDD  operator()(const IIIDDBT & iIIDDBT) const {
-	int eCMNeighborId=				thrust::get<0>(iIIDDBT) ; 
-	int cellRank=					thrust::get<1>(iIIDDBT) ; 
-	int nodeRankInOneCell=          thrust::get<2>(iIIDDBT) ; 
-	double            locX=         thrust::get<3>(iIIDDBT) ; 
-	double            locY=         thrust::get<4>(iIIDDBT) ; 
-	bool              nodeIsActive= thrust::get<5>(iIIDDBT) ; 
-	MembraneType1     mNodeType=     thrust::get<6>(iIIDDBT) ; 
+	__device__ DDIDD  operator()(const IIIDDBTD & iIIDDBTD) const {
+	int eCMNeighborId=				thrust::get<0>(iIIDDBTD) ; 
+	int cellRank=					thrust::get<1>(iIIDDBTD) ; 
+	int nodeRankInOneCell=          thrust::get<2>(iIIDDBTD) ; 
+	double            locX=         thrust::get<3>(iIIDDBTD) ; 
+	double            locY=         thrust::get<4>(iIIDDBTD) ; 
+	bool              nodeIsActive= thrust::get<5>(iIIDDBTD) ; 
+	MembraneType1     mNodeType=    thrust::get<6>(iIIDDBTD) ; 
+	double			  scaling =     thrust::get<7>(iIIDDBTD) ;
+	
 	
 	double locX_ECM, locY_ECM ; 
 	double dist ;
@@ -401,16 +391,11 @@ struct MoveNodes2_Cell: public thrust::unary_function<IIIDDBT,DDIDD> {
 	int   iPair=-1 ;
 	double smallNumber=0.000001;
 	int eCMId ; 
-	bool enteringMitotic;
-	double scaling;
 		
 		if ( nodeIsActive && nodeRankInOneCell<_maxMembrNodePerCell ) {
 			//for (int i=0 ; i<_numNodes_ECM ; i++) {
 			for (int i=eCMNeighborId-150 ; i<eCMNeighborId+150 ; i++) {
 				eCMId=i ; 
-				// if (_isActiveECM[eCMId]==false){
-				// 	continue;
-				// }
 				if (eCMId>_numNodes_ECM){
 					eCMId=eCMId-_numNodes_ECM ;
 				}
@@ -420,27 +405,7 @@ struct MoveNodes2_Cell: public thrust::unary_function<IIIDDBT,DDIDD> {
 				locX_ECM=_locXAddr_ECM[eCMId]; 
 				locY_ECM=_locYAddr_ECM[eCMId];
 				dist=sqrt((locX-locX_ECM)*(locX-locX_ECM)+(locY-locY_ECM)*(locY-locY_ECM)) ;
-				if (_cellGrowthProgress[cellRank] > _mitoticThreshold){
-					enteringMitotic = true;
-					//scaling = (_nodeCellGrowProAddr[i] - _mitoticThreshold)/(1 - _mitoticThreshold);
-					scaling = 1; //change made on 2/19/2022
-				}
-				else{
-					enteringMitotic = false;
-					scaling = 1;
-				}
-				if (enteringMitotic = true){
-					fMorse=(1.0+(2.0-1.0)*scaling)*calMorse_ECM(dist);
-				}
-				else{
-					fMorse=calMorse_ECM(dist);
-				}
-				// if (_cellGrowthProgress[cellRank] > _mitoticThreshold){
-				// 	fMorse=calMorse_ECM_mitotic(dist, 1.0);
-				// }
-				// else{
-					// fMorse=calMorse_ECM(dist);
-				// }
+				fMorse=calMorse_ECM(dist);
 				eMorseCell=eMorseCell + calMorseEnergy_ECM(dist);  
 				fTotalMorseX=fTotalMorseX+fMorse*(locX_ECM-locX)/dist ; 
 				fTotalMorseY=fTotalMorseY+fMorse*(locY_ECM-locY)/dist ; 
@@ -456,11 +421,18 @@ struct MoveNodes2_Cell: public thrust::unary_function<IIIDDBT,DDIDD> {
 			}
 			if (IsValidAdhPairForNotInitPhase(distMin)&& iPair!=-1) {
 
-        		fAdhMemECM=CalAdhECM(distMin) ; 
+				if (_isEnteringMitotic[cellRank] == true){
+					fAdhMemECM = 0.0;
+				}
+				else{
+        			fAdhMemECM=CalAdhECM(distMin) ; 
+				}
 				eAdhCell=CalAdhEnergy(distMin) ; 
 
-				fAdhMemECMX=fAdhMemECM*distMinX/distMin ;  
-				fAdhMemECMY=fAdhMemECM*distMinY/distMin ; 
+				// fAdhMemECMX=scaling*fAdhMemECM*distMinX/distMin ;  
+				// fAdhMemECMY=scaling*fAdhMemECM*distMinY/distMin ; 
+				fAdhMemECMX=1.0*fAdhMemECM*distMinX/distMin ;  
+				fAdhMemECMY=1.0*fAdhMemECM*distMinY/distMin ; 
 				adhPairECM=iPair ; 
 			}
 	 }
@@ -483,17 +455,18 @@ struct MoveNodes2_Cell: public thrust::unary_function<IIIDDBT,DDIDD> {
 
 
 struct LinSpringForceECM: public thrust::unary_function<IDD,DDDD> {
-         int   _numECMNodes ; 	
+         int   _numNodes ; 	
          double  *_locXAddr; 
          double  *_locYAddr;
 		 double *_stiffAddr; 
 		 double * _sponLenAddr ; 
-		//  bool * _isActiveECM;
+		 double _timeRatio;
+		 double _timeRatio_Crit_ECM;
 
 
-	__host__ __device__ LinSpringForceECM (double numECMNodes, double * locXAddr, double * locYAddr, 
-										   double * stiffAddr, double * sponLenAddr/*, bool * isActiveECM*/ ) :
-	 _numECMNodes(numECMNodes),_locXAddr(locXAddr),_locYAddr(locYAddr),_stiffAddr (stiffAddr), _sponLenAddr (sponLenAddr)/*, _isActiveECM(isActiveECM)*/ {
+	__host__ __device__ LinSpringForceECM (double numNodes, double * locXAddr, double * locYAddr, 
+										   double * stiffAddr, double * sponLenAddr, double timeRatio, double timeRatio_Crit_ECM) :
+	 _numNodes(numNodes),_locXAddr(locXAddr),_locYAddr(locYAddr),_stiffAddr (stiffAddr), _sponLenAddr (sponLenAddr), _timeRatio (timeRatio), _timeRatio_Crit_ECM (timeRatio_Crit_ECM) {
 	}
 	 __device__ DDDD operator()(const IDD & iDD) const {
 	
@@ -517,99 +490,164 @@ struct LinSpringForceECM: public thrust::unary_function<IDD,DDDD> {
 	double forceRightX ; 
 	double forceRightY ;
 
-	bool activePairLeft ;
-	bool activePairRight ;
+	double ecm_scale_index;
+	double ecm_scale_left;
+	double ecm_scale_right;
+	
 
 	double energyLeft, energyRight ; 
 	int indexLeft, indexRight ; 
 
-	if (index != 0 && index != _numECMNodes) {
+        if (index != 0) {
+
 		locXLeft=_locXAddr[index-1] ; 
 		locYLeft=_locYAddr[index-1] ;
 		indexLeft=index-1 ; 
-		// if (_isActiveECM[index]==true && _isActiveECM[indexLeft]==true){
-		// 	activePairLeft = true;
-		// }
+		}
+	else {
+		locXLeft=_locXAddr[_numNodes-1] ;
+		locYLeft=_locYAddr[_numNodes-1] ;
+		indexLeft=_numNodes-1 ; 
 	}
-	else if (index == 0){
-		locXLeft=_locXAddr[_numECMNodes-1] ;
-		locYLeft=_locYAddr[_numECMNodes-1] ;
-		indexLeft=_numECMNodes-1 ;
-		// if (_isActiveECM[index]==true && _isActiveECM[indexLeft]==true){
-		// 	activePairLeft = true;
-		// }
-	}
-	else if (index == _numECMNodes){
-		locXLeft=_locXAddr[index-1] ;
-		locYLeft=_locYAddr[index-1] ;
-		indexLeft=index-1 ;
-		// if (_isActiveECM[index]==true && _isActiveECM[indexLeft]==true){
-		// 	activePairLeft = true;
-		// }
-	}
-	// else {
-	// 	locXLeft=_locXAddr[_numNodes-1] ;
-	// 	locYLeft=_locYAddr[_numNodes-1] ;
-	// 	indexLeft=_numNodes-1 ; 
-	// }
+	double ecm_sec1_scale = 1.0;
+	double ecm_sec2_scale = 1.0;
+	double ecm_sec3_scale = 1.0;
+	double ecm_sec1_timedeptscaling = 1.0;
+	double ecm_sec2_timedeptscaling = 0.0625;
+	double ecm_sec3_timedeptscaling = 1.0;
 
-	// if (activePairLeft == true){
-		distLeft=sqrt( ( locX-locXLeft )*(locX-locXLeft) +( locY-locYLeft )*(locY-locYLeft) ) ;
-		double kStiffLeft =0.5*(  _stiffAddr[indexLeft]  +  _stiffAddr[index]  ) ; 
-		double sponLenLeft=0.5*(_sponLenAddr[indexLeft]  +_sponLenAddr[index]  ) ; 
-		//	forceLeft=calWLC_ECM(distLeft) ; 
-			//forceLeft=_linSpringStiff*(distLeft-_restLen) ; 
-			forceLeft=kStiffLeft*(distLeft-sponLenLeft) ; 
-			energyLeft=0.5*kStiffLeft*(distLeft-sponLenLeft)*(distLeft-sponLenLeft) ; 
-			forceLeftX=forceLeft*(locXLeft-locX)/distLeft ; 
-			forceLeftY=forceLeft*(locYLeft-locY)/distLeft ; 
-	// }
-	
-	if (index != _numECMNodes-1) {
+	if (0<1){
+	// if (_timeRatio < _timeRatio_Crit_ECM){
+		if (index>=0 && index<=650){
+			ecm_scale_index = ecm_sec1_scale;
+		}
+		else if (index>=651 && index<=1301){
+			ecm_scale_index = ecm_sec2_scale;
+		}
+		else if (index>=1302 && index<=1952){
+			ecm_scale_index = ecm_sec3_scale;
+		}
+		else{
+			ecm_scale_index = 1.0;
+		}
+	}
+	else if (_timeRatio >= _timeRatio_Crit_ECM){
+		if (index>=0 && index<=650){
+			ecm_scale_index = ecm_sec1_scale*ecm_sec1_timedeptscaling;
+		}
+		else if (index>=651 && index<=1301){
+			ecm_scale_index = ecm_sec2_scale*ecm_sec2_timedeptscaling;
+		}
+		else if (index>=1302 && index<=1952){
+			ecm_scale_index = ecm_sec3_scale*ecm_sec3_timedeptscaling;
+		}
+		else{
+			ecm_scale_index = 1.0;
+		}
+	}
+	if (0 < 1){
+	// if (_timeRatio < _timeRatio_Crit_ECM){	
+		if (indexLeft>=0 && indexLeft<=650){
+			ecm_scale_left = ecm_sec1_scale;
+		}
+		else if (indexLeft>=651 && indexLeft<=1301){
+			ecm_scale_left = ecm_sec2_scale;
+		}
+		else if (indexLeft>=1302 && indexLeft<=1952){
+			ecm_scale_left = ecm_sec3_scale;
+		}
+		else{
+			ecm_scale_left = 1.0;
+		}
+	}
+	else if (_timeRatio >= _timeRatio_Crit_ECM){	
+		if (indexLeft>=0 && indexLeft<=650){
+			ecm_scale_left = ecm_sec1_scale*ecm_sec1_timedeptscaling;
+		}
+		else if (indexLeft>=651 && indexLeft<=1301){
+			ecm_scale_left = ecm_sec2_scale*ecm_sec2_timedeptscaling;
+		}
+		else if (indexLeft>=1302 && indexLeft<=1952){
+			ecm_scale_left = ecm_sec3_scale*ecm_sec3_timedeptscaling;
+		}
+		else{
+			ecm_scale_left = 1.0;
+		}
+	}
+
+	distLeft=sqrt( ( locX-locXLeft )*(locX-locXLeft) +( locY-locYLeft )*(locY-locYLeft) ) ;
+	double kStiffLeft =0.5*(  ecm_scale_left*_stiffAddr[indexLeft]  +  ecm_scale_index*_stiffAddr[index]  ) ; 
+	double sponLenLeft=0.5*(_sponLenAddr[indexLeft]  +_sponLenAddr[index]  ) ; 
+	//	forceLeft=calWLC_ECM(distLeft) ; 
+		//forceLeft=_linSpringStiff*(distLeft-_restLen) ; 
+		forceLeft=kStiffLeft*(distLeft-sponLenLeft) ; 
+		energyLeft=0.5*kStiffLeft*(distLeft-sponLenLeft)*(distLeft-sponLenLeft) ; 
+		forceLeftX=forceLeft*(locXLeft-locX)/distLeft ; 
+		forceLeftY=forceLeft*(locYLeft-locY)/distLeft ; 
+
+	if (index != _numNodes-1) {
+
+		
 		locXRight=_locXAddr[index+1] ; 
 		locYRight=_locYAddr[index+1] ;
 		indexRight=index+1 ; 
-		// if (_isActiveECM[index]==true && _isActiveECM[indexRight]==true){
-		// 	activePairRight = true;
-		// }
-	}
-	if (index == _numECMNodes-1){
+		}
+	else {
+
 		locXRight=_locXAddr[0] ; 
 		locYRight=_locYAddr[0] ;
-		indexRight=0  ;
-		// if (_isActiveECM[index]==true && _isActiveECM[indexRight]==true){
-		// 	activePairRight = true;
-		// }
+		indexRight=0  ; 
 	}
-	else {
-		locXRight=_locXAddr[index+1] ; 
-		locYRight=_locYAddr[index+1] ;
-		indexRight=index+1 ;
-		// if (_isActiveECM[index]==true && _isActiveECM[indexRight]==true){
-		// 	activePairRight = true;
-		// }
-	}
-	// if (activePairRight==true){
-		distRight=sqrt( ( locX-locXRight )*(locX-locXRight) +( locY-locYRight )*(locY-locYRight) ) ; 
-		double kStiffRight =0.5*(_stiffAddr  [indexRight]  +  _stiffAddr[index]  ) ; 
-		double sponLenRight=0.5*(_sponLenAddr[indexRight]  +_sponLenAddr[index]  ) ; 
-				//forceRight=_linSpringStiff*(distRight-_restLen) ; 
-		forceRight=kStiffRight*(distRight-sponLenRight) ;
-		energyRight=0.5*kStiffRight*(distRight-sponLenRight)*(distRight-sponLenRight)  ;
 
-	//  	forceRight=calWLC_ECM(distRight) ; 
+	if (0 < 1){
+	// if (_timeRatio < _timeRatio_Crit_ECM){
+		if (indexRight>=0 && indexRight<=650){
+			ecm_scale_right = ecm_sec1_scale;
+		}
+		else if (indexRight>=651 && indexRight<=1301){
+			ecm_scale_right = ecm_sec2_scale;
+		}
+		else if (indexRight>=1302 && indexRight<=1952){
+			ecm_scale_right = ecm_sec3_scale;
+		}
+		else{
+			ecm_scale_right = 1.0;
+		}
+	}
+	else if (_timeRatio >= _timeRatio_Crit_ECM){
+		if (indexRight>=0 && indexRight<=650){
+			ecm_scale_right = ecm_sec1_scale*ecm_sec1_timedeptscaling;
+		}
+		else if (indexRight>=651 && indexRight<=1301){
+			ecm_scale_right = ecm_sec2_scale*ecm_sec2_timedeptscaling;
+		}
+		else if (indexRight>=1302 && indexRight<=1952){
+			ecm_scale_right = ecm_sec3_scale*ecm_sec3_timedeptscaling;
+		}
+		else{
+			ecm_scale_right = 1.0;
+		}
+	}
+
+	distRight=sqrt( ( locX-locXRight )*(locX-locXRight) +( locY-locYRight )*(locY-locYRight) ) ; 
+	double kStiffRight =0.5*(ecm_scale_right*_stiffAddr  [indexRight]  +  ecm_scale_index*_stiffAddr[index]  ) ; 
+	double sponLenRight=0.5*(_sponLenAddr[indexRight]  +_sponLenAddr[index]  ) ; 
+   	    	//forceRight=_linSpringStiff*(distRight-_restLen) ; 
+   	    	forceRight=kStiffRight*(distRight-sponLenRight) ;
+			energyRight=0.5*kStiffRight*(distRight-sponLenRight)*(distRight-sponLenRight)  ;
+
+        //  	forceRight=calWLC_ECM(distRight) ; 
 		forceRightX=forceRight*(locXRight-locX)/distRight ; 
 		forceRightY=forceRight*(locYRight-locY)/distRight ; 
-	//  }
-	//for open ECM.
-	//	if (index == 0 || index==int(_numNodes/2) ) {
-	//		return thrust::make_tuple(forceRightX,forceRightY,forceRight) ;
-	// }
-	//  else if (index ==_numNodes-1 || index==(int(_numNodes/2)-1) ) {
-	//		return thrust::make_tuple(forceLeftX,forceLeftY,forceLeft) ;
-	//	}
-	//	else {
-	return thrust::make_tuple(forceLeftX+forceRightX,forceLeftY+forceRightY,0.5*(forceLeft+forceRight), energyLeft+energyRight) ;
+		//for open ECM.
+//	if (index == 0 || index==int(_numNodes/2) ) {
+//		return thrust::make_tuple(forceRightX,forceRightY,forceRight) ;
+  // }
+ //  else if (index ==_numNodes-1 || index==(int(_numNodes/2)-1) ) {
+//		return thrust::make_tuple(forceLeftX,forceLeftY,forceLeft) ;
+//	}
+//	else {
+		return thrust::make_tuple(forceLeftX+forceRightX,forceLeftY+forceRightY,0.5*(forceLeft+forceRight), energyLeft+energyRight) ;
 //	}
         
 
@@ -625,13 +663,12 @@ struct LinSpringForceECM: public thrust::unary_function<IDD,DDDD> {
          uint  _maxMembrNodePerCell ; 	
          double  *_locXAddr_Cell; 
          double  *_locYAddr_Cell; 
+		 double  *_integrinMultip;
 	 bool    *_nodeIsActive_Cell ;  
 	 int     *_adhPairECM_Cell ; 
-	//  bool * _isActiveECM;
-	 double * _nodeCellGrowProAddr;
-	 double _mitoticThreshold;
-	__host__ __device__ MorseAndAdhForceECM (int numCells, uint maxNodePerCell, uint maxMembrNodePerCell, double * locXAddr_Cell, double * locYAddr_Cell, bool * nodeIsActive_Cell, int * adhPairECM_Cell/*, bool* isActiveECM*/, double* nodeCellGrowProAddr, double mitoticThreshold):
-	_numCells(numCells), _maxNodePerCell(maxNodePerCell), _maxMembrNodePerCell(maxMembrNodePerCell),_locXAddr_Cell(locXAddr_Cell),_locYAddr_Cell(locYAddr_Cell),_nodeIsActive_Cell(nodeIsActive_Cell),_adhPairECM_Cell(adhPairECM_Cell), /*_isActiveECM(isActiveECM),*/ _nodeCellGrowProAddr(nodeCellGrowProAddr), _mitoticThreshold(mitoticThreshold) {
+	 bool* _isEnteringMitotic;
+	__host__ __device__ MorseAndAdhForceECM (int numCells, uint maxNodePerCell, uint maxMembrNodePerCell, double * locXAddr_Cell, double * locYAddr_Cell, double * integrinMultip, bool * nodeIsActive_Cell, int * adhPairECM_Cell, bool* isEnteringMitotic) :
+	_numCells(numCells), _maxNodePerCell(maxNodePerCell), _maxMembrNodePerCell(maxMembrNodePerCell),_locXAddr_Cell(locXAddr_Cell),_locYAddr_Cell(locYAddr_Cell), _integrinMultip(integrinMultip), _nodeIsActive_Cell(nodeIsActive_Cell),_adhPairECM_Cell(adhPairECM_Cell), _isEnteringMitotic(isEnteringMitotic) {
 	}
 	 __device__ 
 	DDDD operator()(const IDDI & iDDI) const {
@@ -642,7 +679,7 @@ struct LinSpringForceECM: public thrust::unary_function<IDD,DDDD> {
 	int   cellId=     thrust::get<3>(iDDI) ; 
 
 	double fMorse ; 
-	double locX_C, locY_C ; 
+	double locX_C, locY_C ,scaling; 
 	double dist ;
 	double fAdhX=0 ; 
 	double fAdhY=0 ; 
@@ -656,8 +693,6 @@ struct LinSpringForceECM: public thrust::unary_function<IDD,DDDD> {
 	//double distAdhMax=0.78125 ; // need to take out
 	double fAdh ; 
 	// we are already in active cells. Two more conditions: 1-it is membrane 2-it is active node
-	bool enteringMitotic;
-	double scaling;
 
 	int cellIdAfter=cellId +1 ; 
 	if (cellIdAfter>_numCells-1) {
@@ -670,102 +705,76 @@ struct LinSpringForceECM: public thrust::unary_function<IDD,DDDD> {
 
     for (int i=cellIdBefore*_maxNodePerCell ; i<(cellIdBefore+1)*_maxNodePerCell ; i++) {
     //for (int i=0 ; i<_numCells*_maxNodePerCell ; i++) {
-		if (_nodeCellGrowProAddr[i] > _mitoticThreshold){
-			enteringMitotic = true;
-			//scaling = (_nodeCellGrowProAddr[i] - _mitoticThreshold)/(1 - _mitoticThreshold);
-			scaling = 1; //change made on 2/2/2022
-		}
-		else{
-			enteringMitotic = false;
-			scaling = 1;
-		}
 		if (_nodeIsActive_Cell[i] && (i%_maxNodePerCell)<_maxMembrNodePerCell){
 			locX_C=_locXAddr_Cell[i]; 
 			locY_C=_locYAddr_Cell[i];
+			scaling = 1.0;//_integrinMultip[i];
 			dist=sqrt((locX-locX_C)*(locX-locX_C)+(locY-locY_C)*(locY-locY_C)) ;
-			if (enteringMitotic == true){
-				fMorse=(1.0+(2.0-1.0)*scaling)*calMorse_ECM(dist);
-			}
-			else{
-				fMorse=calMorse_ECM(dist);
-			}  
+			fMorse=calMorse_ECM(dist);  
 			eMorse=eMorse + calMorseEnergy_ECM(dist);  
 			fTotalMorseX=fTotalMorseX+fMorse*(locX_C-locX)/dist ; 
 			fTotalMorseY=fTotalMorseY+fMorse*(locY_C-locY)/dist ; 
 			fTotalMorse=fTotalMorse+fMorse ;
 			if (_adhPairECM_Cell[i]==index) {
-				fAdh=CalAdhECM(dist) ; 
+				if (_isEnteringMitotic[cellIdBefore]){
+					fAdh = 0.0;
+				}
+				else{
+					fAdh=CalAdhECM(dist) ; 
+				}
 				eAdh=eAdh+CalAdhEnergy(dist) ; 
-				fAdhX=fAdhX+fAdh*(locX_C-locX)/dist ; 
-				fAdhY=fAdhY+fAdh*(locY_C-locY)/dist ; 
+				fAdhX=fAdhX+scaling*fAdh*(locX_C-locX)/dist ; 
+				fAdhY=fAdhY+scaling*fAdh*(locY_C-locY)/dist ; 
 			}			 
 		}
 	}
 	
 	for (int i=cellId*_maxNodePerCell ; i<(cellId+1)*_maxNodePerCell ; i++) {
-		if (_nodeCellGrowProAddr[i] > _mitoticThreshold){
-			enteringMitotic = true;
-			// scaling = (_nodeCellGrowProAddr[i] - _mitoticThreshold)/(1 - _mitoticThreshold);
-			scaling = 1; // change made on 2/2/2022
-		}
-		else{
-			enteringMitotic = false;
-			scaling = 1;
-		}
 		if (_nodeIsActive_Cell[i] && (i%_maxNodePerCell)<_maxMembrNodePerCell){
 			locX_C=_locXAddr_Cell[i]; 
 			locY_C=_locYAddr_Cell[i];
+			scaling = 1.0;//_integrinMultip[i];
 			dist=sqrt((locX-locX_C)*(locX-locX_C)+(locY-locY_C)*(locY-locY_C)) ;
-			if (enteringMitotic == true){
-				fMorse=(1.0+(2.0-1.0)*scaling)*calMorse_ECM(dist);
-			}
-			else{
-				fMorse=calMorse_ECM(dist);
-			}
-			// fMorse=calMorse_ECM(dist);  
+			fMorse=calMorse_ECM(dist);  
 			eMorse=eMorse + calMorseEnergy_ECM(dist);  
 			fTotalMorseX=fTotalMorseX+fMorse*(locX_C-locX)/dist ; 
 			fTotalMorseY=fTotalMorseY+fMorse*(locY_C-locY)/dist ; 
 			fTotalMorse=fTotalMorse+fMorse ;
 			if (_adhPairECM_Cell[i]==index) {
-				fAdh=CalAdhECM(dist) ; 
+				if (_isEnteringMitotic[cellId]){
+					fAdh = 0.0;
+				}
+				else{
+					fAdh=CalAdhECM(dist) ;
+				} 
 				eAdh=eAdh+CalAdhEnergy(dist) ; 
-				fAdhX=fAdhX+fAdh*(locX_C-locX)/dist ; 
-				fAdhY=fAdhY+fAdh*(locY_C-locY)/dist ; 
+				fAdhX=fAdhX+scaling*fAdh*(locX_C-locX)/dist ; 
+				fAdhY=fAdhY+scaling*fAdh*(locY_C-locY)/dist ; 
 			}			 
 		}
 	}
 
 	for (int i=cellIdAfter*_maxNodePerCell ; i<(cellIdAfter+1)*_maxNodePerCell ; i++) {
-		if (_nodeCellGrowProAddr[i] > _mitoticThreshold){
-			enteringMitotic = true;
-			// scaling = (_nodeCellGrowProAddr[i] - _mitoticThreshold)/(1 - _mitoticThreshold);
-			scaling = 1; // change made on 2/2/2022
-		}
-		else{
-			enteringMitotic = false;
-			scaling = 1;
-		}
 		if (_nodeIsActive_Cell[i] && (i%_maxNodePerCell)<_maxMembrNodePerCell){
 			locX_C=_locXAddr_Cell[i]; 
 			locY_C=_locYAddr_Cell[i];
+			scaling = 1.0;//_integrinMultip[i];
 			dist=sqrt((locX-locX_C)*(locX-locX_C)+(locY-locY_C)*(locY-locY_C)) ;
-			if (enteringMitotic == true){
-				fMorse=(1.0+(2.0-1.0)*scaling)*calMorse_ECM(dist);
-			}
-			else{
-				fMorse=calMorse_ECM(dist);
-			}
-			// fMorse=calMorse_ECM(dist);  
+			fMorse=calMorse_ECM(dist);  
 			eMorse=eMorse + calMorseEnergy_ECM(dist);  
 			fTotalMorseX=fTotalMorseX+fMorse*(locX_C-locX)/dist ; 
 			fTotalMorseY=fTotalMorseY+fMorse*(locY_C-locY)/dist ; 
 			fTotalMorse=fTotalMorse+fMorse ;
 			if (_adhPairECM_Cell[i]==index) {
-				fAdh=CalAdhECM(dist) ; 
+				if (_isEnteringMitotic[cellIdAfter]){
+					fAdh = 0.0;
+				}
+				else{
+					fAdh=CalAdhECM(dist) ; 
+				}
 				eAdh=eAdh+CalAdhEnergy(dist) ; 
-				fAdhX=fAdhX+fAdh*(locX_C-locX)/dist ; 
-				fAdhY=fAdhY+fAdh*(locY_C-locY)/dist ; 
+				fAdhX=fAdhX+scaling*fAdh*(locX_C-locX)/dist ; 
+				fAdhY=fAdhY+scaling*fAdh*(locY_C-locY)/dist ; 
 
 			}			 
 		}
@@ -891,10 +900,9 @@ struct CalBendECM: public thrust::unary_function<IDD, DDDDDD> {
 	double* _locYAddr;
 	int  _numECMNodes ;
 	double _eCMBendStiff ;  
-	// bool* _isActiveECM ;
 
-	__host__ __device__ CalBendECM (double* locXAddr, double* locYAddr, int numECMNodes, double eCMBendStiff/*, bool* isActiveECM*/) :
-				_locXAddr(locXAddr), _locYAddr(locYAddr),_numECMNodes(numECMNodes),_eCMBendStiff(eCMBendStiff)/*, _isActiveECM(isActiveECM)*/{
+	__host__ __device__ CalBendECM (double* locXAddr, double* locYAddr, int numECMNodes, double eCMBendStiff) :
+				_locXAddr(locXAddr), _locYAddr(locYAddr),_numECMNodes(numECMNodes),_eCMBendStiff(eCMBendStiff){
 	}
 	
 	__host__ __device__ DDDDDD operator()(const IDD &  iDD) const {
@@ -909,8 +917,6 @@ struct CalBendECM: public thrust::unary_function<IDD, DDDDDD> {
 
 		double rightPosX,rightPosY;
 		double lenRight;
-		double cosTheta, bendLeftX, bendRightX, bendLeftY, bendRightY, bendCenterX, bendCenterY;
-		bool activeTrio;
 			
 			int index_left = nodeRank - 1;
 			if (index_left == -1) {
@@ -930,30 +936,23 @@ struct CalBendECM: public thrust::unary_function<IDD, DDDDDD> {
 				rightPosY = _locYAddr[index_right];
 				lenRight = sqrt((rightPosX - locX) * (rightPosX - locX) + (rightPosY - locY) * (rightPosY - locY) );
 
-			// if (_isActiveECM[nodeRank]==true && _isActiveECM[index_left]==true && _isActiveECM[index_right]==true){
-			// 	activeTrio = true;
-			// }
+			double cosTheta=( (leftPosX-locX)*(rightPosX-locX)+(leftPosY-locY)*(rightPosY-locY) )/(lenRight*lenLeft) ; 
 
+			
+			double 	bendLeftX= -kb*(rightPosX-locX)/(lenRight*lenLeft)+
+						            kb*cosTheta/(lenLeft*lenLeft)*(leftPosX-locX) ; 
 
-			// if (activeTrio == true){
-				cosTheta=( (leftPosX-locX)*(rightPosX-locX)+(leftPosY-locY)*(rightPosY-locY) )/(lenRight*lenLeft) ; 
+			double 	bendRightX=-kb*(leftPosX-locX)/(lenRight*lenLeft)+
+						            kb*cosTheta/(lenRight*lenRight)*(rightPosX-locX) ; 
 
-				
-				bendLeftX= -kb*(rightPosX-locX)/(lenRight*lenLeft)+
-										kb*cosTheta/(lenLeft*lenLeft)*(leftPosX-locX) ; 
+			double  bendLeftY =-kb*(rightPosY-locY)/(lenRight*lenLeft)+
+						            kb* cosTheta/(lenLeft*lenLeft)*(leftPosY-locY) ; 
 
-				bendRightX=-kb*(leftPosX-locX)/(lenRight*lenLeft)+
-										kb*cosTheta/(lenRight*lenRight)*(rightPosX-locX) ; 
+		    double 	bendRightY=-kb*(leftPosY-locY)/(lenRight*lenLeft)+
+						            kb* cosTheta/(lenRight*lenRight)*(rightPosY-locY) ;
 
-				bendLeftY =-kb*(rightPosY-locY)/(lenRight*lenLeft)+
-										kb* cosTheta/(lenLeft*lenLeft)*(leftPosY-locY) ; 
-
-				bendRightY=-kb*(leftPosY-locY)/(lenRight*lenLeft)+
-										kb* cosTheta/(lenRight*lenRight)*(rightPosY-locY) ;
-
-				bendCenterX=-(bendLeftX+bendRightX) ; 
-				bendCenterY=-(bendLeftY+bendRightY) ; 
-			// }	
+			double bendCenterX=-(bendLeftX+bendRightX) ; 
+			double bendCenterY=-(bendLeftY+bendRightY) ; 
 			return thrust::make_tuple(bendCenterX,bendCenterY,
 					bendLeftX, bendLeftY, bendRightX, bendRightY);
 
@@ -1031,28 +1030,5 @@ struct AssignDamping : public thrust::unary_function<EType,double> {
 	
 } ; 
 
-
-struct ECMGrowFunc: public thrust::unary_function<DT, bool> {
-	uint _currECMCount;
-	uint _bound;
-	double _maxLengthToAddECMNodes;
-	// comment prevents bad formatting issues of __host__ and __device__ in Nsight__host__ __device__
-	__host__ __device__ ECMGrowFunc(uint currECMCount, uint bound, double maxLengthToAddECMNodes) :
-	_currECMCount(currECMCount), _bound(bound), _maxLengthToAddECMNodes(maxLengthToAddECMNodes) {
-	}
-	//Ali __host__ __device__ BoolD operator()(const DUi& dui) {
-	__host__ __device__ bool operator()(const DT& dt) {
-		//Ali double progress = thrust::get<0>(dui);
-        double LengthMax=thrust::get<0>(dt); //Ali
-		EType newNodeType = thrust::get<1>(dt);
-		if (_currECMCount < _bound   && LengthMax>_maxLengthToAddECMNodes){
-			return true;
-		}
-		else {
-			return false;
-		}
-		
-	}
-};
 
 #endif

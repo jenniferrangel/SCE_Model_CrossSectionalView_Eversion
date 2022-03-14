@@ -360,7 +360,6 @@ SceNodes::SceNodes(uint maxTotalCellCount, uint maxAllNodePerCell, uint currentA
 			<< allocPara_M.maxTotalNodeCount << std::endl;
 
 	allocSpaceForNodes(maxTotalNodeCount, allocPara_M.maxCellCount, currentActiveCellCount);
-	std::cout<<"Finished allocSpaceForNodes"<<std::endl;
 	thrust::host_vector<SceNodeType> hostTmpVector(maxTotalNodeCount);
 	thrust::host_vector<bool> hostTmpVector2(maxTotalNodeCount);
 
@@ -385,7 +384,7 @@ SceNodes::SceNodes(uint maxTotalCellCount, uint maxAllNodePerCell, uint currentA
 			//std::cout << std::endl;
 		}
 	}
-	std::cout << "finished" << std::endl;
+	//std::cout << "finished" << std::endl;
 	//std::cout.flush();
 	infoVecs.nodeCellType = hostTmpVector;
 	infoVecs.nodeIsActive = hostTmpVector2;
@@ -394,7 +393,7 @@ SceNodes::SceNodes(uint maxTotalCellCount, uint maxAllNodePerCell, uint currentA
 	infoVecs.nodeAdhereIndex = bondVec;
 	infoVecs.membrIntnlIndex = bondVec;
 	infoVecs.nodeAdhIndxHostCopy = bondVec;
-	std::cout << "copy finished!" << std::endl;
+	//std::cout << "copy finished!" << std::endl;
 	//std::cout.flush();
 	copyParaToGPUConstMem_M();
         std::cout << " I am in SceNodes constructor with short input which includes copyParaToGPUConstMem_M  function " << endl ; 
@@ -1534,12 +1533,10 @@ void calAndAddInter_M(double& xPos, double& yPos, double& xPos2, double& yPos2,
 	if (linkLength > sceInterBPara_M[4]) {
 		forceValue = 0;
 	} else {
-		
-			forceValue = -sceInterBPara_M[0] / sceInterBPara_M[2]
-					* exp(-linkLength / sceInterBPara_M[2])
-					+ sceInterBPara_M[1] / sceInterBPara_M[3]
-							* exp(-linkLength / sceInterBPara_M[3]);
-		
+		forceValue = -sceInterBPara_M[0] / sceInterBPara_M[2]
+				* exp(-linkLength / sceInterBPara_M[2])
+				+ sceInterBPara_M[1] / sceInterBPara_M[3]
+						* exp(-linkLength / sceInterBPara_M[3]);
 	//	if (forceValue > 0) {  //Ali 
 	//		forceValue = 0;
 	//	}
@@ -1547,32 +1544,7 @@ void calAndAddInter_M(double& xPos, double& yPos, double& xPos2, double& yPos2,
 	xRes = xRes + forceValue * (xPos2 - xPos) / linkLength;
 	yRes = yRes + forceValue * (yPos2 - yPos) / linkLength;
 }
-
-__device__
-void calAndAddInter_M_mitotic(double& xPos, double& yPos, double& xPos2, double& yPos2,
-		double& xRes, double& yRes, double scaling) {
-	double linkLength = computeDist2D(xPos, yPos, xPos2, yPos2);
-	double forceValue;
-	if (linkLength > sceInterBPara_M[4]) {
-		forceValue = 0;
-	} else {
-				forceValue = -(1.0+(2.5-1.0)*scaling)*sceInterBPara_M[0] / (/*(1*(1-scaling)+scaling*(1.0/2.0))**/sceInterBPara_M[2])
-					* exp(-linkLength / (/*(1*(1-scaling)+scaling*(1.0/2.0))**/sceInterBPara_M[2]))
-					+ (1.0+(2.5-1.0)*scaling)*sceInterBPara_M[1] / (/*(1*(1-scaling)+scaling*(1.0/2.0))**/sceInterBPara_M[3])
-							* exp(-linkLength / (/*(1*(1-scaling)+scaling*(1.0/2.0))**/sceInterBPara_M[3]));
-				// forceValue = -sceInterBPara_M[0] / (sceInterBPara_M[2])
-				// 	* exp(-linkLength / (sceInterBPara_M[2]))
-				// 	+ sceInterBPara_M[1] / (sceInterBPara_M[3])
-				// 			* exp(-linkLength / (sceInterBPara_M[3]));
-		
-	//	if (forceValue > 0) {  //Ali 
-	//		forceValue = 0;
-	//	}
-	}
-	xRes = xRes + forceValue * (xPos2 - xPos) / linkLength;
-	yRes = yRes + forceValue * (yPos2 - yPos) / linkLength;
-}
-
+//Ali
 __device__
 void calAndAddInter_M2(double& xPos, double& yPos, double& xPos2, double& yPos2,
 		double& xRes, double& yRes) {
@@ -2062,33 +2034,33 @@ void handleSceForceNodesDisc(uint& nodeRank1, uint& nodeRank2, double& xPos,
 	}
 }
 
-// __device__
-// void handleSceForceNodesDisc_M(uint& nodeRank1, uint& nodeRank2, double& xPos,
-// 		double& yPos, double& xPos2, double& yPos2, double& xRes, double& yRes,
-// 		double* _nodeLocXAddress, double* _nodeLocYAddress,
-// 		double* _nodeGrowProAddr) {
+__device__
+void handleSceForceNodesDisc_M(uint& nodeRank1, uint& nodeRank2, double& xPos,
+		double& yPos, double& xPos2, double& yPos2, double& xRes, double& yRes,
+		double* _nodeLocXAddress, double* _nodeLocYAddress,
+		double* _nodeGrowProAddr) {
 
-// 	if (isSameCell_m(nodeRank1, nodeRank2)) {
-// 		if (bothInternal(nodeRank1, nodeRank2)) {
-// 			// both nodes are internal type.
-// 			calAndAddIntraDiv_M(xPos, yPos, _nodeLocXAddress[nodeRank2],
-// 					_nodeLocYAddress[nodeRank2], _nodeGrowProAddr[nodeRank2],
-// 					xRes, yRes);
-// 		} else if (bothMembr(nodeRank1, nodeRank2)) {
-// 			// both nodes epithilium type. no sce force applied.
-// 			// nothing to do here.
-// 		} else {
-// 			// one node is epithilium type the other is internal type.
-// 			calAndAddIntraB_M(xPos, yPos, _nodeLocXAddress[nodeRank2],
-// 					_nodeLocYAddress[nodeRank2], xRes, yRes);
-// 		}
-// 	} else {
-// 		if (bothMembr(nodeRank1, nodeRank2)) {
-// 			calAndAddInter_M(xPos, yPos, _nodeLocXAddress[nodeRank2],
-// 					_nodeLocYAddress[nodeRank2], xRes, yRes);
-// 		}
-// 	}
-// }
+	if (isSameCell_m(nodeRank1, nodeRank2)) {
+		if (bothInternal(nodeRank1, nodeRank2)) {
+			// both nodes are internal type.
+			calAndAddIntraDiv_M(xPos, yPos, _nodeLocXAddress[nodeRank2],
+					_nodeLocYAddress[nodeRank2], _nodeGrowProAddr[nodeRank2],
+					xRes, yRes);
+		} else if (bothMembr(nodeRank1, nodeRank2)) {
+			// both nodes epithilium type. no sce force applied.
+			// nothing to do here.
+		} else {
+			// one node is epithilium type the other is internal type.
+			calAndAddIntraB_M(xPos, yPos, _nodeLocXAddress[nodeRank2],
+					_nodeLocYAddress[nodeRank2], xRes, yRes);
+		}
+	} else {
+		if (bothMembr(nodeRank1, nodeRank2)) {
+			calAndAddInter_M(xPos, yPos, _nodeLocXAddress[nodeRank2],
+					_nodeLocYAddress[nodeRank2], xRes, yRes);
+		}
+	}
+}
 
 void SceNodes::extendBuckets2D() {
 	static const uint extensionFactor2D = 9;
@@ -2342,7 +2314,7 @@ void SceNodes::applySceForcesDisc() {
 					nodeLocZAddress, nodeGrowProAddr));
 }
 
-void SceNodes::applySceForcesDisc_M(double mitoticThreshold) {
+void SceNodes::applySceForcesDisc_M() {
 
 	ECellType eCellTypeTmp ; 
 	thrust::host_vector <ECellType> eCellTypeVHost ;
@@ -2656,32 +2628,32 @@ void SceNodes::applySceForcesDisc_M(double mitoticThreshold) {
 			
 					int idFront=subApicalInfo[i].nodeIdFront[j] ;
 					// if (i == 31){
-						// std::cout<<"ERROR 1"<<std::endl;
+					// 	std::cout<<"ERROR 1"<<std::endl;
 					// }	
 					int idBehind=subApicalInfo[i].nodeIdBehind[j] ;
 					// if (i == 31){
-						// std::cout<<"ERROR 2"<<std::endl;
+					// 	std::cout<<"ERROR 2"<<std::endl;
 					// }	
 					int cellRankFront=infoVecs.nodeCellRankFrontHost[i] ;
 					// if (i == 31){
-						// std::cout<<"ERROR 3"<<std::endl;
+					// 	std::cout<<"ERROR 3"<<std::endl;
 					// }	 
 					int cellRankBehind=infoVecs.nodeCellRankBehindHost[i] ;
 					// if (i == 31){
-						// std::cout<<"ERROR 4"<<std::endl;
+					// 	std::cout<<"ERROR 4"<<std::endl;
 					// 	std::cout<<subApicalInfo[cellRankFront].nodeIdBehind.size()<<std::endl;
 					// }	
 					if (idFront != -1 && cellRankFront != -1) {
 						infoVecs.nodeAdhereIndexHost[idFront]=subApicalInfo[cellRankFront].nodeIdBehind[j] ;
 					}
 					// if (i == 31){
-						// std::cout<<"ERROR 5"<<std::endl;
+					// 	std::cout<<"ERROR 5"<<std::endl;
 					// }	
 					if (idBehind !=-1 && cellRankBehind != -1) {
 						infoVecs.nodeAdhereIndexHost[idBehind]=subApicalInfo[cellRankBehind].nodeIdFront[j] ;
 					}
 					// if (i == 31){
-						// std::cout<<"ERROR 6"<<std::endl;
+					// 	std::cout<<"ERROR 6"<<std::endl;
 					// }	
 					if ( eCellTypeVHost[i]==pouch && NumAdhBefore(i,pouch)==NumAdhAfter(i,pouch) ) {
 						infoVecs.nodeMemMirrorIndexHost[idFront]=idBehind ;
@@ -2774,8 +2746,6 @@ void SceNodes::applySceForcesDisc_M(double mitoticThreshold) {
 			&infoVecs.membrIntnlIndex[0]);
 	double* nodeGrowProAddr = thrust::raw_pointer_cast(
 			&infoVecs.nodeGrowPro[0]);
-	double* quiescencePerNodeAddr = thrust::raw_pointer_cast(
-			&infoVecs.quiescencePerNode[0]);
 	
 	thrust::transform(
 			make_zip_iterator(
@@ -2807,8 +2777,7 @@ void SceNodes::applySceForcesDisc_M(double mitoticThreshold) {
 							make_permutation_iterator(infoVecs.nodeVelY.begin(),
 									auxVecs.bucketValues.begin()))),
 			AddForceDisc_M(valueAddress, nodeLocXAddress, nodeLocYAddress,
-					nodeAdhIdxAddress, membrIntnlAddress,
-					nodeGrowProAddr, mitoticThreshold, quiescencePerNodeAddr));
+					nodeAdhIdxAddress, membrIntnlAddress, nodeGrowProAddr));
 	
 }
 
@@ -2911,9 +2880,7 @@ void SceNodes::sceForcesDisc() {
 }
 
 //Node velocity is reset back to zero in this function at the beginning of every new time step
-void SceNodes::sceForcesDisc_M(double timeRatio, double timeRatio_Crit_Division, int cycle,
-								double contractActomyo_multip_perCell1, double contractActomyo_multip_perCell2, double contractActomyo_multip_perCell3,
-								double contractActomyo_multip_perCell_apical1, double contractActomyo_multip_perCell_apical2, double contractActomyo_multip_perCell_apical3, double mitoticThreshold) {
+void SceNodes::sceForcesDisc_M(double timeRatio, double timeRatio_Crit_Division, int cycle) {
 #ifdef DebugMode
 	cudaEvent_t start1, start2, start3, stop;
 	float elapsedTime1, elapsedTime2, elapsedTime3;
@@ -2933,193 +2900,111 @@ void SceNodes::sceForcesDisc_M(double timeRatio, double timeRatio_Crit_Division,
 	cudaEventElapsedTime(&elapsedTime1, start1, start2);
 #endif
 	if (timeRatio == 0 && cycle <= 0){
-		// std::cout<<"Setting the anisotropic contractility profile"<<std::endl;
-		// std::cout<<"This message should only appear once, if more than once is shown, something is wrong!"<<std::endl;
-		// std::vector<double> contractActomyo_multip;
-		// //Starting from cell 0 to cell 62
-		// contractActomyo_multip.push_back(0.0);//CellID0
-		// contractActomyo_multip.push_back(0.0);
-		// contractActomyo_multip.push_back(0.536452492);
-		// contractActomyo_multip.push_back(0.52731934 );
-		// contractActomyo_multip.push_back(0.586284249);
-		// contractActomyo_multip.push_back(0.634834161);
-		// contractActomyo_multip.push_back(0.639320622);
-		// contractActomyo_multip.push_back(0.690594456);
-		// contractActomyo_multip.push_back(0.704374299);
-		// contractActomyo_multip.push_back(0.817977888);
-		// contractActomyo_multip.push_back(0.825348502);
-		// contractActomyo_multip.push_back(0.831277039);
-		// contractActomyo_multip.push_back(0.791539817);
-		// contractActomyo_multip.push_back(0.845217113);
-		// contractActomyo_multip.push_back(0.963467393);
-		// contractActomyo_multip.push_back(0.949206858);
-		// contractActomyo_multip.push_back(0.777279282);
-		// contractActomyo_multip.push_back(0.796026278);
-		// contractActomyo_multip.push_back(0.782887358);
-		// contractActomyo_multip.push_back(0.810767505);
-		// contractActomyo_multip.push_back(0.783528281);
-		// contractActomyo_multip.push_back(0.654382311);
-		// contractActomyo_multip.push_back(0.631950008);
-		// contractActomyo_multip.push_back(0.734657907);
-		// contractActomyo_multip.push_back(0.653260695);
-		// contractActomyo_multip.push_back(0.667040538);
-		// contractActomyo_multip.push_back(0.653581157);
-		// contractActomyo_multip.push_back(0.686909149);
-		// contractActomyo_multip.push_back(0.59509694 );
-		// contractActomyo_multip.push_back(0.636596699);
-		// contractActomyo_multip.push_back(0.56449287 );
-		// contractActomyo_multip.push_back(0.655343695);
-		// contractActomyo_multip.push_back(0.650536773);
-		// contractActomyo_multip.push_back(0.794584201);
-		// contractActomyo_multip.push_back(0.664156385);
-		// contractActomyo_multip.push_back(0.692997917);
-		// contractActomyo_multip.push_back(0.675212306);
-		// contractActomyo_multip.push_back(0.623297548);
-		// contractActomyo_multip.push_back(0.662714309);
-		// contractActomyo_multip.push_back(0.536612722);
-		// contractActomyo_multip.push_back(0.561288255);
-		// contractActomyo_multip.push_back(0.701650377);
-		// contractActomyo_multip.push_back(0.613683705);
-		// contractActomyo_multip.push_back(0.647332158);
-		// contractActomyo_multip.push_back(0.602467553);
-		// contractActomyo_multip.push_back(0.696042301);
-		// contractActomyo_multip.push_back(0.661592693);
-		// contractActomyo_multip.push_back(0.697003685);
-		// contractActomyo_multip.push_back(0.732574908);
-		// contractActomyo_multip.push_back(0.669123538);
-		// contractActomyo_multip.push_back(0.635475084);
-		// contractActomyo_multip.push_back(0.62586124 );
-		// contractActomyo_multip.push_back(0.632590931);
-		// contractActomyo_multip.push_back(0.701490146);
-		// contractActomyo_multip.push_back(0.712065374);
-		// contractActomyo_multip.push_back(0.795385355);
-		// contractActomyo_multip.push_back(0.798910431);
-		// contractActomyo_multip.push_back(0.838647653);
-		// contractActomyo_multip.push_back(0.777279282);
-		// contractActomyo_multip.push_back(0.693158148);
-		// contractActomyo_multip.push_back(0.647492389);
-		// contractActomyo_multip.push_back(0.631950008);
-		// contractActomyo_multip.push_back(0.611760936);
-
-
-		// std::vector<double> contractActomyo_multip_apical;
-		// contractActomyo_multip_apical.push_back(0.0);//CellID0
-		// contractActomyo_multip_apical.push_back(0.0);
-		// contractActomyo_multip_apical.push_back(0.563851947);
-		// contractActomyo_multip_apical.push_back(0.617529242);
-		// contractActomyo_multip_apical.push_back(0.626502163);
-		// contractActomyo_multip_apical.push_back(0.623938471);
-		// contractActomyo_multip_apical.push_back(0.623137318);
-		// contractActomyo_multip_apical.push_back(0.669764461);
-		// contractActomyo_multip_apical.push_back(0.63675693 );
-		// contractActomyo_multip_apical.push_back(0.672808845);
-		// contractActomyo_multip_apical.push_back(0.686268226);
-		// contractActomyo_multip_apical.push_back(0.679858997);
-		// contractActomyo_multip_apical.push_back(0.708059606);
-		// contractActomyo_multip_apical.push_back(0.7002083  );
-		// contractActomyo_multip_apical.push_back(0.791059125);
-		// contractActomyo_multip_apical.push_back(0.752123057);
-		// contractActomyo_multip_apical.push_back(0.770549591);
-		// contractActomyo_multip_apical.push_back(0.756609518);
-		// contractActomyo_multip_apical.push_back(0.786412434);
-		// contractActomyo_multip_apical.push_back(0.76814613 );
-		// contractActomyo_multip_apical.push_back(0.683544304);
-		// contractActomyo_multip_apical.push_back(0.701329915);
-		// contractActomyo_multip_apical.push_back(0.721038295);
-		// contractActomyo_multip_apical.push_back(0.798910431);
-		// contractActomyo_multip_apical.push_back(0.745874059);
-		// contractActomyo_multip_apical.push_back(0.767505207);
-		// contractActomyo_multip_apical.push_back(0.787534049);
-		// contractActomyo_multip_apical.push_back(0.823746195);
-		// contractActomyo_multip_apical.push_back(0.835603269);
-		// contractActomyo_multip_apical.push_back(0.873257491);
-		// contractActomyo_multip_apical.push_back(0.822945041);
-		// contractActomyo_multip_apical.push_back(1          );
-		// contractActomyo_multip_apical.push_back(0.834161192);
-		// contractActomyo_multip_apical.push_back(0.783528281);
-		// contractActomyo_multip_apical.push_back(0.830315655);
-		// contractActomyo_multip_apical.push_back(0.778240667);
-		// contractActomyo_multip_apical.push_back(0.795064893);
-		// contractActomyo_multip_apical.push_back(0.775516744);
-		// contractActomyo_multip_apical.push_back(0.756289056);
-		// contractActomyo_multip_apical.push_back(0.714148374);
-		// contractActomyo_multip_apical.push_back(0.692517225);
-		// contractActomyo_multip_apical.push_back(0.750841211);
-		// contractActomyo_multip_apical.push_back(0.785130588);
-		// contractActomyo_multip_apical.push_back(0.714949527);
-		// contractActomyo_multip_apical.push_back(0.675372536);
-		// contractActomyo_multip_apical.push_back(0.71126422 );
-		// contractActomyo_multip_apical.push_back(0.656785772);
-		// contractActomyo_multip_apical.push_back(0.658227848);
-		// contractActomyo_multip_apical.push_back(0.655023233);
-		// contractActomyo_multip_apical.push_back(0.616567858);
-		// contractActomyo_multip_apical.push_back(0.62810447 );
-		// contractActomyo_multip_apical.push_back(0.629065855);
-		// contractActomyo_multip_apical.push_back(0.638679699);
-		// contractActomyo_multip_apical.push_back(0.660471078);
-		// contractActomyo_multip_apical.push_back(0.667521231);
-		// contractActomyo_multip_apical.push_back(0.568017946);
-		// contractActomyo_multip_apical.push_back(0.633231854);
-		// contractActomyo_multip_apical.push_back(0.564332639);
-		// contractActomyo_multip_apical.push_back(0.548309566);
-		// contractActomyo_multip_apical.push_back(0.584842173);
-		// contractActomyo_multip_apical.push_back(0.550552796);
-		// contractActomyo_multip_apical.push_back(0.539817337);
-		// contractActomyo_multip_apical.push_back(0.529722801);
+		std::cout<<"Setting the anisotropic contractility profile"<<std::endl;
+		std::cout<<"This message should only appear once, if more than once is shown, something is wrong!"<<std::endl;
+		std::vector<double> contractActomyo_multip;
+		//Starting from cell 0 to cell 62
+		contractActomyo_multip.push_back(0.000000000);
+		contractActomyo_multip.push_back(0.000000000);
+		contractActomyo_multip.push_back(0.556793614);
+		contractActomyo_multip.push_back(0.547314153);
+		contractActomyo_multip.push_back(0.608514884);
+		contractActomyo_multip.push_back(0.658905704);
+		contractActomyo_multip.push_back(0.663562282);
+		contractActomyo_multip.push_back(0.716780309);
+		contractActomyo_multip.push_back(0.731082654);
+		contractActomyo_multip.push_back(0.848993847);
+		contractActomyo_multip.push_back(0.856643938);
+		contractActomyo_multip.push_back(0.862797273);
+		contractActomyo_multip.push_back(0.821553301);
+		contractActomyo_multip.push_back(0.877265924);
+		contractActomyo_multip.push_back(1.000000000);
+		contractActomyo_multip.push_back(0.985198736);
+		contractActomyo_multip.push_back(0.806752037);
+		contractActomyo_multip.push_back(0.826209879);
+		contractActomyo_multip.push_back(0.812572759);
+		contractActomyo_multip.push_back(0.841510062);
+		contractActomyo_multip.push_back(0.813237984);
+		contractActomyo_multip.push_back(0.679195077);
+		contractActomyo_multip.push_back(0.655912190);
+		contractActomyo_multip.push_back(0.762514552);
+		contractActomyo_multip.push_back(0.678030933);
+		contractActomyo_multip.push_back(0.692333278);
+		contractActomyo_multip.push_back(0.678363546);
+		contractActomyo_multip.push_back(0.712955264);
+		contractActomyo_multip.push_back(0.617661733);
+		contractActomyo_multip.push_back(0.660735074);
+		contractActomyo_multip.push_back(0.585897223);
+		contractActomyo_multip.push_back(0.680192915);
+		contractActomyo_multip.push_back(0.675203725);
+		contractActomyo_multip.push_back(0.824713122);
+		contractActomyo_multip.push_back(0.689339764);
+		contractActomyo_multip.push_back(0.719274904);
+		contractActomyo_multip.push_back(0.700814901);
+		contractActomyo_multip.push_back(0.646931648);
+		contractActomyo_multip.push_back(0.687843007);
+		contractActomyo_multip.push_back(0.556959920);
+		contractActomyo_multip.push_back(0.582571096);
+		contractActomyo_multip.push_back(0.728255447);
+		contractActomyo_multip.push_back(0.636953268);
+		contractActomyo_multip.push_back(0.671877599);
+		contractActomyo_multip.push_back(0.625311824);
+		contractActomyo_multip.push_back(0.722434725);
+		contractActomyo_multip.push_back(0.686678862);
+		contractActomyo_multip.push_back(0.723432563);
+		contractActomyo_multip.push_back(0.760352569);
+		contractActomyo_multip.push_back(0.694495260);
+		contractActomyo_multip.push_back(0.659570930);
+		contractActomyo_multip.push_back(0.649592549);
+		contractActomyo_multip.push_back(0.656577416);
+		contractActomyo_multip.push_back(0.728089140);
+		contractActomyo_multip.push_back(0.739065358);
+		contractActomyo_multip.push_back(0.825544653);
+		contractActomyo_multip.push_back(0.829203393);
+		contractActomyo_multip.push_back(0.870447364);
+		contractActomyo_multip.push_back(0.806752037);
+		contractActomyo_multip.push_back(0.719441211);
+		contractActomyo_multip.push_back(0.672043905);
+		contractActomyo_multip.push_back(0.655912190);
+		contractActomyo_multip.push_back(0.634957592);
 
 		for (int i = 0; i < allocPara_M.maxTotalNodeCount; i++){
 			uint cellRank = i/allocPara_M.maxAllNodePerCell;
-			if (cellRank >= 2 && cellRank <= 21){
-			// if (cellRank >= 2 && cellRank <= 15){
-				// infoVecs.contractActomyo_multip[i] = pow(contractActomyo_multip[cellRank], 1.0);////1.0;
-				// infoVecs.contractActomyo_multip_apical[i] = pow(contractActomyo_multip_apical[cellRank], 1.0);//0.25;
-				infoVecs.contractActomyo_multip[i] = contractActomyo_multip_perCell1;//pow(contractActomyo_multip[cellRank], 3.0);////1.0;
-				infoVecs.contractActomyo_multip_apical[i] = contractActomyo_multip_perCell_apical1;//0.25;
+			// if (cellRank >= 2 && cellRank <= 21){
+			if (cellRank >= 2 && cellRank <= 15){
+				infoVecs.contractActomyo_multip[i] = 1.25;//pow(contractActomyo_multip[cellRank], 3.0);////1.0;
+				infoVecs.contractActomyo_multip_apical[i] = 0.25;
 				if (i == 2*allocPara_M.maxAllNodePerCell || i == 21*allocPara_M.maxAllNodePerCell){
 					std::cout<<"infoVecs.contractActomyo_multip["<<i<<"] = "<<infoVecs.contractActomyo_multip[i]<<std::endl;
 					std::cout<<"infoVecs.contractActomyo_multip_apical["<<i<<"] = "<<infoVecs.contractActomyo_multip_apical[i]<<std::endl;
 				}
-				// cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[cellRank] = pow(contractActomyo_multip[cellRank], 1.0);//infoVecs.contractActomyo_multip[i];
-				// cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[cellRank] = pow(contractActomyo_multip_apical[cellRank], 1.0);//0.25;//infoVecs.contractActomyo_multip_apical[i];
-				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[cellRank] = contractActomyo_multip_perCell1;//infoVecs.contractActomyo_multip[i];
-				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[cellRank] = contractActomyo_multip_perCell_apical1;//0.25;//infoVecs.contractActomyo_multip_apical[i];
+				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[cellRank] = infoVecs.contractActomyo_multip[i];
+				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[cellRank] = infoVecs.contractActomyo_multip_apical[i];
 			}
-			else if (cellRank >= 22 && cellRank <= 42){
-			// else if (cellRank >= 16 && cellRank <= 48){
-				// infoVecs.contractActomyo_multip[i] = pow(contractActomyo_multip[cellRank], 1.0);////1.0;
-				// infoVecs.contractActomyo_multip_apical[i] = pow(contractActomyo_multip_apical[cellRank], 1.0);//0.25;
-				infoVecs.contractActomyo_multip[i] = contractActomyo_multip_perCell2;//1.5;//pow(contractActomyo_multip[cellRank], 3.0);//0.25;//1.0;
-				infoVecs.contractActomyo_multip_apical[i] = contractActomyo_multip_perCell_apical2;//1.5;
-				// if (cellRank >=28 && cellRank <=34){
+			// else if (cellRank >= 22 && cellRank <= 42){
+			else if (cellRank >= 16 && cellRank <= 48){
+				infoVecs.contractActomyo_multip[i] = 1.0;//pow(contractActomyo_multip[cellRank], 3.0);//0.25;//1.0;
+				infoVecs.contractActomyo_multip_apical[i] = 1.5;
+				// if (cellRank >=29 && cellRank <=35){
 				// 	infoVecs.contractActomyo_multip_apical[i] = 2.0;
 				// }
 				if (i == 22*allocPara_M.maxAllNodePerCell || i == 42*allocPara_M.maxAllNodePerCell){
 					std::cout<<"infoVecs.contractActomyo_multip["<<i<<"] = "<<infoVecs.contractActomyo_multip[i]<<std::endl;
 					std::cout<<"infoVecs.contractActomyo_multip_apical["<<i<<"] = "<<infoVecs.contractActomyo_multip_apical[i]<<std::endl;
 				}
-				// cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[cellRank] = pow(contractActomyo_multip[cellRank], 1.0);//infoVecs.contractActomyo_multip[i];
-				// cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[cellRank] = pow(contractActomyo_multip_apical[cellRank], 1.0);
-				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[cellRank] = contractActomyo_multip_perCell2;//1.5;//infoVecs.contractActomyo_multip[i];
-				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[cellRank] = contractActomyo_multip_perCell_apical2;//1.5;//infoVecs.contractActomyo_multip_apical[i];
-				// if (cellRank >=28 && cellRank <=34){
-				// 	cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[cellRank] = contractActomyo_multip_perCell2*1.125;
-				// 	cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[cellRank] = contractActomyo_multip_perCell_apical2*1.0;
-				// }
+				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[cellRank] = infoVecs.contractActomyo_multip[i];
+				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[cellRank] = infoVecs.contractActomyo_multip_apical[i];
 			}
-			else if (cellRank >= 43 && cellRank <= 62){
-			// else if (cellRank >= 49 && cellRank <= 62){
-				// infoVecs.contractActomyo_multip[i] = pow(contractActomyo_multip[cellRank], 1.0);////1.0;
-				// infoVecs.contractActomyo_multip_apical[i] = pow(contractActomyo_multip_apical[cellRank], 1.0);//0.25;
-				infoVecs.contractActomyo_multip[i] = contractActomyo_multip_perCell3;//pow(contractActomyo_multip[cellRank], 3.0);//1.0;
-				infoVecs.contractActomyo_multip_apical[i] = contractActomyo_multip_perCell_apical3;//0.25;
+			// else if (cellRank >= 43 && cellRank <= 62){
+			else if (cellRank >= 49 && cellRank <= 62){
+				infoVecs.contractActomyo_multip[i] = 1.25;//pow(contractActomyo_multip[cellRank], 3.0);//1.0;
+				infoVecs.contractActomyo_multip_apical[i] = 0.25;
 				if (i == 43*allocPara_M.maxAllNodePerCell || i == 62*allocPara_M.maxAllNodePerCell){
 					std::cout<<"infoVecs.contractActomyo_multip["<<i<<"] = "<<infoVecs.contractActomyo_multip[i]<<std::endl;
 					std::cout<<"infoVecs.contractActomyo_multip_apical["<<i<<"] = "<<infoVecs.contractActomyo_multip_apical[i]<<std::endl;
 				}
-				// cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[cellRank] = pow(contractActomyo_multip[cellRank], 1.0);//infoVecs.contractActomyo_multip[i];
-				// cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[cellRank] = pow(contractActomyo_multip_apical[cellRank], 1.0);
-				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[cellRank] = contractActomyo_multip_perCell3;//infoVecs.contractActomyo_multip[i];
-				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[cellRank] = contractActomyo_multip_perCell_apical3;//0.25;//infoVecs.contractActomyo_multip_apical[i];
+				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[cellRank] = infoVecs.contractActomyo_multip[i];
+				cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[cellRank] = infoVecs.contractActomyo_multip_apical[i];
 			}
 			else{
 				infoVecs.contractActomyo_multip[i] = 0.0;
@@ -3132,15 +3017,10 @@ void SceNodes::sceForcesDisc_M(double timeRatio, double timeRatio_Crit_Division,
 		for (int j = 0; j < allocPara_M.maxCellCount; j++){
 			std::cout<<"contractActomyo_multip_perCell["<<j<<"] = "<<cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[j]<<", and multip_apical_perCell = "<<cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[j]<<std::endl;
 		}
-
-		for (int i = 0; i < allocPara_M.currentActiveCellCount; i++){
-			std::cout<<"basal actomyo contractility for cell["<<i<<"] : "<<cellsSceNodes->getCellInfoVecs().contractActomyo_multip_perCell[i] <<std::endl;
-			std::cout<<"apical actomyo contractility for cell["<<i<<"] : "<<cellsSceNodes->getCellInfoVecs().contractActomyo_multip_apical_perCell[i]<<std::endl;
-		}
 	}
 	// cout << " confirm--- 2 ---" << endl;
 	cout.flush();
-	applySceForcesDisc_M(mitoticThreshold); // compate the MMD forces and also finds the nearset neighbor for applying the adhesion
+	applySceForcesDisc_M(); // compate the MMD forces and also finds the nearset neighbor for applying the adhesion
 
 
 #ifdef DebugMode
@@ -3235,7 +3115,6 @@ void SceNodes::allocSpaceForNodes(uint maxTotalNodeCount,uint maxNumCells, uint 
 	infoVecs.nodeActomyosinMultip_basal.resize(maxTotalNodeCount);
 	infoVecs.nodeActomyosinMultip_apical.resize(maxTotalNodeCount);
 	infoVecs.nodeIntegrinMultip.resize(maxTotalNodeCount);
-	infoVecs.quiescencePerNode.resize(maxTotalNodeCount, -100.0);
 
 	//infoVecs.nodeContractLevel.resize(maxTotalNodeCount,0.0);// Ali
 	infoVecs.nodeF_MM_C_X.resize(maxTotalNodeCount,0.0);// Ali
@@ -3292,8 +3171,7 @@ void SceNodes::allocSpaceForNodes(uint maxTotalNodeCount,uint maxNumCells, uint 
 		infoVecs.nodeAdhereIndexHost.resize(maxTotalNodeCount); //Ali 
 		infoVecs.nodeMemMirrorIndexHost.resize(maxTotalNodeCount); //Ali 
 		infoVecs.membrIntnlIndex.resize(maxTotalNodeCount);
-		infoVecs.nodeGrowPro.resize(maxTotalNodeCount, false);
-		infoVecs.nodeMitotic.resize(maxTotalNodeCount);
+		infoVecs.nodeGrowPro.resize(maxTotalNodeCount);
 		infoVecs.membrTensionMag.resize(maxTotalNodeCount, 0);
 		infoVecs.membrTenMagRi.resize(maxTotalNodeCount, 0);
 		infoVecs.membrDistToRi.resize(maxTotalNodeCount, 0);//AAMIRI

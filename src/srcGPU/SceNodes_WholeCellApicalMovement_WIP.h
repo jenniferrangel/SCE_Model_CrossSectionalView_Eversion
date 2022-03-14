@@ -91,7 +91,6 @@ typedef thrust::tuple<double, double, double, double> CVec4;
 typedef thrust::tuple<double, double, double, double, bool> CVec4Bool;
 typedef thrust::tuple<double, double, double, double, double> CVec5;
 typedef thrust::tuple<double, double, double, double, double, double> CVec6;
-typedef thrust::tuple<uint, double, double, double, double, double, double> CVec7;
 typedef thrust::tuple<double, double, double, double, double, double, double,
 		double, double, double> CVec10;
 typedef thrust::tuple<double, double, double, double, double, double, bool> CVec6Bool;
@@ -549,11 +548,6 @@ double computeDist2D(double &xPos, double &yPos, double &xPos2, double &yPos2);
 __device__
 void calAndAddInter_M(double& xPos, double& yPos, double& xPos2, double& yPos2,
 		double& xRes, double& yRes);
-
-__device__
-void calAndAddInter_M_mitotic(double& xPos, double& yPos, double& xPos2, double& yPos2,
-		double& xRes, double& yRes, double scaling);
-
 __device__
 void calAndAddInter_M2(double& xPos, double& yPos, double& xPos2, double& yPos2,
 		double& xRes, double& yRes);
@@ -699,17 +693,15 @@ struct AddForceDisc_M: public thrust::unary_function<Tuuudd, CVec2> {
 	int* _nodeAdhereIndex;
 	int* _membrIntnlIndex;
 	double* _nodeGroProAddr;
-	double _mitoticThreshold;
-	double* _quiescencePerNode;
 	// comment prevents bad formatting issues of __host__ and __device__ in Nsight
 	__host__ __device__
 	AddForceDisc_M(uint* valueAddress, double* nodeLocXAddress,
 			double* nodeLocYAddress, int* nodeAdhereIndex, int* membrIntnlIndex,
-			double* nodeGrowProAddr, double mitoticThreshold, double* quiescencePerNode) :
+			double* nodeGrowProAddr) :
 			_extendedValuesAddress(valueAddress), _nodeLocXAddress(
 					nodeLocXAddress), _nodeLocYAddress(nodeLocYAddress), _nodeAdhereIndex(
-					nodeAdhereIndex), _membrIntnlIndex(membrIntnlIndex),  _nodeGroProAddr(
-					nodeGrowProAddr), _mitoticThreshold(mitoticThreshold), _quiescencePerNode(quiescencePerNode) {
+					nodeAdhereIndex), _membrIntnlIndex(membrIntnlIndex), _nodeGroProAddr(
+					nodeGrowProAddr) {
 	}
 	__device__
 	CVec2 operator()(const Tuuudd &u3d2) const {
@@ -722,90 +714,23 @@ struct AddForceDisc_M: public thrust::unary_function<Tuuudd, CVec2> {
 		double xPos = thrust::get<3>(u3d2);
 		double yPos = thrust::get<4>(u3d2);
 
-
 		bool isSuccess = false;
 		uint index;
 		double dist;
-		// uint cellRank = myValue/_maxAllNodePerCell;
-		bool enteringMitotic, postMitotic;
-		double scaling, scalingPostMitotic;
                 bool  Lennard_Jones = false ;// Is_Lennard_Jones() ;
 		for (uint i = begin; i < end; i++) {
 			uint nodeRankOther = _extendedValuesAddress[i];
 			if (nodeRankOther == myValue) {
 				continue;
 			}
-			if (_nodeGroProAddr[myValue] > _mitoticThreshold){// || _nodeGroProAddr[nodeRankOther] > _mitoticThreshold){
-				enteringMitotic = true;
-				if (_nodeGroProAddr[myValue] > _mitoticThreshold){
-					// scaling = (_nodeGroProAddr[myValue] - _mitoticThreshold)/(1 - _mitoticThreshold);
-					// if (scaling > 1.0){
-						scaling = 1.0;
-					// }
-					enteringMitotic = true;
-					postMitotic = false;
-				}
-			}
-			else if (_nodeGroProAddr[nodeRankOther] > _mitoticThreshold){
-					// scaling = (_nodeGroProAddr[nodeRankOther] - _mitoticThreshold)/(1 - _mitoticThreshold);
-					// if (scaling > 1.0){
-						scaling = 1.0;
-					// }
-					enteringMitotic = true;
-					postMitotic = false;
-				}
-			else{
-				enteringMitotic = false;
-				if ((_nodeGroProAddr[myValue] - _quiescencePerNode[myValue]) < 1e4*0.5*3.84e-7){
-					// scalingPostMitotic = pow((_nodeGroProAddr[myValue]/-0.1), 2.0); //1.0;
-					// if (scalingPostMitotic >= 1.0){
-						// scalingPostMitotic = 1.0;
-						scaling = 1.0;
-					// }
-					postMitotic = true;
-					enteringMitotic = false;
-				} 
-				else if ((_nodeGroProAddr[nodeRankOther] - _quiescencePerNode[nodeRankOther]) < 1e4*0.5*3.84e-7){
-					// scalingPostMitotic = pow((_nodeGroProAddr[myValue]/-0.1), 2.0); //1.0;
-					// if (scalingPostMitotic >= 1.0){
-						// scalingPostMitotic = 1.0;
-						scaling = 1.0;
-					// }
-					postMitotic = true;
-					enteringMitotic = false;
-				} 
-				// else if (_nodeGroProAddr[nodeRankOther] <= 0.00){
-				// 	scalingPostMitotic = 1.0;
-				// 	postMitotic = true;
-				// 	enteringMitotic = false;
-				// } 
-				else{
-					postMitotic = false;
-					enteringMitotic = false;
-				}
-			}
 			if (bothMembrDiffCell(myValue, nodeRankOther)) {
                             if (Lennard_Jones) {
 				calAndAddInter_M2(xPos, yPos, _nodeLocXAddress[nodeRankOther],
 						_nodeLocYAddress[nodeRankOther], xRes, yRes);
                                                }
-                            else               {
-								if (enteringMitotic == true){    
-									calAndAddInter_M_mitotic(xPos, yPos, _nodeLocXAddress[nodeRankOther],
-											_nodeLocYAddress[nodeRankOther], xRes, yRes, scaling);
-								}
-								else{
-									if (postMitotic == true){
-										// calAndAddInter_M_mitotic(xPos, yPos, _nodeLocXAddress[nodeRankOther],
-										// 	_nodeLocYAddress[nodeRankOther], xRes, yRes, scalingPostMitotic);
-										calAndAddInter_M_mitotic(xPos, yPos, _nodeLocXAddress[nodeRankOther],
-											_nodeLocYAddress[nodeRankOther], xRes, yRes, scaling);
-									}
-									else{
-										calAndAddInter_M(xPos, yPos, _nodeLocXAddress[nodeRankOther],
-												_nodeLocYAddress[nodeRankOther], xRes, yRes);
-									}
-								}
+                            else               {    
+				calAndAddInter_M(xPos, yPos, _nodeLocXAddress[nodeRankOther],
+						_nodeLocYAddress[nodeRankOther], xRes, yRes);
                                                }
 					}
 		}
@@ -867,11 +792,24 @@ struct ApplyAdh: public thrust::unary_function<BoolIUiDDT, CVec2> {
 	int* _nodeAdhAddr ;
 	double * _nodeDppAddr ;
 	bool _isApicalAdhPresent ;
+	uint _maxNodePerCell;
+	bool* _isEnteringMitotic;
+	double* _individualCellHeight;
+	double* _memContractProgress;
+	//double* _distFromNucleus_normal_apical;
+	double* _apicalLocX;
+	double* _apicalLocY;
 // comment prevents bad formatting issues of __host__ and __device__ in Nsight
 	__host__ __device__
-	ApplyAdh(double* nodeLocXArrAddr, double* nodeLocYArrAddr, double* nodeGrowProAddr, int* nodeAdhAddr , double * nodeDppAddr, bool isApicalAdhPresent) :
+	ApplyAdh(double* nodeLocXArrAddr, double* nodeLocYArrAddr, double* nodeGrowProAddr,
+	 			int* nodeAdhAddr , double * nodeDppAddr, bool isApicalAdhPresent, 
+				uint maxNodePerCell, bool* isEnteringMitotic,
+				double* individualCellHeight, double* memContractProgress,//double* distFromNucleus_normal_apical,
+				double* apicalLocX, double* apicalLocY) :
 			_nodeLocXArrAddr(nodeLocXArrAddr), _nodeLocYArrAddr(nodeLocYArrAddr), _nodeGrowProAddr(nodeGrowProAddr), _nodeAdhAddr(nodeAdhAddr),
-		    _nodeDppAddr(nodeDppAddr), _isApicalAdhPresent(isApicalAdhPresent) 	{
+		    _nodeDppAddr(nodeDppAddr), _isApicalAdhPresent(isApicalAdhPresent), _maxNodePerCell(maxNodePerCell), _isEnteringMitotic(isEnteringMitotic),
+			_individualCellHeight(individualCellHeight), _memContractProgress(memContractProgress),//_distFromNucleus_normal_apical(distFromNucleus_normal_apical),
+			_apicalLocX(apicalLocX), _apicalLocY(apicalLocY) 	{
 	}
 	__device__
 	CVec2 operator()(const BoolIUiDDT& adhInput) const {
@@ -887,6 +825,8 @@ struct ApplyAdh: public thrust::unary_function<BoolIUiDDT, CVec2> {
 		//bool adhSkipped = false;	
 		double alpha = getMitoticAdhCoef(growProg, growProgNeigh);//to adjust the mitotic values of stiffness
 		double beta=1 ; // every other pair is one for apical is different. 
+		int cellRank = nodeIndx/_maxNodePerCell;
+		int cellRankOther = adhIndx/_maxNodePerCell;
 	   	if (nodeType==apical1 && _isApicalAdhPresent) {
 			//beta=0.1* 0.5*( _nodeDppAddr[nodeIndx]+ _nodeDppAddr [adhIndx] ) ; 
 			//beta=0.1* 0.5*( _nodeDppAddr[nodeIndx]+ _nodeDppAddr [adhIndx] ) ; 
@@ -896,7 +836,7 @@ struct ApplyAdh: public thrust::unary_function<BoolIUiDDT, CVec2> {
 			//beta=0.1* 0.5*( _nodeDppAddr[nodeIndx]+ _nodeDppAddr [adhIndx] ) ; 
 			//beta=0.1* 0.5*( _nodeDppAddr[nodeIndx]+ _nodeDppAddr [adhIndx] ) ; 
 			beta=0.0;   
-		}
+		}	
 
 		/*int maxNodePerCell=680  ; 
 		int cellRank=nodeIndx/maxNodePerCell ;
@@ -922,6 +862,32 @@ struct ApplyAdh: public thrust::unary_function<BoolIUiDDT, CVec2> {
 				double locY = _nodeLocYArrAddr[nodeIndx];
 				double adhLocX = _nodeLocXArrAddr[adhIndx];
 				double adhLocY = _nodeLocYArrAddr[adhIndx];
+				double dist = sqrt((_apicalLocX[cellRank] - locX)*(_apicalLocX[cellRank] - locX) + (_apicalLocY[cellRank] - locY)*(_apicalLocY[cellRank] - locY));
+				double dist_nbrCell = sqrt((_apicalLocX[cellRankOther] - adhLocX)*(_apicalLocX[cellRankOther] - adhLocX) + (_apicalLocY[cellRankOther] - adhLocY)*(_apicalLocY[cellRankOther] - adhLocY));
+				double adhesionDist = _individualCellHeight[cellRank] - _memContractProgress[cellRank];
+				double adhesionDist_nbrCell = _individualCellHeight[cellRankOther] - _memContractProgress[cellRankOther];
+				//*_distFromNucleus_normal_apical[cellRank];
+				
+				if (cellRank != 0 && cellRank != 1 && (cellRank <= 62 || cellRank > 85) && nodeType == lateralA && (dist > adhesionDist)){ 
+					beta = 0.0;
+				}
+				else if (cellRank != 0 && cellRank != 1 && (cellRank <= 62 || cellRank > 85) && nodeType == lateralA && (dist_nbrCell > adhesionDist_nbrCell)){
+					beta = 0.0;
+				}
+				if (cellRank != 0 && cellRank != 1 && (cellRank <= 62 || cellRank > 85) && nodeType == lateralB && (dist > adhesionDist)){
+					beta = 0.0;
+				}
+				else if (cellRank != 0 && cellRank != 1 && (cellRank <= 62 || cellRank > 85) && nodeType == lateralB && (dist_nbrCell > adhesionDist_nbrCell)){
+					beta = 0.0;
+				}
+				
+				// if (cellRank <= 62 && cellRank > 85 && nodeType == lateralB &&  (dist < adhesionDist || dist_nbrCell < adhesionDist_nbrCell)){
+				// 	beta = 1.0;
+				// }
+				// if (cellRank <= 62 && cellRank > 85 && nodeType == lateralB &&  (dist < adhesionDist || dist_nbrCell < adhesionDist_nbrCell)){
+				// 	beta = 1.0;
+				// }
+				
 				handleAdhesionForce_M(adhIndx, locX, locY, adhLocX, adhLocY,
 					oriVelX, oriVelY, alpha, beta);
 				return thrust::make_tuple(oriVelX, oriVelY);
@@ -1075,7 +1041,6 @@ public:
 	thrust::host_vector<double> nodeActomyosinMultipHost_basal;
 	thrust::host_vector<double> nodeActomyosinMultipHost_apical;
 	thrust::device_vector<double> nodeIntegrinMultip;
-	thrust::device_vector<double> quiescencePerNode;
 	// thrust::device_vector<double> nodeIntegrinMultip_basal;
 	// thrust::device_vector<double> nodeIntegrinMultip_apical;
 	// thrust::host_vector<double> nodeIntegrinMultipHost_basal;
@@ -1132,8 +1097,6 @@ public:
 
 // growth progress of the cell that the node belongs to.
 	thrust::device_vector<double> nodeGrowPro;
-
-	thrust::device_vector<bool> nodeMitotic;
 
 	thrust::device_vector<double> nodeInterForceX;
 
@@ -1311,7 +1274,7 @@ class SceNodes {
 	 */
 	void applySceForcesDisc();
 
-	void applySceForcesDisc_M(double mitoticThreshold);
+	void applySceForcesDisc_M();
 
 	/**
 	 * This method outputs a vector of possible neighbor pairs.
@@ -1435,10 +1398,7 @@ public:
 	 */
 	void sceForcesDisc();
 
-	void sceForcesDisc_M(double timeRatio, double timeRatio_Crit_Division, int cycle,
-								double contractActomyo_multip_perCell1, double contractActomyo_multip_perCell2, double contractActomyo_multip_perCell3,
-								double contractActomyo_multip_perCell_apical1, double contractActomyo_multip_perCell_apical2, double contractActomyo_multip_perCell_apical3,
-								double mitoticThreshold);
+	void sceForcesDisc_M(double timeRatio, double timeRatio_Crit_Division, int cycle);
 
 	/**
 	 * add maxNodeOfOneCell

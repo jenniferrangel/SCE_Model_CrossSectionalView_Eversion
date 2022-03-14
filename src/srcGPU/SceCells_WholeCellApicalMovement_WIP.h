@@ -75,6 +75,9 @@ double calMembrForce_Mitotic(double& length, double& progress, double mitoticCri
 __device__
 double calMembrForce_Actin(double& length, double kAvg);
 
+__device__
+double calMembrForce_ActinMitotic(double& length, double kAvg);
+
 
 __device__
 double CalMembrLinSpringEnergy(double& length, double kAvg);
@@ -131,24 +134,18 @@ bool bigEnough(double& num);
 __device__
 double cross_Z(double vecA_X, double vecA_Y, double vecB_X, double vecB_Y);
 
-// __device__
-// void calAndAddIB_M(double& xPos, double& yPos, double& xPos2, double& yPos2,
-// 		double& growPro, double& xRes, double& yRes, double grthPrgrCriVal_M);
 __device__
 void calAndAddIB_M(double& xPos, double& yPos, double& xPos2, double& yPos2,
-		double& growPro, double& xRes, double& yRes, double grthPrgrCriVal_M, bool enteringMitotic);
+		double& growPro, double& xRes, double& yRes, double grthPrgrCriVal_M);
 __device__
 void CalAndAddIMEnergy(double& xPos, double& yPos, double& xPos2, double& yPos2,
 		double& growPro, double& IMEnergyT, double grthPrgrCriVal_M);
 
 
 //AliA 
-// __device__
-// void calAndAddIB_M2(double& xPos, double& yPos, double& xPos2, double& yPos2,
-// 		double& growPro, double& xRes, double& yRes, double &F_MI_M_x, double & F_MI_M_y,double grthPrgrCriVal_M);
-	__device__
+__device__
 void calAndAddIB_M2(double& xPos, double& yPos, double& xPos2, double& yPos2,
-		double& growPro, double& xRes, double& yRes, double &F_MI_M_x, double & F_MI_M_y,double grthPrgrCriVal_M, bool enteringMitotic);
+		double& growPro, double& xRes, double& yRes, double &F_MI_M_x, double & F_MI_M_y,double grthPrgrCriVal_M);
 
 // __device__
 // void calAndAddMM_ContractAdh(double& xPos, double& yPos, double& xPos2, double& yPos2,
@@ -567,38 +564,25 @@ struct CalNucleusLoc: public thrust::unary_function<CVec5,CVec2> {
 	}
 };
 
-struct CalCellHeight: public thrust::unary_function<CVec7,CVec3> {
-	double _distFromNucleus_normalMax1;
-	double _distFromNucleus_normalMax2;
-	double _distFromNucleus_normalMax3;
-	double _distFromNucleus_normalMax_apical1;
-	double _distFromNucleus_normalMax_apical2;
-	double _distFromNucleus_normalMax_apical3;
+struct CalCellHeight: public thrust::unary_function<CVec4,CVec3> {
+	double _distFromNucleus_normalMax;
+	double _distFromNucleus_normalMax_apical;
 
 	// comment prevents bad formatting issues of __host__ and __device__ in Nsight
-	__host__ __device__ CalCellHeight(double distFromNucleus_normalMax1,
-										double distFromNucleus_normalMax2,
-										double distFromNucleus_normalMax3,
-										double distFromNucleus_normalMax_apical1,
-										double distFromNucleus_normalMax_apical2,
-										double distFromNucleus_normalMax_apical3): 
-								_distFromNucleus_normalMax1(distFromNucleus_normalMax1),
-								_distFromNucleus_normalMax2(distFromNucleus_normalMax2),
-								_distFromNucleus_normalMax3(distFromNucleus_normalMax3),
-								_distFromNucleus_normalMax_apical1(distFromNucleus_normalMax_apical1),
-								_distFromNucleus_normalMax_apical2(distFromNucleus_normalMax_apical2),
-								_distFromNucleus_normalMax_apical3(distFromNucleus_normalMax_apical3) {
+	__host__ __device__ CalCellHeight(double distFromNucleus_normalMax, 
+								double distFromNucleus_normalMax_apical): 
+								_distFromNucleus_normalMax(distFromNucleus_normalMax),
+								_distFromNucleus_normalMax_apical(distFromNucleus_normalMax_apical) {
 		
 		}
 	// comment prevents bad formatting issues of __host__ and __device__ in Nsight
-	__host__  __device__ CVec3 operator()(const CVec7 &cVec7) const {
-		uint cellRank = thrust::get<0>(cVec7);
-		double   apicalX=  thrust::get<1>(cVec7) ;
-		double   apicalY = thrust::get<2>(cVec7);
-		double   basalX=  thrust::get<3>(cVec7) ;
-		double   basalY = thrust::get<4>(cVec7);
-		bool	isEnteringMitotic = thrust::get<5>(cVec7);
-		double	individualCellHeightPreMitotic = thrust::get<6>(cVec7);
+	__host__  __device__ CVec3 operator()(const CVec6 &cVec6) const {
+		double   apicalX=  thrust::get<0>(cVec6) ;
+		double   apicalY = thrust::get<1>(cVec6);
+		double   basalX=  thrust::get<2>(cVec6) ;
+		double   basalY = thrust::get<3>(cVec6);
+		bool	isEnteringMitotic = thrust::get<4>(cVec6);
+		double	individualCellHeightPreMitotic = thrust::get<5>(cVec6);
 		//nucleusHPercent=4*(progress-0.5)*(progress-0.5) ;
 		double cellHeight, cellHeight_springHeight, cellHeight_springHeight_apical;
 		if (1 < 0){//isEnteringMitotic == true){
@@ -606,46 +590,9 @@ struct CalCellHeight: public thrust::unary_function<CVec7,CVec3> {
 		}
 		else{
 			cellHeight = sqrt((apicalX - basalX)*(apicalX - basalX) + (apicalY - basalY)*(apicalY - basalY));
-			if (cellRank >= 2 && cellRank <= 21){
-				cellHeight_springHeight = _distFromNucleus_normalMax1;//-1.0*cellHeight*0.275;
-				cellHeight_springHeight_apical = _distFromNucleus_normalMax_apical1;//1.0*cellHeight*0.215;
-			}
-			if (cellRank >= 22 && cellRank <= 42){
-				cellHeight_springHeight = _distFromNucleus_normalMax2;//-1.0*cellHeight*0.275;
-				cellHeight_springHeight_apical = _distFromNucleus_normalMax_apical2;//1.0*cellHeight*0.215;
-			}
-			if (cellRank >= 43 && cellRank <= 64){
-				cellHeight_springHeight = _distFromNucleus_normalMax3;//-1.0*cellHeight*0.275;
-				cellHeight_springHeight_apical = _distFromNucleus_normalMax_apical3;//1.0*cellHeight*0.215;
-			}
+			cellHeight_springHeight = _distFromNucleus_normalMax;//-1.0*cellHeight*0.275;
+			cellHeight_springHeight_apical = _distFromNucleus_normalMax_apical;//1.0*cellHeight*0.215;
 			return thrust::make_tuple( cellHeight, cellHeight_springHeight, cellHeight_springHeight_apical) ; 
-		}
-	}
-};
-
-struct CalCellHeight_Ver2: public thrust::unary_function<CVec7,double> {
-
-	// comment prevents bad formatting issues of __host__ and __device__ in Nsight
-	__host__ __device__ CalCellHeight_Ver2()  {
-		
-		}
-	// comment prevents bad formatting issues of __host__ and __device__ in Nsight
-	__host__  __device__ double operator()(const CVec7 &cVec7) const {
-		uint cellRank = thrust::get<0>(cVec7);
-		double   apicalX=  thrust::get<1>(cVec7) ;
-		double   apicalY = thrust::get<2>(cVec7);
-		double   basalX=  thrust::get<3>(cVec7) ;
-		double   basalY = thrust::get<4>(cVec7);
-		bool	isEnteringMitotic = thrust::get<5>(cVec7);
-		double	individualCellHeightPreMitotic = thrust::get<6>(cVec7);
-		//nucleusHPercent=4*(progress-0.5)*(progress-0.5) ;
-		double cellHeight, cellHeight_springHeight, cellHeight_springHeight_apical;
-		if (1 < 0){//isEnteringMitotic == true){
-			// return thrust::make_tuple(individualCellHeightPreMitotic, 0.0, 0.0);
-		}
-		else{
-			cellHeight = sqrt((apicalX - basalX)*(apicalX - basalX) + (apicalY - basalY)*(apicalY - basalY));
-			return  cellHeight ; 
 		}
 	}
 };
@@ -859,12 +806,25 @@ struct AddMembrForce: public thrust::unary_function<TensionData, CVec10> {
 	double _mitoticCri;
 	double _minY ; 
 	double _maxY ; 
+	bool* _isEnteringMitotic;
+	double* _individualCellHeight;
+	double* _memContractProgress;
+	// double* _distFromNucleus_normal_apical;
+	double* _apicalLocX;
+	double* _apicalLocY;
+	MembraneType1* _memNodeType1;
 
 	// comment prevents bad formatting issues of __host__ and __device__ in Nsight
 	__host__ __device__ AddMembrForce(uint bdryCount, uint maxNodePerCell,
-			double* locXAddr, double* locYAddr, bool* isActiveAddr, int* adhereIndexAddr,double *actinLevelAddr, double mitoticCri, double minY, double maxY) :
+			double* locXAddr, double* locYAddr, bool* isActiveAddr, int* adhereIndexAddr,
+			double *actinLevelAddr, double mitoticCri, double minY, double maxY, bool* isEnteringMitotic, 
+			double* individualCellHeight, double* memContractProgress, /*double* distFromNucleus_normal_apical,*/ double* apicalLocX, double* apicalLocY, MembraneType1* memNodeType1) :
 			_bdryCount(bdryCount), _maxNodePerCell(maxNodePerCell), _locXAddr(
-					locXAddr), _locYAddr(locYAddr), _isActiveAddr(isActiveAddr),_adhereIndexAddr(adhereIndexAddr),_actinLevelAddr(actinLevelAddr), _mitoticCri(mitoticCri),_minY(minY),_maxY(maxY) {
+					locXAddr), _locYAddr(locYAddr), _isActiveAddr(isActiveAddr),_adhereIndexAddr(adhereIndexAddr),_actinLevelAddr(actinLevelAddr), _mitoticCri(mitoticCri),_minY(minY),_maxY(maxY),
+					_isEnteringMitotic(isEnteringMitotic), _individualCellHeight(individualCellHeight),
+					_memContractProgress(memContractProgress),
+					/*_distFromNucleus_normal_apical(distFromNucleus_normal_apical),*/
+					_apicalLocX(apicalLocX), _apicalLocY(apicalLocY), _memNodeType1(memNodeType1) {
 	}
 	// comment prevents bad formatting issues of __host__ and __device__ in Nsight
 	__device__ CVec10 operator()(const TensionData &tData) const {
@@ -923,7 +883,29 @@ struct AddMembrForce: public thrust::unary_function<TensionData, CVec10> {
 				leftDiffY = leftPosY - locY;
 				lenLeft = sqrt(leftDiffX * leftDiffX + leftDiffY * leftDiffY);
 				//double forceVal = calMembrForce_Mitotic(lenLeft,progress, _mitoticCri,adhereIndex); //Ali & Abu June 30th
-				double forceVal =calMembrForce_Actin(lenLeft,kAvgLeft); // Ali & June 30th
+				
+				// double forceVal =calMembrForce_Actin(lenLeft,kAvgLeft); // Ali & June 30th
+				double forceVal;
+				if (cellRank == 0 || cellRank == 1 || cellRank ==2 || cellRank == 3 || (cellRank > 60 && cellRank < 86)){//_isEnteringMitotic[cellRank] == false){
+					forceVal = calMembrForce_Actin(lenLeft,kAvgLeft); // Ali & June 30th
+				}
+				else{
+					double dist = sqrt((_apicalLocX[cellRank] - locX)*(_apicalLocX[cellRank] - locX) + (_apicalLocY[cellRank] - locY)*(_apicalLocY[cellRank] - locY));
+					double adhesionDist = _individualCellHeight[cellRank] - _memContractProgress[cellRank];
+					//_individualCellHeight[cellRank]*_distFromNucleus_normal_apical[cellRank];
+					if (_memNodeType1[index] == lateralA && dist >= adhesionDist){
+						forceVal = calMembrForce_ActinMitotic(lenLeft, kAvgLeft);
+					}
+					else if (_memNodeType1[index] == lateralB && dist >= adhesionDist){
+						forceVal = calMembrForce_ActinMitotic(lenLeft, kAvgLeft);
+					}
+					else if (_memNodeType1[index] == basal1 && dist >= adhesionDist){
+						forceVal = calMembrForce_ActinMitotic(lenLeft, kAvgLeft);
+					}
+					else{
+						forceVal = calMembrForce_Actin(lenLeft,kAvgLeft);
+					}
+				}
 			        //if (adhereIndex==-1 && _adhereIndexAddr[index_left]==-1) {
 				if (longEnough(lenLeft)) {
 					velX = velX + forceVal * leftDiffX / lenLeft;
@@ -948,7 +930,28 @@ struct AddMembrForce: public thrust::unary_function<TensionData, CVec10> {
 				lenRight = sqrt(
 						rightDiffX * rightDiffX + rightDiffY * rightDiffY);
 				//double forceVal = calMembrForce_Mitotic(lenRight,progress, _mitoticCri,adhereIndex); // Ali & June 30th
-				double forceVal = calMembrForce_Actin(lenRight,kAvgRight); // Ali & June 30th
+				double forceVal;
+				if (cellRank == 0 || cellRank == 1 || cellRank ==2 || cellRank == 3 || (cellRank > 60 && cellRank < 86)){//_isEnteringMitotic[cellRank] == false){
+					forceVal = calMembrForce_Actin(lenRight,kAvgRight); // Ali & June 30th
+				}
+				else{
+					double dist = sqrt((_apicalLocX[cellRank] - locX)*(_apicalLocX[cellRank] - locX) + (_apicalLocY[cellRank] - locY)*(_apicalLocY[cellRank] - locY));
+					double adhesionDist = _individualCellHeight[cellRank] - _memContractProgress[cellRank];
+					// _individualCellHeight[cellRank]*_distFromNucleus_normal_apical[cellRank];
+					if (_memNodeType1[index] == lateralA && dist >= adhesionDist){
+						forceVal = calMembrForce_ActinMitotic(lenRight, kAvgRight);
+					}
+					else if (_memNodeType1[index] == lateralB && dist >= adhesionDist){
+						forceVal = calMembrForce_ActinMitotic(lenRight, kAvgRight);
+					}
+					else if (_memNodeType1[index] == basal1 && dist >= adhesionDist){
+						forceVal = calMembrForce_ActinMitotic(lenRight, kAvgRight);
+					}
+					else{
+						forceVal = calMembrForce_Actin(lenRight,kAvgRight);
+					}
+				}
+				
 				//if (adhereIndex==-1 && _adhereIndexAddr[index_right]==-1) {
 			if (longEnough(lenRight)) {
 					velX = velX + forceVal * rightDiffX / lenRight;
@@ -1597,15 +1600,14 @@ struct AddSceCellForce: public thrust::unary_function<CellData, CVec6> {
 	double* _locYAddr;
 	bool* _isActiveAddr;
 	double _grthPrgrCriVal_M;
-	bool* _isEnteringMitotic;
 	// comment prevents bad formatting issues of __host__ and __device__ in Nsight
 	__host__ __device__ AddSceCellForce(uint maxNodePerCell,
 			uint maxMemNodePerCell, double* locXAddr, double* locYAddr,
-			bool* isActiveAddr, double grthPrgrCriVal_M, bool* isEnteringMitotic) :
+			bool* isActiveAddr, double grthPrgrCriVal_M) :
 			_maxNodePerCell(maxNodePerCell), _maxMemNodePerCell(
 					maxMemNodePerCell), _locXAddr(locXAddr), _locYAddr(
 					locYAddr), _isActiveAddr(isActiveAddr), _grthPrgrCriVal_M(
-					grthPrgrCriVal_M), _isEnteringMitotic(isEnteringMitotic) {
+					grthPrgrCriVal_M) {
 	}
 	// comment prevents bad formatting issues of __host__ and __device__ in Nsight
 	__device__ CVec6 operator()(const CellData &cData) const {
@@ -1636,7 +1638,6 @@ struct AddSceCellForce: public thrust::unary_function<CellData, CVec6> {
 		// means membrane node
 		//Because we want to compute the force on the membrane nodes we modify this function 
 		if (nodeRank < _maxMemNodePerCell) {
-			bool enteringMitotic = _isEnteringMitotic[cellRank];
 			for (index_other = intnlIndxBegin; index_other < intnlIndxEnd;
 					index_other++) {
 				nodeXOther = _locXAddr[index_other];
@@ -1646,7 +1647,7 @@ struct AddSceCellForce: public thrust::unary_function<CellData, CVec6> {
 						oriVelX, oriVelY, _grthPrgrCriVal_M);
                                  */ 
 				calAndAddIB_M2(nodeX, nodeY, nodeXOther, nodeYOther, progress,
-						oriVelX, oriVelY,F_MI_M_x,F_MI_M_y, _grthPrgrCriVal_M, enteringMitotic);
+						oriVelX, oriVelY,F_MI_M_x,F_MI_M_y, _grthPrgrCriVal_M);
 				CalAndAddIMEnergy(nodeX, nodeY, nodeXOther, nodeYOther, progress,
 						IMEnergyT, _grthPrgrCriVal_M);
 
@@ -1654,14 +1655,13 @@ struct AddSceCellForce: public thrust::unary_function<CellData, CVec6> {
 			}
 		} else {
 			// means internal node
-			bool enteringMitotic = _isEnteringMitotic[cellRank];
 			for (index_other = intnlIndxMemBegin;
 					index_other < intnlIndxMemBegin + activeMembrCount;
 					index_other++) {
 				nodeXOther = _locXAddr[index_other];
 				nodeYOther = _locYAddr[index_other];
 				calAndAddIB_M(nodeX, nodeY, nodeXOther, nodeYOther, progress,
-						oriVelX, oriVelY, _grthPrgrCriVal_M, enteringMitotic);
+						oriVelX, oriVelY, _grthPrgrCriVal_M);
 				CalAndAddIMEnergy(nodeX, nodeY, nodeXOther, nodeYOther, progress,
 						IMEnergyT, _grthPrgrCriVal_M);
 
@@ -2213,29 +2213,29 @@ struct AddMemContractForce_tmp2: public thrust::unary_function<DUiDDUiUiBDDT , C
 	double _distFromNucleus_min;
 	double* _distFromNucleus_normal;
 	double* _distFromNucleus_normal_apical;
-	// double _percentage_before_timeRatio_Crit_Division_scaling;
-	double _mitoRndActomyoStrengthScaling;
+	double _percentage_before_timeRatio_Crit_Division_scaling;
 	bool* _isEnteringMitotic;
 	double* _contractileSpringGrowthProgress;
 	double* _individualCellHeight;
 	double* _distFromBasalLoc;
 	double* _distFromApicalLoc;
+	double _mitoRndActomyoStrengthScaling;
 	// comment prevents bad formatting issues of __host__ and __device__ in Nsight
 	__host__ __device__ AddMemContractForce_tmp2(uint maxNodePerCell, uint maxMemNodePerCell, double* locXAddr, double* locYAddr, MembraneType1* MemTypeAddr, int* MirrorIndexAddr, 
 										double timeRatio,  double* contractActomyo_multip, double* contractActomyo_multip_apical, double distFromNucleus_max, double distFromNucleus_min, double* distFromNucleus_normal, double* distFromNucleus_normal_apical,
-										/*double percentage_before_timeRatio_Crit_Division_scaling,*/double mitoRndActomyoStrengthScaling, bool* isEnteringMitotic, double* contractileSpringGrowthProgress, double* individualCellHeight,
-										double* distFromBasalLoc, double* distFromApicalLoc) :
+										double percentage_before_timeRatio_Crit_Division_scaling, bool* isEnteringMitotic, double* contractileSpringGrowthProgress, double* individualCellHeight,
+										double* distFromBasalLoc, double* distFromApicalLoc, double mitoRndActomyoStrengthScaling) :
 			_maxNodePerCell(maxNodePerCell), _maxMemNodePerCell(
 					maxMemNodePerCell), _locXAddr(locXAddr), _locYAddr(locYAddr),_MemTypeAddr(MemTypeAddr), _MirrorIndexAddr(MirrorIndexAddr), 
 										_timeRatio(timeRatio), _contractActomyo_multip(contractActomyo_multip),_contractActomyo_multip_apical(contractActomyo_multip_apical),
 										_distFromNucleus_max(distFromNucleus_max), _distFromNucleus_min(distFromNucleus_min), _distFromNucleus_normal(distFromNucleus_normal), _distFromNucleus_normal_apical(distFromNucleus_normal_apical),
-										// _percentage_before_timeRatio_Crit_Division_scaling(percentage_before_timeRatio_Crit_Division_scaling),
-										_mitoRndActomyoStrengthScaling(mitoRndActomyoStrengthScaling),
+										_percentage_before_timeRatio_Crit_Division_scaling(percentage_before_timeRatio_Crit_Division_scaling),
 										_isEnteringMitotic(isEnteringMitotic),
 										_contractileSpringGrowthProgress(contractileSpringGrowthProgress),
 										_individualCellHeight(individualCellHeight),
 										_distFromBasalLoc(distFromBasalLoc),
-										_distFromApicalLoc(distFromApicalLoc) {
+										_distFromApicalLoc(distFromApicalLoc),
+										_mitoRndActomyoStrengthScaling(mitoRndActomyoStrengthScaling) {
 	}
 	// comment prevents bad formatting issues of __host__ and __device__ in Nsight
 	__device__ CVec6 operator()(const DUiDDUiUiBDDT & dUiDDUiUiBDDT ) const {
@@ -2283,41 +2283,24 @@ struct AddMemContractForce_tmp2: public thrust::unary_function<DUiDDUiUiBDDT , C
 			// if (DistFromNucleus >= _distFromNucleus_max){
 			// 	DistFromNucleus = _distFromNucleus_max;
 			// }
-			// distMaxBasalContrSpringToApical = _individualCellHeight[cellRank] - _contractileSpringGrowthProgress[cellRank];
-			// distMaxBasalContrSpringToApical = _individualCellHeight[cellRank] - (distMaxBasalContrSpringToApical_shortest+_contractileSpringGrowthProgress[cellRank]);
-			// distMinApicalContrSpringToApical = 0.0;
-			// if (distMaxBasalContrSpringToApical <= distMaxBasalContrSpringToApical_shortest_mitotic){
-			// 	distMaxBasalContrSpringToApical = distMaxBasalContrSpringToApical_shortest_mitotic;
-			// }
-			//////////////////////////////////////////////////////////
-			// //For no "zipping" mitotic rounding case //////////////
-			//////////////////////////////////////////////////////////
-			distMaxBasalContrSpringToApical = _individualCellHeight[cellRank] - (distMaxBasalContrSpringToApical_shortest+_contractileSpringGrowthProgress[cellRank]);
+			distMaxBasalContrSpringToApical = -9999.9;//_individualCellHeight[cellRank] - _contractileSpringGrowthProgress[cellRank];
 			distMinApicalContrSpringToApical = 0.0;
-			if (distMaxBasalContrSpringToApical <= distMaxBasalContrSpringToApical_shortest_mitotic){
-				distMaxBasalContrSpringToApical = distMaxBasalContrSpringToApical_shortest_mitotic;
+			// if (distMaxBasalContrSpringToApical <= distMaxBasalContrSpringToApical_shortest_mitotic){
+			if (distMaxBasalContrSpringToApical <= 0.25*distMaxBasalContrSpringToApical_shortest_mitotic){
+				distMaxBasalContrSpringToApical = -9999.9;//distMaxBasalContrSpringToApical_shortest_mitotic;
 			}
-			
-			//////////////////////////////////////////////////////////
-			//////////////////////////////////////////////////////////
-			//////////////////////////////////////////////////////////
 		}
 		else{
-			// distMaxBasalContrSpringToApical = _individualCellHeight[cellRank] - _distFromBasalLoc[cellRank];
-			// if (distMaxBasalContrSpringToApical <= (_individualCellHeight[cellRank] - distMaxBasalContrSpringToApical_shortest)){
+			distMaxBasalContrSpringToApical = _individualCellHeight[cellRank] - _distFromBasalLoc[cellRank];
+			if (distMaxBasalContrSpringToApical <= (_individualCellHeight[cellRank] - distMaxBasalContrSpringToApical_shortest)){
 				distMaxBasalContrSpringToApical = _individualCellHeight[cellRank] - distMaxBasalContrSpringToApical_shortest;
-			// }
-			// distMinApicalContrSpringToApical = _distFromApicalLoc[cellRank];
-			// if (distMinApicalContrSpringToApical >= distMinApicalContrSpringToApical_longest){
+			}
+			distMinApicalContrSpringToApical = _distFromApicalLoc[cellRank];
+			if (distMinApicalContrSpringToApical >= distMinApicalContrSpringToApical_longest){
 				distMinApicalContrSpringToApical = distMinApicalContrSpringToApical_longest;
-			// }
-
-			/*// DistFromNucleus = _distFromNucleus_normal[cellRank];
+			}
+			// DistFromNucleus = _distFromNucleus_normal[cellRank];
 			// DistFromNucleus_apical = _distFromNucleus_normal_apical[cellRank];
-			// if (cellRank >= 28 & cellRank <=34){
-			// 	distMinApicalContrSpringToApical = -9999.9;
-			// 	distMaxBasalContrSpringToApical = 9999.9;
-			// }*/
 		}
 		// if (_timeRatio == 0 && nodeRank == 0 && cellRank == 0){
 		// 	std::cout<<"Cell division requires the contractile spring to increase strength by "<<percentage_before_timeRatio_Crit_Division_scaling<<" fold."<<std::endl;
@@ -2338,8 +2321,8 @@ struct AddMemContractForce_tmp2: public thrust::unary_function<DUiDDUiUiBDDT , C
 			locY 		= _locYAddr[index];
 			// locZ		= _locZAddr[index];
 			// if (_timeRatio < _timeRatio_Crit_actomyo){
-				kContrMemb_multip_basal = _contractActomyo_multip[cellRank];//index];
-				kContrMemb_multip_apical = _contractActomyo_multip_apical[cellRank];//index];
+				kContrMemb_multip_basal = _contractActomyo_multip[index];
+				kContrMemb_multip_apical = _contractActomyo_multip_apical[index];
 				// kContrMemb_multip_apical = 0.0;
 				// if (cellRank==_cellRank_division && _timeRatio < _timeRatio_Crit_Division){
 				if (_isEnteringMitotic[cellRank] == true){
@@ -2364,8 +2347,8 @@ struct AddMemContractForce_tmp2: public thrust::unary_function<DUiDDUiUiBDDT , C
 			locYOther   = _locYAddr[index_Other];
 			// locZOther	= _locZAddr[index_Other];
 			// if (_timeRatio < _timeRatio_Crit_actomyo){
-				kContrMemb_multip2_basal = _contractActomyo_multip[cellRank];//index_Other];
-				kContrMemb_multip2_apical = _contractActomyo_multip_apical[cellRank];//index_Other];
+				kContrMemb_multip2_basal = _contractActomyo_multip[index_Other];
+				kContrMemb_multip2_apical = _contractActomyo_multip_apical[index_Other];
 				// kContrMemb_multip2_apical = 0.0;
 				// if (cellRank==_cellRank_division && _timeRatio < _timeRatio_Crit_Division){
 				if (_isEnteringMitotic[cellRank] == true){
@@ -2435,8 +2418,8 @@ struct AddMemContractForce_tmp2: public thrust::unary_function<DUiDDUiUiBDDT , C
 
 				// }
 				// if ( ((nodeDistToApical) < distMinApicalContrSpringToApical)&& 
-				// 	((nodeDistToApicalOther) < distMinApicalContrSpringToApical) ) {
-				if  (((nodeDistToApical) < 9999.9) && ((nodeDistToApicalOther) < 9999.9) ) { 
+				// 	((nodeDistToApicalOther) < distMinApicalContrSpringToApical) ) { 
+				if ( ((nodeDistToApical) < 9999.9)&&((nodeDistToApicalOther) < 9999.9) ) { 
 					if (  (nodeTypeOther==lateralB && nodeType==lateralA) || (nodeTypeOther==lateralA && nodeType==lateralB) )  {
                 		calAndAddMM_ContractRepl(locX, locY, locXOther, locYOther,oriVelX, oriVelY,F_MM_C_X,F_MM_C_Y);
 					}
@@ -2738,18 +2721,6 @@ struct MemGrowFunc: public thrust::unary_function<UiDDBoolIITI, BoolDII> {
 				else if (newNodeType == basal1 && numBasalNode < _maxApicalBasalNodeNum){
 					return thrust::make_tuple(true, 0, numApicalNode, numBasalNode+1);
 				}
-				// else if (cellRank == 0 && newNodeType != apical1 && newNodeType != basal1){
-				// 	return thrust::make_tuple(true, 0, numApicalNode, numBasalNode);
-				// }
-				// else if (cellRank == 1 && newNodeType != apical1 && newNodeType != basal1){
-				// 	return thrust::make_tuple(true, 0, numApicalNode, numBasalNode);
-				// }
-				// else if (cellRank == 63 && newNodeType != apical1 && newNodeType != basal1){
-				// 	return thrust::make_tuple(true, 0, numApicalNode, numBasalNode);
-				// }
-				// else if (cellRank == 64 && newNodeType != apical1 && newNodeType != basal1){
-				// 	return thrust::make_tuple(true, 0, numApicalNode, numBasalNode);
-				// }
 				else{
 					return thrust::make_tuple(false, 0, numApicalNode, numBasalNode);
 				}
@@ -3086,79 +3057,6 @@ struct progress_BCImp: thrust::unary_function<DDUi, double> {
 			}
 			else {
 				return (growProgress) ; 
-			}
-		}
-		else{
-			return (0.0);
-		}
-	}
-
-
-};
-
-struct progress_BCImp_Ver2: thrust::unary_function<DDUi, double> {
-
-	// comment prevents bad formatting issues of __host__ and __device__ in Nsight
-	
-	double _growthProgressSpeed;
-	int* _daughterCellProduced;
-	int* _cellRankFront;
-	int* _cellRankBehind;
-	double* _currentGrowthProgress;
-	double _mitoticThreshold;
-	// comment prevents bad formatting issues of __host__ and __device__ in Nsight__host__ __device__
-	__host__ __device__ progress_BCImp_Ver2(double growthProgressSpeed, int* daughterCellProduced,
-										 int* cellRankFront, int* cellRankBehind, double* currentGrowthProgress, double mitoticThreshold) :
-			_growthProgressSpeed(growthProgressSpeed), _daughterCellProduced(daughterCellProduced),
-							 _cellRankFront(cellRankFront), _cellRankBehind(cellRankBehind), _currentGrowthProgress(currentGrowthProgress), _mitoticThreshold(mitoticThreshold) {
-	}
-
-
-	// comment prevents bad formatting issues of __host__ and __device__ in Nsight
-	__device__ double operator()(const DDUi &ddi) {
-		double growProgressOld = thrust::get<0>(ddi);
-		// double growSpeed = thrust::get<1>(ddi);
-		uint    cellRank = thrust::get<2>(ddi);
-
-		// double growProgress=growProgressOld+growSpeed*_dt;
-		if (_daughterCellProduced[cellRank] < 10){
-			if (_currentGrowthProgress[_cellRankFront[cellRank]] < _mitoticThreshold && _currentGrowthProgress[_cellRankBehind[cellRank]] < _mitoticThreshold){
-				double growProgress=growProgressOld+_growthProgressSpeed;
-				if (cellRank < 2){
-					growProgress=0;
-				}
-				else if (cellRank > 62 && cellRank < 86){
-					growProgress=0;
-				}
-				
-			//         if (cellRank==5 || cellRank==6) {
-			//	return (growProgressOld);
-			//	}
-				if (growProgress>1.0) {
-					return (1.0);
-				}
-				else {
-					return (growProgress) ; 
-				}
-			}
-			else{
-				double growProgress=growProgressOld;
-				if (cellRank < 2){
-					growProgress=0;
-				}
-				else if (cellRank > 62 && cellRank < 86){
-					growProgress=0;
-				}
-				
-			//         if (cellRank==5 || cellRank==6) {
-			//	return (growProgressOld);
-			//	}
-				if (growProgress>1.0) {
-					return (1.0);
-				}
-				else {
-					return (growProgress) ; 
-				}
 			}
 		}
 		else{
@@ -4229,16 +4127,15 @@ struct CellInfoVecs {
 	 * progress == 0 means recently divided
 	 * progress == 1 means ready to divide
 	 */
-
-
 	thrust::device_vector<int> daughterCellProduced;
 
 	thrust::device_vector<double> distFromBasalLoc;
 	thrust::device_vector<double> distFromApicalLoc; 
-	 bool isOneTimeStepPostDivision = false;// = false;
-	 bool isTwoTimeStepPostDivision = false;
-	bool isPostDivision = false;// = false;
-	bool isPostAddMembrNodes = false;
+	thrust::device_vector<double> memContractProgress;
+	 bool isOneTimeStepPostDivision;// = false;
+	 bool isTwoTimeStepPostDivision;
+	bool isPostDivision;// = false;
+	bool isPostAddMembrNodes;
 	thrust::device_vector<MembraneType1> maxTenIndxTypeVec;
 	thrust::device_vector<double> cellAreaGrowthProgress;
 	thrust::device_vector<double> cellAreaGrowthProgressNonMitotic;
@@ -4811,14 +4708,13 @@ class SceCells {
 	void applySceCellDisc_M();
 
 	// void applyMembContraction(double timeRatio, double timeRatio_Crit_actomyo, double timeRatio_Crit_Division, double distFromNucleus_max, double distFromNucleus_min, double percentage_before_timeRatio_Crit_Division_scaling) ; 
-	void applyMembContraction2(double timeRatio, double timeRatio_Crit_actomyo, double timeRatio_Crit_Division, double distFromNucleus_max, double distFromNucleus_min, double mitoRndActomyoStrengthScaling);//double percentage_before_timeRatio_Crit_Division_scaling) ; 
+	void applyMembContraction2(double timeRatio, double timeRatio_Crit_actomyo, double timeRatio_Crit_Division, double distFromNucleus_max, double distFromNucleus_min, double percentage_before_timeRatio_Crit_Division_scaling, double mitoRndActomyoStrengthScaling) ; 
 	void computeInternalAvgPos_M();
 	void computeInternalMaxMinPos_M();
 	void computeCenterPos_M2();
 
 	// void growAtRandom_M(double dt);
 	void growAtRandom_M(double growthProgressSpeed);
-	void growAtRandom_M_Ver2(double growthProgressSpeed, double mitoticThreshold);
 
 
 	void assignMemNodeType();  //Ali 
@@ -4828,14 +4724,12 @@ class SceCells {
 	void computeNucleusDesireLoc();  //Ali 
 	void computeCellCenterPerturbedLoc(); //Kevin
 	void computeNucleusIniLocPercent();  //Ali 
-	void computeIndividualCellHeight(double distFromNucleus_normalMax1,double distFromNucleus_normalMax2,double distFromNucleus_normalMax3,
-									 double distFromNucleus_normalMax_apical1,double distFromNucleus_normalMax_apical2,double distFromNucleus_normalMax_apical3); //Kevin T. 2021/07/17
-	void computeIndividualCellHeight_Ver2();
+	void computeIndividualCellHeight(double distFromNucleus_normalMax, double distFromNucleus_normalMax_apical); //Kevin T. 2021/07/17
 	void applyForceInteractionNucleusAsPoint() ; //Ali 
 	void updateInternalAvgPosByNucleusLoc_M();  //Ali 
 	void PlotNucleus(int & lastPrintNucleus, int & outputFrameNucleus);  //Ali 
 
-	void enterMitoticCheckForDivAxisCal(double mitoticThreshold);
+	void enterMitoticCheckForDivAxisCal();
 	void divide2D_M(double volume_Increase_Target_Ratio, double timeRatio, double thresholdToIntroduceNewCell);
 
 	void distributeCellGrowthProgress_M();
@@ -4853,7 +4747,6 @@ class SceCells {
 	// void updateGrowthProgress_M();
 
 	void updateGrowthProgress_M(double growthProgressSpeed);
-	void updateGrowthProgress_M_Ver2(double growthProgressSpeed, double mitoticThreshold);
 
 	void decideIsScheduleToGrow_M();
 
@@ -4889,8 +4782,8 @@ class SceCells {
 		void findHertwigAxis_useBasalApicalLoc();
 	void createTwoNewCellArr_M();
 	void printCellCenterLine_M(int p);
-	void copyFirstCellArr_M(double quiescene1, double quiescence1_half);
-	void copySecondCellArr_M(double quiescene2, double quiescence2_half);
+	void copyFirstCellArr_M(double quiescene1);
+	void copySecondCellArr_M(double quiescene2);
 	void updateActiveCellCount_M();
 	void markIsDivideFalse_M();
 
@@ -4928,7 +4821,7 @@ class SceCells {
 	bool tmpDebug;
 
 	bool decideIfGoingToDivide_M(double volume_Increase_Target_Ratio);
-        bool decideIfAnyCellEnteringMitotic(double mitoticThreshold);//A&A 
+        bool decideIfAnyCellEnteringMitotic();//A&A 
 //	bool decideIfGoingToRemove_M();//AAMIRI
 
 	void assembleVecForTwoCells(uint i);
@@ -4979,8 +4872,7 @@ class SceCells {
 	void calCellArea();
     void calCellPerim();//AAMIRI
     void calCellPressure();//AAMIRI
-	// void eCMCellInteraction(bool cellPolar, bool subCellPolar, bool tmpIsInitSetup, double timeRatio, double timeRatio_Crit_ECM, double timeRatio_Crit_Division, int relaxCount) ;
-	void eCMCellInteraction(bool cellPolar, bool subCellPolar, bool tmpIsInitSetup, double timeRatio, double timeRatio_Crit_ECM, double timeRatio_Crit_Division, int relaxCount, double mitoticThreshold) ; 
+	void eCMCellInteraction(bool cellPolar, bool subCellPolar, bool tmpIsInitSetup, double timeRatio, double timeRatio_Crit_ECM, double timeRatio_Crit_Division) ; 
 public:
 
 	SceCells();
@@ -5005,10 +4897,8 @@ public:
 	void runAllCellLogicsDisc_M(double & dt, double Damp_Coef, double InitTimeStage,
 									 double timeRatio, double timeRatio_Crit_actomyo, double timeRatio_Crit_ECM, double timeRatio_Crit_Division,
 									 	double volume_Increase_Target_Ratio, double volume_Increase_Scale, double postDivision_restorationRateScale, int cycle,
-										 double distFromNucleus_max, double distFromNucleus_min, double distFromNucleus_normalMax1, double distFromNucleus_normalMax2,double distFromNucleus_normalMax3, 
-										 double distFromNucleus_normalMax_apical1, double distFromNucleus_normalMax_apical2, double distFromNucleus_normalMax_apical3, 
-										 double percentage_before_timeRatio_Crit_Division_scaling, double growthProgressSpeed, int maxApicalBasalNodeNum, double maxLengthToAddMemNodes, 
-										 double mitoRndActomyoStrengthScaling, double thresholdToIntroduceNewCell, double mitoticThreshold);    //Kevin 
+										 double distFromNucleus_max, double distFromNucleus_min, double distFromNucleus_normalMax, double distFromNucleus_normalMax_apical, 
+										 double percentage_before_timeRatio_Crit_Division_scaling, double growthProgressSpeed, int maxApicalBasalNodeNum, double maxLengthToAddMemNodes, double mitoRndActomyoStrengthScaling, double thresholdToIntroduceNewCell);    //Kevin 
 
 	void runStretchTest(double dt);
 

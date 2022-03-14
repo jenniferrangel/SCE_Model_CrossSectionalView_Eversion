@@ -65,6 +65,16 @@ CMAKE_BINARY_DIR = /rhome/tsaik/EpiScale_CrossSection_debug3
 #=============================================================================
 # Targets provided globally by CMake.
 
+# Special rule for the target rebuild_cache
+rebuild_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
+	/opt/linux/centos/7.x/x86_64/pkgs/cmake/3.21.0/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : rebuild_cache
+
+# Special rule for the target rebuild_cache
+rebuild_cache/fast: rebuild_cache
+.PHONY : rebuild_cache/fast
+
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
@@ -85,26 +95,16 @@ test:
 test/fast: test
 .PHONY : test/fast
 
-# Special rule for the target rebuild_cache
-rebuild_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/opt/linux/centos/7.x/x86_64/pkgs/cmake/3.21.0/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : rebuild_cache
-
-# Special rule for the target rebuild_cache
-rebuild_cache/fast: rebuild_cache
-.PHONY : rebuild_cache/fast
-
 # The main all target
 all: cmake_check_build_system
-	cd /rhome/tsaik/EpiScale_CrossSection_debug3 && $(CMAKE_COMMAND) -E cmake_progress_start /rhome/tsaik/EpiScale_CrossSection_debug3/CMakeFiles /rhome/tsaik/EpiScale_CrossSection_debug3/src/srcGPU//CMakeFiles/progress.marks
-	cd /rhome/tsaik/EpiScale_CrossSection_debug3 && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/srcGPU/all
+	cd /rhome/tsaik/EpiScale_CrossSection_debug3 && $(CMAKE_COMMAND) -E cmake_progress_start /rhome/tsaik/EpiScale_CrossSection_debug3/CMakeFiles /rhome/tsaik/EpiScale_CrossSection_debug3/src//CMakeFiles/progress.marks
+	cd /rhome/tsaik/EpiScale_CrossSection_debug3 && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /rhome/tsaik/EpiScale_CrossSection_debug3/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /rhome/tsaik/EpiScale_CrossSection_debug3 && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/srcGPU/clean
+	cd /rhome/tsaik/EpiScale_CrossSection_debug3 && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/clean
 .PHONY : clean
 
 # The main clean target
@@ -113,32 +113,18 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /rhome/tsaik/EpiScale_CrossSection_debug3 && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/srcGPU/preinstall
+	cd /rhome/tsaik/EpiScale_CrossSection_debug3 && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /rhome/tsaik/EpiScale_CrossSection_debug3 && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/srcGPU/preinstall
+	cd /rhome/tsaik/EpiScale_CrossSection_debug3 && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
 	cd /rhome/tsaik/EpiScale_CrossSection_debug3 && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
-
-# Convenience name for target.
-src/srcGPU/CMakeFiles/SceGPU.dir/rule:
-	cd /rhome/tsaik/EpiScale_CrossSection_debug3 && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/srcGPU/CMakeFiles/SceGPU.dir/rule
-.PHONY : src/srcGPU/CMakeFiles/SceGPU.dir/rule
-
-# Convenience name for target.
-SceGPU: src/srcGPU/CMakeFiles/SceGPU.dir/rule
-.PHONY : SceGPU
-
-# fast build rule for target.
-SceGPU/fast:
-	cd /rhome/tsaik/EpiScale_CrossSection_debug3 && $(MAKE) $(MAKESILENT) -f src/srcGPU/CMakeFiles/SceGPU.dir/build.make src/srcGPU/CMakeFiles/SceGPU.dir/build
-.PHONY : SceGPU/fast
 
 # Help Target
 help:
@@ -149,7 +135,6 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... test"
-	@echo "... SceGPU"
 .PHONY : help
 
 
