@@ -10,27 +10,6 @@ CGAL  ----- Computational geometry library.
 Thrust ---- Build-in library of cuda, similar to STL of C++
 Paraview -- (Optional) Visualization software for animation purpose. 
 
-To obtain source code copy: 
-git clone https://github.com/laosunhust/SceCells.git (original version)
-git clone https://github.com/ali1363/scecells.git    (updated  version)
-
-To compile:
- (1) In project root folder, type "cmake ." ("sudo cmake ." preferred)
- (2) type "make" 
-Please note that CMake, CUDA, CGAL, Thrust, are all required for compilation.  
-
-To run unit test from project root folder:
- Option 1: Simple run: type "make test"
- Option 2: See more details about unit test: type "./bin/UnitTest"
- 
-To run performance test from project root folder:
- In project root folder, type "./bin/PerfTest"
-
-To run simulation:
- In project root folder, type "./bin/run***Simulation"
- Currently, two simulations are available: Beak and Disc.
-
-
 ************************
 To run simulation on slurm cluster (acms-gpu is powered by slurm) 
  (1) In project root folder, cd ./scripts
@@ -43,16 +22,15 @@ To run simulation on slurm cluster (acms-gpu is powered by slurm)
 Location of configuration files:
  ./resources
 *******************************************
-To run simulation on CRC clusters "acms.crc.nd.edu" which are based on SGE (Sun Grid Engine) cluster software :
-   (1) git clone https://github.com/ali1363/scecells.git
-   (2) module load cmake 
-   (3) module load gcc/4.9.2
-   (4) module load cuda/7.0
-   (5) module load bertini     # it is used for boost libraries#
-   (6) module load boost/1.58   
-   (7) In the directory  ~/SceCells write the command "ccmake . -DCGAL_DIR:PATH=/afs/crc.nd.edu/x86_64_linux/c/cgal/4.7/gcc/4.9.2/build/lib/CGAL
-   (8) In the directory ~/SceCells write the command "cmake ."
-   (9) In the directory ~/SceCells write the command "make"
-   (10)Submit your simulation with the command "qsub EpiScale.sh"  # Note: Other .sh files in ~/script are not active anymore#
-   (11)In this setup, the .vtk animation files are in the directory ~/SceCells/animation. You may change it to ~/SceCells/animation/machine* in the disc_M.cfg file.
-
+To run simulation on UCR HPCC cluster: 
+   After uploading all the files under this repository, follow the command below.
+   (1) cd [The folder where all your files are placed in]
+   (2) module load singluarity
+   (3) module load centos
+   (4) centos.sh
+   (5) module load extra; module load GCC; module load cuda;
+   (6) (IF it is the first time compiling) module load CGAL; module load cmake;
+   (7) (IF it is the first time compiling) cmake .
+   (8) make
+   (9) After compilation, enter: exit
+   (10)
