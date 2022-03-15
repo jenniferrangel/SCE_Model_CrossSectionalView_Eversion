@@ -33,4 +33,4 @@ To run simulation on UCR HPCC cluster:
    (7) (IF it is the first time compiling) cmake .
    (8) make
    (9) After compilation, enter: exit
-   (10)
+   (10) sbatch -p gpu --gres=gpu:1 --time=X:00:00 EpiScale_run.sh; (X here is the number of hours you want to keep the simulation running)
