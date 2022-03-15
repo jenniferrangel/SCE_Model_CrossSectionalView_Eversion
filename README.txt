@@ -10,17 +10,56 @@ CGAL  ----- Computational geometry library.
 Thrust ---- Build-in library of cuda, similar to STL of C++
 Paraview -- (Optional) Visualization software for animation purpose. 
 
-************************
-To run simulation on slurm cluster (acms-gpu is powered by slurm) 
- (1) In project root folder, cd ./scripts
- (2) sbatch *.sh, for example, sbatch discN01G02.sh means take 
-     the first configuration file and then submit it to gpu02 compute node 
-     so. The actual GPU device number that is going to run the program is 
-     controled by slurm, and specified GPUDevice in the config file is ignored 
-     if running on cluster.
+*******************************************
 
 Location of configuration files:
  ./resources
+ 
+Additional parameter-configurating files:
+  (1) disc_NXX_X.cfg, X is some number, contains:
+        animation (vtk) files storage designation.
+        animation files name desgination.
+        initial contractile spring coefficient.
+  (2) disc_M.cfg
+        initial parameter for membrane stiffness, bending stiffness, volume exclusion, simulation time, time step size, etc.
+  (3) ECM_input.cfg
+        ECM stiffness, adhesion with membrane node, volume exclusion with membrane node.
+  (4) discMain_M.cpp
+        growth speed, anisotropic contractile spring coefficients, etc.
+  (5) SceCells.cu
+        cell cycle length
+        
+*******************************************
+
+How to identify the flow of algorithm calling and simulation proceeding?
+
+1. Look for : int main(int argc, char* argv[])
+2. Find : simuDomain.runAllLogic_M
+3. Go to SimulationDomainGPU.cu and SimulationDomainGPU.h in /src/SceGPU subfolder 
+4. Find : SimulationDomainGPU::runAllLogic_M(double & dt...)
+5. You will see that in this function, the followings key algorithms are executed:
+   (a) nodes.sceForcesDisc_M
+     (i) Go to SceNodes.cu and SceNodes.h in /src/SceGPU subfolder for details
+   (b)	cells.runAllCellLogicsDisc_M
+     (i) Go to SceCells.cu and SceCells.h in /src/SceGPU subfolder for details
+
+
+For (a):
+  This function deals with: (a) Identifying node-to-node correspondence for contractile springs and cell-cell adhesion, (b) Volume exclusion (via Morse-like interaction) between membrane nodes.
+  In SceNodes::sceForcesDisc_M, the following key algorithms are executed:
+    (I) prepareSceForceComputation_M
+    (II) Setting up the coefficients of the apical and basal contractile springs.
+    (III) applySceForcesDisc_M
+      (i) Identify membrane nodes connected by cell-cell adhesion forces.
+      (ii) Identify the membrane nodes connected by contractile springs.
+      (iii) Calculate forces due to membrane-to-membrane volume exclusion (or repulsion) using the function : AddForceDisc_M
+    (IV) processMembrAdh_M
+      (i) Calculate adhesion between membrane nodes using : applyMembrAdh_M
+
+  For (b):
+     In cells.runAllCellLogicsDisc_M, the following keyy algorithms are executed
+ 
+
 *******************************************
 To run simulation on UCR HPCC cluster: 
    After uploading all the files under this repository, follow the command below.
