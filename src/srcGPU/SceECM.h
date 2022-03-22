@@ -429,7 +429,7 @@ struct MoveNodes2_Cell: public thrust::unary_function<IIIDDBT,DDIDD> {
 					enteringMitotic = false;
 					scaling = 1;
 				}
-				if (enteringMitotic = true){
+				if (enteringMitotic == true){
 					fMorse=(1.0+(2.0-1.0)*scaling)*calMorse_ECM(dist);
 				}
 				else{
