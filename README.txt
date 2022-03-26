@@ -57,7 +57,22 @@ For (a):
       (i) Calculate adhesion between membrane nodes using : applyMembrAdh_M
 
   For (b):
-     In cells.runAllCellLogicsDisc_M, the following keyy algorithms are executed
+     (I) Assignment for the number of contractile spring for each cell.
+     (II) Speed counter for growth progress and etc are set.
+     In cells.runAllCellLogicsDisc_M, the following key algorithms are executed:
+         (III) Populating nucleus node for dividing cells.
+         (IV) computeApicalLoc
+         (V) computeBasalLoc
+         (VI) computeIndividualCellHeight
+         (VII) eCMCellInteraction
+         (VIII) computeCenterPos_M2: computes centers of cells.
+         (IX) computeInternalAvgPos_M(): computes average nucleus position of each cell.
+         (X) applySceCellDisc_M: volume exclusion between membrane and internal (nucleus) nodes.
+         (XI) applyMembContraction2: calculate contractile spring force.
+         (XII) applyMemForce_M
+         (XIII) applyVolumeConstraint
+         (XIV) growAtRandom_M_Ver2: advance the growth progress counter with specific conditions related to neighboring cells.
+         (XV) allComponentsMove: update position of each node based on previously calculated forces.
  
 
 *******************************************
