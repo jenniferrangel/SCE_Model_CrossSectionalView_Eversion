@@ -1,0 +1,1598 @@
+CellRank:0
+    GrowthProgress:0
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:2
+    CellArea:24.5083
+    CellPerim:25.4434
+    NeighborCellsOrdered:{ 1 85 }
+    NumberOfPointsInContactOrdered:{ 108 30 0 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:224
+    CellCenter:(4.85114,9.1575,0)
+    CellApicalLoc:(2.01865,11.4809,0)
+    CellBasalLoc:(7.02684,5.68647,0)
+    CellNucleusLoc:(5.92665,7.82606,0)
+    CellPressure:64.294
+
+CellRank:1
+    GrowthProgress:0
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:2
+    CellArea:49.4818
+    CellPerim:44.9949
+    NeighborCellsOrdered:{ 2 0 }
+    NumberOfPointsInContactOrdered:{ 180 108 0 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:368
+    CellCenter:(6.59526,11.7724,0)
+    CellApicalLoc:(-1.093,14.8178,0)
+    CellBasalLoc:(13.0267,7.34025,0)
+    CellNucleusLoc:(11.3492,9.91753,0)
+    CellPressure:62.3244
+
+CellRank:2
+    GrowthProgress:-9998.94
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:2
+    CellArea:64.3589
+    CellPerim:49.5451
+    NeighborCellsOrdered:{ 3 1 }
+    NumberOfPointsInContactOrdered:{ 180 180 0 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(7.821,14.6784,0)
+    CellApicalLoc:(-2.31757,18.8928,0)
+    CellBasalLoc:(16.7532,9.73942,0)
+    CellNucleusLoc:(5.11639,14.984,0)
+    CellPressure:77.7414
+
+CellRank:3
+    GrowthProgress:-9998.94
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:2
+    CellArea:64.3205
+    CellPerim:52.5811
+    NeighborCellsOrdered:{ 4 2 }
+    NumberOfPointsInContactOrdered:{ 180 180 0 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(8.86705,17.6901,0)
+    CellApicalLoc:(-1.93179,22.7847,0)
+    CellBasalLoc:(18.4258,11.1945,0)
+    CellNucleusLoc:(0.83888,21.5852,0)
+    CellPressure:83.5108
+
+CellRank:4
+    GrowthProgress:-1.0057
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.3636
+    CellPerim:55.2395
+    NeighborCellsOrdered:{ 5 80 3 }
+    NumberOfPointsInContactOrdered:{ 180 1 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(10.2389,20.3687,0)
+    CellApicalLoc:(-0.740558,26.7976,0)
+    CellBasalLoc:(19.9472,12.6826,0)
+    CellNucleusLoc:(5.79635,23.5119,0)
+    CellPressure:79.4361
+
+CellRank:5
+    GrowthProgress:0.0224
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.3473
+    CellPerim:57.3152
+    NeighborCellsOrdered:{ 6 80 4 }
+    NumberOfPointsInContactOrdered:{ 180 18 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(11.8791,22.7514,0)
+    CellApicalLoc:(1.10733,30.6215,0)
+    CellBasalLoc:(21.4737,14.1749,0)
+    CellNucleusLoc:(3.25827,29.1501,0)
+    CellPressure:80.9157
+
+CellRank:6
+    GrowthProgress:-2.66244
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.356
+    CellPerim:57.6998
+    NeighborCellsOrdered:{ 7 80 5 }
+    NumberOfPointsInContactOrdered:{ 180 18 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:24
+    CurrentActiveMembrNodes:396
+    CellCenter:(13.7823,24.8751,0)
+    CellApicalLoc:(3.86796,33.9967,0)
+    CellBasalLoc:(22.9238,15.5482,0)
+    CellNucleusLoc:(5.95544,32.315,0)
+    CellPressure:79.9734
+
+CellRank:7
+    GrowthProgress:-1.3626
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.4022
+    CellPerim:57.9679
+    NeighborCellsOrdered:{ 8 80 6 }
+    NumberOfPointsInContactOrdered:{ 180 18 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(15.8151,26.8154,0)
+    CellApicalLoc:(6.60925,36.9062,0)
+    CellBasalLoc:(24.4424,16.7881,0)
+    CellNucleusLoc:(12.0304,31.1518,0)
+    CellPressure:75.3111
+
+CellRank:8
+    GrowthProgress:-0.0376
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:4
+    CellArea:64.3565
+    CellPerim:59.1412
+    NeighborCellsOrdered:{ 9 79 80 7 }
+    NumberOfPointsInContactOrdered:{ 180 1 15 180 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(17.9628,28.5794,0)
+    CellApicalLoc:(9.48776,39.6728,0)
+    CellBasalLoc:(26.1202,18.0099,0)
+    CellNucleusLoc:(11.0231,37.467,0)
+    CellPressure:80.0709
+
+CellRank:9
+    GrowthProgress:-1.46681
+    MembrGrowthProgress:0
+    IsBoundrayCell:0
+    NumOfNeighbors:3
+    CellArea:64.345
+    CellPerim:58.6137
+    NeighborCellsOrdered:{ 79 8 88 }
+    NumberOfPointsInContactOrdered:{ 18 180 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:24
+    CurrentActiveMembrNodes:387
+    CellCenter:(20.0995,30.3409,0)
+    CellApicalLoc:(13.0337,42.0491,0)
+    CellBasalLoc:(27.5686,19.0073,0)
+    CellNucleusLoc:(14.2106,39.7575,0)
+    CellPressure:82.1457
+
+CellRank:10
+    GrowthProgress:-1.5186
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.3238
+    CellPerim:58.053
+    NeighborCellsOrdered:{ 11 79 88 }
+    NumberOfPointsInContactOrdered:{ 180 17 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(25.2925,32.3513,0)
+    CellApicalLoc:(19.98,44.9956,0)
+    CellBasalLoc:(30.7306,20.2829,0)
+    CellNucleusLoc:(22.3696,39.1605,0)
+    CellPressure:84.5313
+
+CellRank:11
+    GrowthProgress:0.4867
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.3176
+    CellPerim:58.327
+    NeighborCellsOrdered:{ 12 79 10 }
+    NumberOfPointsInContactOrdered:{ 180 17 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(27.8822,33.2999,0)
+    CellApicalLoc:(23.1094,46.3235,0)
+    CellBasalLoc:(32.6961,20.8401,0)
+    CellNucleusLoc:(27.2857,34.4818,0)
+    CellPressure:85.5367
+
+CellRank:12
+    GrowthProgress:-0.924815
+    MembrGrowthProgress:0
+    IsBoundrayCell:0
+    NumOfNeighbors:4
+    CellArea:64.2667
+    CellPerim:59.1962
+    NeighborCellsOrdered:{ 78 79 11 87 }
+    NumberOfPointsInContactOrdered:{ 7 8 180 180 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:24
+    CurrentActiveMembrNodes:387
+    CellCenter:(30.3958,34.3947,0)
+    CellApicalLoc:(26.5399,47.7168,0)
+    CellBasalLoc:(34.4298,21.3025,0)
+    CellNucleusLoc:(27.0971,45.0607,0)
+    CellPressure:90.8424
+
+CellRank:13
+    GrowthProgress:-1.5016
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.275
+    CellPerim:59.1204
+    NeighborCellsOrdered:{ 14 78 87 }
+    NumberOfPointsInContactOrdered:{ 180 17 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(35.8501,34.857,0)
+    CellApicalLoc:(33.3517,48.7194,0)
+    CellBasalLoc:(38.0349,21.5504,0)
+    CellNucleusLoc:(35.3172,37.4234,0)
+    CellPressure:90.814
+
+CellRank:14
+    GrowthProgress:-0.4134
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.2447
+    CellPerim:59.422
+    NeighborCellsOrdered:{ 15 78 13 }
+    NumberOfPointsInContactOrdered:{ 180 16 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(38.5684,35.0157,0)
+    CellApicalLoc:(36.416,48.9529,0)
+    CellBasalLoc:(40.3815,21.5506,0)
+    CellNucleusLoc:(36.9097,45.2243,0)
+    CellPressure:94.5452
+
+CellRank:15
+    GrowthProgress:0.8898
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.2506
+    CellPerim:59.62
+    NeighborCellsOrdered:{ 16 78 14 }
+    NumberOfPointsInContactOrdered:{ 180 13 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(41.2638,35.1762,0)
+    CellApicalLoc:(39.2235,49.2732,0)
+    CellBasalLoc:(42.8401,21.5219,0)
+    CellNucleusLoc:(41.7117,32.8017,0)
+    CellPressure:94.1121
+
+CellRank:16
+    GrowthProgress:-1.4489
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.2355
+    CellPerim:61.4638
+    NeighborCellsOrdered:{ 17 78 15 }
+    NumberOfPointsInContactOrdered:{ 180 16 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(43.9136,35.3977,0)
+    CellApicalLoc:(42.0954,49.9407,0)
+    CellBasalLoc:(45.2737,21.4986,0)
+    CellNucleusLoc:(42.4385,47.0171,0)
+    CellPressure:96.243
+
+CellRank:17
+    GrowthProgress:-0.4415
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:4
+    CellArea:64.2906
+    CellPerim:63.156
+    NeighborCellsOrdered:{ 18 77 78 16 }
+    NumberOfPointsInContactOrdered:{ 180 5 6 180 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(46.5196,35.6207,0)
+    CellApicalLoc:(45.1531,50.6783,0)
+    CellBasalLoc:(47.715,21.4074,0)
+    CellNucleusLoc:(46.1696,37.8386,0)
+    CellPressure:90.4269
+
+CellRank:18
+    GrowthProgress:0.9215
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:89.9974
+    CellPerim:65.7862
+    NeighborCellsOrdered:{ 19 77 17 }
+    NumberOfPointsInContactOrdered:{ 180 18 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:48
+    CurrentActiveMembrNodes:396
+    CellCenter:(49.4613,35.6819,0)
+    CellApicalLoc:(49.4741,51.1591,0)
+    CellBasalLoc:(49.7994,21.3214,0)
+    CellNucleusLoc:(49.5381,45.0807,0)
+    CellPressure:120.303
+
+CellRank:19
+    GrowthProgress:-1.5374
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.2381
+    CellPerim:62.7109
+    NeighborCellsOrdered:{ 20 77 18 }
+    NumberOfPointsInContactOrdered:{ 180 14 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(52.4027,35.3841,0)
+    CellApicalLoc:(53.6296,50.2394,0)
+    CellBasalLoc:(51.8319,21.1599,0)
+    CellNucleusLoc:(51.6516,32.9814,0)
+    CellPressure:94.4291
+
+CellRank:20
+    GrowthProgress:-0.3276
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.2191
+    CellPerim:61.4787
+    NeighborCellsOrdered:{ 21 77 19 }
+    NumberOfPointsInContactOrdered:{ 180 13 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(54.994,35.0728,0)
+    CellApicalLoc:(56.2355,49.7456,0)
+    CellBasalLoc:(54.3334,20.9165,0)
+    CellNucleusLoc:(55.3311,38.6352,0)
+    CellPressure:98.5736
+
+CellRank:21
+    GrowthProgress:-1.22327
+    MembrGrowthProgress:0
+    IsBoundrayCell:0
+    NumOfNeighbors:3
+    CellArea:64.1724
+    CellPerim:61.7647
+    NeighborCellsOrdered:{ 77 20 92 }
+    NumberOfPointsInContactOrdered:{ 15 180 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:24
+    CurrentActiveMembrNodes:385
+    CellCenter:(57.595,35.1115,0)
+    CellApicalLoc:(59.1305,49.6138,0)
+    CellBasalLoc:(56.5379,20.7329,0)
+    CellNucleusLoc:(58.7255,46.5191,0)
+    CellPressure:103.746
+
+CellRank:22
+    GrowthProgress:-1.4561
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.1789
+    CellPerim:61.4304
+    NeighborCellsOrdered:{ 23 76 92 }
+    NumberOfPointsInContactOrdered:{ 180 15 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(62.6684,33.8063,0)
+    CellApicalLoc:(65.98,47.9797,0)
+    CellBasalLoc:(60.8368,19.8697,0)
+    CellNucleusLoc:(63.6708,40.8874,0)
+    CellPressure:103.708
+
+CellRank:23
+    GrowthProgress:-0.4292
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.1409
+    CellPerim:59.3841
+    NeighborCellsOrdered:{ 24 76 22 }
+    NumberOfPointsInContactOrdered:{ 180 9 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(65.1835,32.9023,0)
+    CellApicalLoc:(68.0056,46.6519,0)
+    CellBasalLoc:(63.5844,19.2587,0)
+    CellNucleusLoc:(65.1165,34.9504,0)
+    CellPressure:107.359
+
+CellRank:24
+    GrowthProgress:0.8772
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.1171
+    CellPerim:58.0863
+    NeighborCellsOrdered:{ 25 76 23 }
+    NumberOfPointsInContactOrdered:{ 180 4 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(67.7939,32.2188,0)
+    CellApicalLoc:(69.504,45.8802,0)
+    CellBasalLoc:(66.5141,18.7423,0)
+    CellNucleusLoc:(67.2745,29.9746,0)
+    CellPressure:109.994
+
+CellRank:25
+    GrowthProgress:-1.464
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.1035
+    CellPerim:58.7871
+    NeighborCellsOrdered:{ 26 76 24 }
+    NumberOfPointsInContactOrdered:{ 180 6 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(70.4717,32.0291,0)
+    CellApicalLoc:(70.8972,45.9446,0)
+    CellBasalLoc:(69.4894,18.3868,0)
+    CellNucleusLoc:(70.3773,27.0997,0)
+    CellPressure:112.067
+
+CellRank:26
+    GrowthProgress:-0.1415
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.1498
+    CellPerim:60.9979
+    NeighborCellsOrdered:{ 27 76 25 }
+    NumberOfPointsInContactOrdered:{ 180 12 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(73.125,32.2461,0)
+    CellApicalLoc:(72.8433,46.6865,0)
+    CellBasalLoc:(72.4729,18.1975,0)
+    CellNucleusLoc:(73.5927,37.2546,0)
+    CellPressure:106.593
+
+CellRank:27
+    GrowthProgress:-2.09702
+    MembrGrowthProgress:0
+    IsBoundrayCell:0
+    NumOfNeighbors:3
+    CellArea:64.1432
+    CellPerim:62.876
+    NeighborCellsOrdered:{ 76 26 93 }
+    NumberOfPointsInContactOrdered:{ 17 180 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:24
+    CurrentActiveMembrNodes:387
+    CellCenter:(75.736,32.8167,0)
+    CellApicalLoc:(75.8791,47.516,0)
+    CellBasalLoc:(74.8407,18.1702,0)
+    CellNucleusLoc:(75.9781,44.9257,0)
+    CellPressure:107.356
+
+CellRank:28
+    GrowthProgress:-1.2457
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:4
+    CellArea:64.1864
+    CellPerim:63.5421
+    NeighborCellsOrdered:{ 29 75 76 93 }
+    NumberOfPointsInContactOrdered:{ 180 7 3 180 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(80.8064,32.0849,0)
+    CellApicalLoc:(82.6672,47.0621,0)
+    CellBasalLoc:(79.1594,17.5895,0)
+    CellNucleusLoc:(80.3458,28.0473,0)
+    CellPressure:102.998
+
+CellRank:29
+    GrowthProgress:-0.1641
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.1585
+    CellPerim:63.2672
+    NeighborCellsOrdered:{ 30 75 28 }
+    NumberOfPointsInContactOrdered:{ 180 17 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(83.3471,31.5073,0)
+    CellApicalLoc:(85.7423,46.1334,0)
+    CellBasalLoc:(82.0908,17.1534,0)
+    CellNucleusLoc:(84.9115,43.4725,0)
+    CellPressure:105.446
+
+CellRank:30
+    GrowthProgress:-1.09378
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.1428
+    CellPerim:60.3129
+    NeighborCellsOrdered:{ 31 75 29 }
+    NumberOfPointsInContactOrdered:{ 180 12 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:24
+    CurrentActiveMembrNodes:396
+    CellCenter:(85.89,30.7437,0)
+    CellApicalLoc:(88.3298,44.7166,0)
+    CellBasalLoc:(85.0076,16.8245,0)
+    CellNucleusLoc:(85.904,35.1051,0)
+    CellPressure:107.601
+
+CellRank:31
+    GrowthProgress:-1.2858
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.1124
+    CellPerim:57.8956
+    NeighborCellsOrdered:{ 32 75 30 }
+    NumberOfPointsInContactOrdered:{ 180 5 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(88.4972,30.0693,0)
+    CellApicalLoc:(89.9067,43.5954,0)
+    CellBasalLoc:(87.9578,16.571,0)
+    CellNucleusLoc:(88.0817,29.0107,0)
+    CellPressure:110.612
+
+CellRank:32
+    GrowthProgress:-0.2608
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.0571
+    CellPerim:57.3093
+    NeighborCellsOrdered:{ 33 75 31 }
+    NumberOfPointsInContactOrdered:{ 180 5 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(91.2074,29.8807,0)
+    CellApicalLoc:(91.1384,43.3938,0)
+    CellBasalLoc:(91.1194,16.4722,0)
+    CellNucleusLoc:(91.1616,24.5277,0)
+    CellPressure:117.417
+
+CellRank:33
+    GrowthProgress:0.7726
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.1346
+    CellPerim:58.3752
+    NeighborCellsOrdered:{ 34 75 32 }
+    NumberOfPointsInContactOrdered:{ 180 8 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(93.9182,30.1833,0)
+    CellApicalLoc:(92.6431,43.8822,0)
+    CellBasalLoc:(94.165,16.5738,0)
+    CellNucleusLoc:(94.415,28.3415,0)
+    CellPressure:108.088
+
+CellRank:34
+    GrowthProgress:-1.2713
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.1734
+    CellPerim:60.3193
+    NeighborCellsOrdered:{ 35 75 33 }
+    NumberOfPointsInContactOrdered:{ 180 12 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(96.5522,30.7255,0)
+    CellApicalLoc:(94.4672,44.7798,0)
+    CellBasalLoc:(97.1566,16.8073,0)
+    CellNucleusLoc:(96.6096,34.3256,0)
+    CellPressure:103.985
+
+CellRank:35
+    GrowthProgress:-0.2595
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.1902
+    CellPerim:62.5258
+    NeighborCellsOrdered:{ 36 75 34 }
+    NumberOfPointsInContactOrdered:{ 180 17 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(99.1546,31.2933,0)
+    CellApicalLoc:(97.2385,45.8954,0)
+    CellBasalLoc:(100.111,17.1231,0)
+    CellNucleusLoc:(97.6909,43.2776,0)
+    CellPressure:102.403
+
+CellRank:36
+    GrowthProgress:-2.56113
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:4
+    CellArea:64.2045
+    CellPerim:62.3724
+    NeighborCellsOrdered:{ 37 74 75 35 }
+    NumberOfPointsInContactOrdered:{ 180 12 2 180 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:24
+    CurrentActiveMembrNodes:396
+    CellCenter:(101.783,31.6172,0)
+    CellApicalLoc:(100.816,46.3343,0)
+    CellBasalLoc:(102.896,17.4781,0)
+    CellNucleusLoc:(101.073,43.6313,0)
+    CellPressure:100.455
+
+CellRank:37
+    GrowthProgress:-1.4196
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.2231
+    CellPerim:60.2814
+    NeighborCellsOrdered:{ 38 74 36 }
+    NumberOfPointsInContactOrdered:{ 180 14 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(104.437,31.6864,0)
+    CellApicalLoc:(103.884,45.9232,0)
+    CellBasalLoc:(105.664,17.8196,0)
+    CellNucleusLoc:(103.97,37.0739,0)
+    CellPressure:98.1919
+
+CellRank:38
+    GrowthProgress:0.0449
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.2092
+    CellPerim:58.6607
+    NeighborCellsOrdered:{ 39 74 37 }
+    NumberOfPointsInContactOrdered:{ 180 11 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(107.124,31.7984,0)
+    CellApicalLoc:(106.134,45.6233,0)
+    CellBasalLoc:(108.613,18.235,0)
+    CellNucleusLoc:(107.231,27.93,0)
+    CellPressure:98.8294
+
+CellRank:39
+    GrowthProgress:-2.16498
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.2192
+    CellPerim:58.1287
+    NeighborCellsOrdered:{ 40 74 38 }
+    NumberOfPointsInContactOrdered:{ 180 10 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:24
+    CurrentActiveMembrNodes:396
+    CellCenter:(109.818,32.1572,0)
+    CellApicalLoc:(108.144,45.8063,0)
+    CellBasalLoc:(111.429,18.6956,0)
+    CellNucleusLoc:(109.631,34.3746,0)
+    CellPressure:98.0379
+
+CellRank:40
+    GrowthProgress:-1.0018
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.2209
+    CellPerim:59.2682
+    NeighborCellsOrdered:{ 41 74 39 }
+    NumberOfPointsInContactOrdered:{ 180 13 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(112.478,32.7459,0)
+    CellApicalLoc:(110.242,46.551,0)
+    CellBasalLoc:(114.267,19.1848,0)
+    CellNucleusLoc:(113.034,28.9983,0)
+    CellPressure:97.9272
+
+CellRank:41
+    GrowthProgress:0.1862
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.2326
+    CellPerim:60.8196
+    NeighborCellsOrdered:{ 42 74 40 }
+    NumberOfPointsInContactOrdered:{ 180 18 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(115.124,33.4065,0)
+    CellApicalLoc:(113.098,47.5763,0)
+    CellBasalLoc:(117.098,19.7461,0)
+    CellNucleusLoc:(113.516,44.6898,0)
+    CellPressure:96.5546
+
+CellRank:42
+    GrowthProgress:-1.16618
+    MembrGrowthProgress:0
+    IsBoundrayCell:0
+    NumOfNeighbors:4
+    CellArea:64.2265
+    CellPerim:60.5047
+    NeighborCellsOrdered:{ 73 74 41 89 }
+    NumberOfPointsInContactOrdered:{ 5 10 180 180 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:24
+    CurrentActiveMembrNodes:387
+    CellCenter:(117.739,34.2076,0)
+    CellApicalLoc:(116.766,48.3019,0)
+    CellBasalLoc:(119.405,20.2821,0)
+    CellNucleusLoc:(117.031,45.6208,0)
+    CellPressure:96.8121
+
+CellRank:43
+    GrowthProgress:-0.8324
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.2453
+    CellPerim:58.41
+    NeighborCellsOrdered:{ 44 73 89 }
+    NumberOfPointsInContactOrdered:{ 180 14 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(123.147,34.2128,0)
+    CellApicalLoc:(122.504,48.0177,0)
+    CellBasalLoc:(123.656,20.7487,0)
+    CellNucleusLoc:(123.288,31.3341,0)
+    CellPressure:94.283
+
+CellRank:44
+    GrowthProgress:0.2741
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.2659
+    CellPerim:58.3322
+    NeighborCellsOrdered:{ 45 73 43 }
+    NumberOfPointsInContactOrdered:{ 180 14 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(125.888,34.4499,0)
+    CellApicalLoc:(125.086,48.1712,0)
+    CellBasalLoc:(126.394,20.9893,0)
+    CellNucleusLoc:(125.766,38.8703,0)
+    CellPressure:92.2418
+
+CellRank:45
+    GrowthProgress:-1.77549
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.2544
+    CellPerim:59.1037
+    NeighborCellsOrdered:{ 46 73 44 }
+    NumberOfPointsInContactOrdered:{ 180 17 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:24
+    CurrentActiveMembrNodes:396
+    CellCenter:(128.632,34.7672,0)
+    CellApicalLoc:(128.041,48.6294,0)
+    CellBasalLoc:(129.035,21.2517,0)
+    CellNucleusLoc:(128.301,45.1812,0)
+    CellPressure:93.1127
+
+CellRank:46
+    GrowthProgress:-0.9521
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.2837
+    CellPerim:59.0006
+    NeighborCellsOrdered:{ 47 73 45 }
+    NumberOfPointsInContactOrdered:{ 180 14 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(131.369,35.0493,0)
+    CellApicalLoc:(131.04,48.9934,0)
+    CellBasalLoc:(131.63,21.4949,0)
+    CellNucleusLoc:(131.441,32.229,0)
+    CellPressure:90.0952
+
+CellRank:47
+    GrowthProgress:0.3907
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.3098
+    CellPerim:59.443
+    NeighborCellsOrdered:{ 48 73 46 }
+    NumberOfPointsInContactOrdered:{ 180 15 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(134.097,35.3103,0)
+    CellApicalLoc:(133.967,49.36,0)
+    CellBasalLoc:(134.249,21.734,0)
+    CellNucleusLoc:(134.092,38.9822,0)
+    CellPressure:87.1828
+
+CellRank:48
+    GrowthProgress:-1.00424
+    MembrGrowthProgress:0
+    IsBoundrayCell:0
+    NumOfNeighbors:3
+    CellArea:64.2602
+    CellPerim:59.2274
+    NeighborCellsOrdered:{ 72 47 86 }
+    NumberOfPointsInContactOrdered:{ 16 180 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:24
+    CurrentActiveMembrNodes:386
+    CellCenter:(136.84,35.7052,0)
+    CellApicalLoc:(137.423,49.4259,0)
+    CellBasalLoc:(136.662,21.9876,0)
+    CellNucleusLoc:(137.11,46.6555,0)
+    CellPressure:92.1108
+
+CellRank:49
+    GrowthProgress:-1.2618
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.3015
+    CellPerim:57.775
+    NeighborCellsOrdered:{ 50 72 86 }
+    NumberOfPointsInContactOrdered:{ 180 15 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(142.361,35.2135,0)
+    CellApicalLoc:(143.693,48.7021,0)
+    CellBasalLoc:(141.131,22.036,0)
+    CellNucleusLoc:(142.684,37.832,0)
+    CellPressure:87.8207
+
+CellRank:50
+    GrowthProgress:-0.1264
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.3065
+    CellPerim:57.8698
+    NeighborCellsOrdered:{ 51 72 49 }
+    NumberOfPointsInContactOrdered:{ 180 16 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(145.156,35.0907,0)
+    CellApicalLoc:(146.83,48.612,0)
+    CellBasalLoc:(143.551,21.9816,0)
+    CellNucleusLoc:(144.861,32.5855,0)
+    CellPressure:87.1546
+
+CellRank:51
+    GrowthProgress:-2.30313
+    MembrGrowthProgress:0
+    IsBoundrayCell:0
+    NumOfNeighbors:3
+    CellArea:64.3298
+    CellPerim:57.2127
+    NeighborCellsOrdered:{ 72 50 91 }
+    NumberOfPointsInContactOrdered:{ 14 180 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:24
+    CurrentActiveMembrNodes:384
+    CellCenter:(147.966,35.0952,0)
+    CellApicalLoc:(150.063,48.3895,0)
+    CellBasalLoc:(145.543,21.9473,0)
+    CellNucleusLoc:(149.173,41.5245,0)
+    CellPressure:83.7054
+
+CellRank:52
+    GrowthProgress:-1.1595
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.343
+    CellPerim:58.4935
+    NeighborCellsOrdered:{ 53 71 91 }
+    NumberOfPointsInContactOrdered:{ 180 18 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(153.336,33.7738,0)
+    CellApicalLoc:(157.876,46.7458,0)
+    CellBasalLoc:(148.868,21.2815,0)
+    CellNucleusLoc:(157.064,44.0285,0)
+    CellPressure:81.7098
+
+CellRank:53
+    GrowthProgress:0.0941
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.3686
+    CellPerim:57.3493
+    NeighborCellsOrdered:{ 54 71 52 }
+    NumberOfPointsInContactOrdered:{ 180 18 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(155.957,32.7825,0)
+    CellApicalLoc:(161.259,45.1518,0)
+    CellBasalLoc:(150.935,20.6495,0)
+    CellNucleusLoc:(156.389,33.7963,0)
+    CellPressure:79.3505
+
+CellRank:54
+    GrowthProgress:-1.56896
+    MembrGrowthProgress:0
+    IsBoundrayCell:0
+    NumOfNeighbors:3
+    CellArea:64.3522
+    CellPerim:56.045
+    NeighborCellsOrdered:{ 71 53 90 }
+    NumberOfPointsInContactOrdered:{ 14 180 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:24
+    CurrentActiveMembrNodes:383
+    CellCenter:(158.616,31.8326,0)
+    CellApicalLoc:(164.222,43.7215,0)
+    CellBasalLoc:(152.739,20.0915,0)
+    CellNucleusLoc:(161.541,37.97,0)
+    CellPressure:80.6622
+
+CellRank:55
+    GrowthProgress:-1.5192
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:4
+    CellArea:64.4105
+    CellPerim:57.7486
+    NeighborCellsOrdered:{ 56 70 71 90 }
+    NumberOfPointsInContactOrdered:{ 180 7 8 180 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(163.482,29.0337,0)
+    CellApicalLoc:(171.159,40.2958,0)
+    CellBasalLoc:(155.707,18.4445,0)
+    CellNucleusLoc:(167.127,34.1351,0)
+    CellPressure:74.4074
+
+CellRank:56
+    GrowthProgress:-0.1703
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.3731
+    CellPerim:57.7217
+    NeighborCellsOrdered:{ 57 70 55 }
+    NumberOfPointsInContactOrdered:{ 180 18 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(165.733,27.322,0)
+    CellApicalLoc:(174.191,37.7496,0)
+    CellBasalLoc:(157.423,17.1989,0)
+    CellNucleusLoc:(172.506,35.5804,0)
+    CellPressure:77.6741
+
+CellRank:57
+    GrowthProgress:-2.55712
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.428
+    CellPerim:56.7094
+    NeighborCellsOrdered:{ 58 70 56 }
+    NumberOfPointsInContactOrdered:{ 180 18 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:24
+    CurrentActiveMembrNodes:396
+    CellCenter:(167.892,25.4586,0)
+    CellApicalLoc:(176.99,35.1054,0)
+    CellBasalLoc:(159.109,15.8874,0)
+    CellNucleusLoc:(170.938,28.6606,0)
+    CellPressure:72.2273
+
+CellRank:58
+    GrowthProgress:-1.2499
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.3841
+    CellPerim:57.2535
+    NeighborCellsOrdered:{ 59 70 57 }
+    NumberOfPointsInContactOrdered:{ 180 18 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(169.969,23.4892,0)
+    CellApicalLoc:(179.895,32.3897,0)
+    CellBasalLoc:(160.648,14.5253,0)
+    CellNucleusLoc:(177.771,30.6302,0)
+    CellPressure:76.3054
+
+CellRank:59
+    GrowthProgress:-0.0404
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:3
+    CellArea:64.3843
+    CellPerim:56.8684
+    NeighborCellsOrdered:{ 60 70 58 }
+    NumberOfPointsInContactOrdered:{ 180 11 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(171.822,21.2906,0)
+    CellApicalLoc:(182.71,28.8431,0)
+    CellBasalLoc:(162.042,13.1266,0)
+    CellNucleusLoc:(180.583,27.5643,0)
+    CellPressure:76.557
+
+CellRank:60
+    GrowthProgress:-2.05039
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:2
+    CellArea:64.364
+    CellPerim:54.7401
+    NeighborCellsOrdered:{ 61 59 }
+    NumberOfPointsInContactOrdered:{ 180 180 0 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:24
+    CurrentActiveMembrNodes:396
+    CellCenter:(173.346,18.787,0)
+    CellApicalLoc:(184.48,24.5806,0)
+    CellBasalLoc:(163.436,11.6069,0)
+    CellNucleusLoc:(181.949,23.5609,0)
+    CellPressure:78.8125
+
+CellRank:61
+    GrowthProgress:-9998.94
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:2
+    CellArea:64.3624
+    CellPerim:51.2136
+    NeighborCellsOrdered:{ 62 60 }
+    NumberOfPointsInContactOrdered:{ 180 180 0 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(174.629,16.0123,0)
+    CellApicalLoc:(185.302,20.5384,0)
+    CellBasalLoc:(164.908,9.99976,0)
+    CellNucleusLoc:(179.088,18.1781,0)
+    CellPressure:78.4822
+
+CellRank:62
+    GrowthProgress:-9998.94
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:2
+    CellArea:64.3738
+    CellPerim:48.6132
+    NeighborCellsOrdered:{ 63 61 }
+    NumberOfPointsInContactOrdered:{ 180 180 0 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:396
+    CellCenter:(175.657,12.924,0)
+    CellApicalLoc:(185.452,17.0705,0)
+    CellBasalLoc:(166.552,8.40953,0)
+    CellNucleusLoc:(177.375,12.7842,0)
+    CellPressure:76.1123
+
+CellRank:63
+    GrowthProgress:0
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:2
+    CellArea:49.4691
+    CellPerim:44.9031
+    NeighborCellsOrdered:{ 64 62 }
+    NumberOfPointsInContactOrdered:{ 108 180 0 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:368
+    CellCenter:(176.989,10.0048,0)
+    CellApicalLoc:(184.493,13.2695,0)
+    CellBasalLoc:(170.485,5.72012,0)
+    CellNucleusLoc:(172.07,7.82711,0)
+    CellPressure:64.0458
+
+CellRank:64
+    GrowthProgress:0
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:2
+    CellArea:24.5243
+    CellPerim:25.4311
+    NeighborCellsOrdered:{ 65 63 }
+    NumberOfPointsInContactOrdered:{ 30 108 0 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:224
+    CellCenter:(179.055,7.46055,0)
+    CellApicalLoc:(181.746,9.9303,0)
+    CellBasalLoc:(177.004,4.01194,0)
+    CellNucleusLoc:(178.259,6.09686,0)
+    CellPressure:62.8969
+
+CellRank:65
+    GrowthProgress:0
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:2
+    CellArea:19.2847
+    CellPerim:16.5456
+    NeighborCellsOrdered:{ 66 64 }
+    NumberOfPointsInContactOrdered:{ 30 30 0 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:120
+    CellCenter:(183.083,7.69636,0)
+    CellApicalLoc:(182.553,9.59576,0)
+    CellBasalLoc:(183.63,5.53347,0)
+    CellNucleusLoc:(183.343,7.48029,0)
+    CellPressure:96.0642
+
+CellRank:66
+    GrowthProgress:0
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:2
+    CellArea:19.4834
+    CellPerim:16.9005
+    NeighborCellsOrdered:{ 67 65 }
+    NumberOfPointsInContactOrdered:{ 30 30 0 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:120
+    CellCenter:(186.591,11.2799,0)
+    CellApicalLoc:(185.02,12.5785,0)
+    CellBasalLoc:(188.176,9.81816,0)
+    CellNucleusLoc:(186.815,11.3246,0)
+    CellPressure:71.2577
+
+CellRank:67
+    GrowthProgress:0
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:2
+    CellArea:19.5849
+    CellPerim:16.8728
+    NeighborCellsOrdered:{ 68 66 }
+    NumberOfPointsInContactOrdered:{ 30 30 0 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:120
+    CellCenter:(188.181,16.2128,0)
+    CellApicalLoc:(186.228,16.738,0)
+    CellBasalLoc:(190.217,15.61,0)
+    CellNucleusLoc:(188.312,16.3044,0)
+    CellPressure:59.0688
+
+CellRank:68
+    GrowthProgress:0
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:2
+    CellArea:19.6552
+    CellPerim:16.8603
+    NeighborCellsOrdered:{ 69 67 }
+    NumberOfPointsInContactOrdered:{ 30 30 0 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:120
+    CellCenter:(187.987,21.4566,0)
+    CellApicalLoc:(185.918,21.5374,0)
+    CellBasalLoc:(190.113,21.3153,0)
+    CellNucleusLoc:(188.02,21.543,0)
+    CellPressure:50.8457
+
+CellRank:69
+    GrowthProgress:0
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:2
+    CellArea:19.7987
+    CellPerim:17.2387
+    NeighborCellsOrdered:{ 70 68 }
+    NumberOfPointsInContactOrdered:{ 28 30 0 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:120
+    CellCenter:(186.543,26.6477,0)
+    CellApicalLoc:(184.622,26.3833,0)
+    CellBasalLoc:(188.592,26.715,0)
+    CellNucleusLoc:(186.538,26.8608,0)
+    CellPressure:33.0386
+
+CellRank:70
+    GrowthProgress:0
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:7
+    CellArea:64.9322
+    CellPerim:41.7343
+    NeighborCellsOrdered:{ 71 55 56 57 58 59 69 }
+    NumberOfPointsInContactOrdered:{ 28 7 18 18 18 11 28 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:280
+    CellCenter:(179.287,36.1397,0)
+    CellApicalLoc:(178.108,34.9504,0)
+    CellBasalLoc:(180.669,37.4672,0)
+    CellNucleusLoc:(177.802,38.093,0)
+    CellPressure:10.2922
+
+CellRank:71
+    GrowthProgress:0
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:8
+    CellArea:64.9405
+    CellPerim:42.571
+    NeighborCellsOrdered:{ 72 91 52 53 54 90 55 70 }
+    NumberOfPointsInContactOrdered:{ 28 3 18 18 14 18 8 28 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:280
+    CellCenter:(163.967,46.5059,0)
+    CellApicalLoc:(163.512,44.9079,0)
+    CellBasalLoc:(164.531,48.2942,0)
+    CellNucleusLoc:(164.153,46.7628,0)
+    CellPressure:9.12867
+
+CellRank:72
+    GrowthProgress:0
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:8
+    CellArea:64.9602
+    CellPerim:42.9712
+    NeighborCellsOrdered:{ 73 48 86 49 50 51 91 71 }
+    NumberOfPointsInContactOrdered:{ 28 16 13 15 16 14 12 28 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:280
+    CellCenter:(145.54,51.0941,0)
+    CellApicalLoc:(145.414,49.4418,0)
+    CellBasalLoc:(145.694,52.8969,0)
+    CellNucleusLoc:(142.698,51.4867,0)
+    CellPressure:7.02284
+
+CellRank:73
+    GrowthProgress:0
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:9
+    CellArea:64.9849
+    CellPerim:41.7224
+    NeighborCellsOrdered:{ 74 42 89 43 44 45 46 47 72 }
+    NumberOfPointsInContactOrdered:{ 28 5 13 14 14 17 14 15 28 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:280
+    CellCenter:(126.52,51.1125,0)
+    CellApicalLoc:(126.2,49.285,0)
+    CellBasalLoc:(126.785,52.9473,0)
+    CellNucleusLoc:(124.286,50.9515,0)
+    CellPressure:3.82573
+
+CellRank:74
+    GrowthProgress:0
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:9
+    CellArea:64.9865
+    CellPerim:39.9764
+    NeighborCellsOrdered:{ 75 36 37 38 39 40 41 42 73 }
+    NumberOfPointsInContactOrdered:{ 28 12 14 11 10 13 18 10 28 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:280
+    CellCenter:(108.565,49.375,0)
+    CellApicalLoc:(108.546,47.4074,0)
+    CellBasalLoc:(108.568,51.2578,0)
+    CellNucleusLoc:(106.909,48.8703,0)
+    CellPressure:2.69772
+
+CellRank:75
+    GrowthProgress:0
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:11
+    CellArea:65.0407
+    CellPerim:40.4103
+    NeighborCellsOrdered:{ 76 28 29 30 31 32 33 34 35 36 74 }
+    NumberOfPointsInContactOrdered:{ 28 7 17 12 5 5 8 12 17 2 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:280
+    CellCenter:(91.0851,48.1627,0)
+    CellApicalLoc:(91.2233,46.048,0)
+    CellBasalLoc:(90.9454,49.9414,0)
+    CellNucleusLoc:(90.8983,47.2436,0)
+    CellPressure:-4.59872
+
+CellRank:76
+    GrowthProgress:0
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:11
+    CellArea:65.0142
+    CellPerim:41.8786
+    NeighborCellsOrdered:{ 77 92 22 23 24 25 26 27 93 28 75 }
+    NumberOfPointsInContactOrdered:{ 28 2 15 9 4 6 12 17 15 3 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:280
+    CellCenter:(73.2089,49.9135,0)
+    CellApicalLoc:(73.1311,47.9957,0)
+    CellBasalLoc:(73.2473,51.6782,0)
+    CellNucleusLoc:(70.2046,49.52,0)
+    CellPressure:-1.26586
+
+CellRank:77
+    GrowthProgress:0
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:8
+    CellArea:64.9354
+    CellPerim:43.0306
+    NeighborCellsOrdered:{ 78 17 18 19 20 21 92 76 }
+    NumberOfPointsInContactOrdered:{ 28 5 18 14 13 15 13 28 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:280
+    CellCenter:(54.7816,52.5982,0)
+    CellApicalLoc:(54.781,50.9657,0)
+    CellBasalLoc:(54.8263,54.4712,0)
+    CellNucleusLoc:(54.7882,52.8636,0)
+    CellPressure:9.60964
+
+CellRank:78
+    GrowthProgress:0
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:9
+    CellArea:64.9812
+    CellPerim:42.4338
+    NeighborCellsOrdered:{ 79 12 87 13 14 15 16 17 77 }
+    NumberOfPointsInContactOrdered:{ 28 7 15 17 16 13 16 6 28 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:280
+    CellCenter:(35.7111,51.5326,0)
+    CellApicalLoc:(35.5567,49.7453,0)
+    CellBasalLoc:(35.8168,53.3625,0)
+    CellNucleusLoc:(38.1852,51.9307,0)
+    CellPressure:4.3083
+
+CellRank:79
+    GrowthProgress:0
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:8
+    CellArea:64.9327
+    CellPerim:41.8429
+    NeighborCellsOrdered:{ 80 8 9 88 10 11 12 78 }
+    NumberOfPointsInContactOrdered:{ 28 1 18 15 17 17 8 28 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:280
+    CellCenter:(17.7424,46.676,0)
+    CellApicalLoc:(18.0654,44.9863,0)
+    CellBasalLoc:(17.2928,48.5545,0)
+    CellNucleusLoc:(20.0589,48.008,0)
+    CellPressure:10.1599
+
+CellRank:80
+    GrowthProgress:0
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:7
+    CellArea:64.9211
+    CellPerim:41.4429
+    NeighborCellsOrdered:{ 81 4 5 6 7 8 79 }
+    NumberOfPointsInContactOrdered:{ 28 1 18 18 18 15 28 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:280
+    CellCenter:(2.95193,36.3637,0)
+    CellApicalLoc:(4.30249,35.3535,0)
+    CellBasalLoc:(1.3888,37.5436,0)
+    CellNucleusLoc:(0.824801,34.698,0)
+    CellPressure:11.5351
+
+CellRank:81
+    GrowthProgress:0
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:2
+    CellArea:19.7086
+    CellPerim:16.9259
+    NeighborCellsOrdered:{ 82 80 }
+    NumberOfPointsInContactOrdered:{ 30 28 0 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:120
+    CellCenter:(-3.73201,26.7671,0)
+    CellApicalLoc:(-1.71515,26.4763,0)
+    CellBasalLoc:(-5.82807,26.8519,0)
+    CellNucleusLoc:(-3.68266,26.913,0)
+    CellPressure:44.1358
+
+CellRank:82
+    GrowthProgress:0
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:2
+    CellArea:19.5996
+    CellPerim:16.7569
+    NeighborCellsOrdered:{ 83 81 }
+    NumberOfPointsInContactOrdered:{ 30 30 0 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:120
+    CellCenter:(-4.95841,21.6875,0)
+    CellApicalLoc:(-2.88987,21.7372,0)
+    CellBasalLoc:(-7.10813,21.5576,0)
+    CellNucleusLoc:(-5.01808,21.7839,0)
+    CellPressure:56.8314
+
+CellRank:83
+    GrowthProgress:0
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:2
+    CellArea:19.5187
+    CellPerim:16.7311
+    NeighborCellsOrdered:{ 84 82 }
+    NumberOfPointsInContactOrdered:{ 30 30 0 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:120
+    CellCenter:(-4.75984,16.5702,0)
+    CellApicalLoc:(-2.85119,17.2618,0)
+    CellBasalLoc:(-6.76466,15.7856,0)
+    CellNucleusLoc:(-4.93018,16.639,0)
+    CellPressure:66.9055
+
+CellRank:84
+    GrowthProgress:0
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:2
+    CellArea:19.453
+    CellPerim:16.8531
+    NeighborCellsOrdered:{ 85 83 }
+    NumberOfPointsInContactOrdered:{ 30 30 0 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:120
+    CellCenter:(-2.64399,11.9695,0)
+    CellApicalLoc:(-1.17208,13.493,0)
+    CellBasalLoc:(-4.066,10.2746,0)
+    CellNucleusLoc:(-2.88785,11.9824,0)
+    CellPressure:74.7962
+
+CellRank:85
+    GrowthProgress:0
+    MembrGrowthProgress:0
+    IsBoundrayCell:1
+    NumOfNeighbors:2
+    CellArea:19.2226
+    CellPerim:16.3561
+    NeighborCellsOrdered:{ 0 84 }
+    NumberOfPointsInContactOrdered:{ 30 30 0 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:23
+    CurrentActiveMembrNodes:120
+    CellCenter:(1.10082,8.93035,0)
+    CellApicalLoc:(1.48633,10.9293,0)
+    CellBasalLoc:(0.699464,6.6884,0)
+    CellNucleusLoc:(0.906621,8.66393,0)
+    CellPressure:103.108
+
+CellRank:86
+    GrowthProgress:-1.3821
+    MembrGrowthProgress:0
+    IsBoundrayCell:0
+    NumOfNeighbors:3
+    CellArea:64.2734
+    CellPerim:57.4459
+    NeighborCellsOrdered:{ 49 72 48 }
+    NumberOfPointsInContactOrdered:{ 180 13 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:24
+    CurrentActiveMembrNodes:383
+    CellCenter:(139.595,35.5056,0)
+    CellApicalLoc:(140.774,48.9366,0)
+    CellBasalLoc:(138.819,22.0911,0)
+    CellNucleusLoc:(140.271,42.9662,0)
+    CellPressure:90.8982
+
+CellRank:87
+    GrowthProgress:-0.562642
+    MembrGrowthProgress:0
+    IsBoundrayCell:0
+    NumOfNeighbors:3
+    CellArea:64.269
+    CellPerim:58.431
+    NeighborCellsOrdered:{ 13 78 12 }
+    NumberOfPointsInContactOrdered:{ 180 15 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:24
+    CurrentActiveMembrNodes:384
+    CellCenter:(33.1058,34.7857,0)
+    CellApicalLoc:(30.1823,48.3475,0)
+    CellBasalLoc:(36.0622,21.5354,0)
+    CellNucleusLoc:(31.2463,42.705,0)
+    CellPressure:91.4225
+
+CellRank:88
+    GrowthProgress:-1.82449
+    MembrGrowthProgress:0
+    IsBoundrayCell:0
+    NumOfNeighbors:3
+    CellArea:64.3214
+    CellPerim:57.6332
+    NeighborCellsOrdered:{ 10 79 9 }
+    NumberOfPointsInContactOrdered:{ 180 15 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:24
+    CurrentActiveMembrNodes:384
+    CellCenter:(22.6331,31.4825,0)
+    CellApicalLoc:(16.6461,43.6623,0)
+    CellBasalLoc:(28.9977,19.718,0)
+    CellNucleusLoc:(17.8491,40.9708,0)
+    CellPressure:85.2435
+
+CellRank:89
+    GrowthProgress:-1.8311
+    MembrGrowthProgress:0
+    IsBoundrayCell:0
+    NumOfNeighbors:3
+    CellArea:64.2402
+    CellPerim:58.223
+    NeighborCellsOrdered:{ 43 73 42 }
+    NumberOfPointsInContactOrdered:{ 180 13 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:24
+    CurrentActiveMembrNodes:383
+    CellCenter:(120.428,34.2593,0)
+    CellApicalLoc:(119.995,48.076,0)
+    CellBasalLoc:(121.399,20.5955,0)
+    CellNucleusLoc:(120.034,37.6231,0)
+    CellPressure:95.2314
+
+CellRank:90
+    GrowthProgress:-1.37405
+    MembrGrowthProgress:0
+    IsBoundrayCell:0
+    NumOfNeighbors:3
+    CellArea:64.3475
+    CellPerim:57.4235
+    NeighborCellsOrdered:{ 55 71 54 }
+    NumberOfPointsInContactOrdered:{ 180 18 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:24
+    CurrentActiveMembrNodes:387
+    CellCenter:(161.238,30.74,0)
+    CellApicalLoc:(167.658,42.3221,0)
+    CellBasalLoc:(154.203,19.4214,0)
+    CellNucleusLoc:(166.526,39.9479,0)
+    CellPressure:80.981
+
+CellRank:91
+    GrowthProgress:-1.66897
+    MembrGrowthProgress:0
+    IsBoundrayCell:0
+    NumOfNeighbors:4
+    CellArea:64.3174
+    CellPerim:58.4905
+    NeighborCellsOrdered:{ 52 71 72 51 }
+    NumberOfPointsInContactOrdered:{ 180 3 12 180 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:24
+    CurrentActiveMembrNodes:387
+    CellCenter:(150.74,34.8039,0)
+    CellApicalLoc:(153.838,48.0262,0)
+    CellBasalLoc:(147.122,21.7468,0)
+    CellNucleusLoc:(153.3,45.453,0)
+    CellPressure:84.7999
+
+CellRank:92
+    GrowthProgress:-2.18394
+    MembrGrowthProgress:0
+    IsBoundrayCell:0
+    NumOfNeighbors:4
+    CellArea:64.1549
+    CellPerim:62.8331
+    NeighborCellsOrdered:{ 22 76 77 21 }
+    NumberOfPointsInContactOrdered:{ 180 2 13 180 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:24
+    CurrentActiveMembrNodes:387
+    CellCenter:(60.1924,34.8456,0)
+    CellApicalLoc:(62.8257,49.323,0)
+    CellBasalLoc:(58.5851,20.411,0)
+    CellNucleusLoc:(62.3617,46.9208,0)
+    CellPressure:105.528
+
+CellRank:93
+    GrowthProgress:-1.22324
+    MembrGrowthProgress:0
+    IsBoundrayCell:0
+    NumOfNeighbors:3
+    CellArea:64.1556
+    CellPerim:63.0506
+    NeighborCellsOrdered:{ 28 76 27 }
+    NumberOfPointsInContactOrdered:{ 180 15 180 0 0 0 0 0 0 0 }
+    CurrentActiveIntnlNode:24
+    CurrentActiveMembrNodes:384
+    CellCenter:(78.299,32.6466,0)
+    CellApicalLoc:(79.5156,47.5231,0)
+    CellBasalLoc:(76.8507,17.9966,0)
+    CellNucleusLoc:(79.4357,44.6611,0)
+    CellPressure:106.108
+
