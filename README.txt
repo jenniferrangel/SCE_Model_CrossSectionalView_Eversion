@@ -1,3 +1,5 @@
+DOI: https://zenodo.org/badge/latestdoi/314704785
+
 CUDA code for developmental biology using Subcellular Element Method
 
 Hardware requirement: 
