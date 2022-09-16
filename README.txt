@@ -100,4 +100,4 @@ The curvature calculated here is the Menger curvature.
    position, respectively.
 2. For simulations involving growth, the order of cells must be entered to acquire the correct curvature calculation. 
    The cell order can be found in the printout created (see EpiScale_run.sh). For the detail on what information is 
-   presented in the files with "detailedStat_" prefix, see 
+   presented in the files with "detailedStat_" prefix, see detailedStat_example.txt in the dataOutput folder.
