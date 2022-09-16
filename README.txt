@@ -11,7 +11,6 @@ Thrust ---- Build-in library of cuda, similar to STL of C++
 Paraview -- (Optional) Visualization software for animation purpose. 
 
 *******************************************
-
 Location of configuration files:
  ./resources
  
@@ -30,7 +29,6 @@ Additional parameter-configurating files:
         cell cycle length
         
 *******************************************
-
 How to identify the flow of algorithm calling and simulation proceeding?
 
 1. Look for : int main(int argc, char* argv[])
@@ -88,3 +86,18 @@ To run simulation on UCR HPCC cluster:
    (8) make
    (9) After compilation, enter: exit
    (10) sbatch -p gpu --gres=gpu:1 --time=X:00:00 EpiScale_run.sh; (X here is the number of hours you want to keep the simulation running)
+   
+********************************************
+[Data processing]
+ExtractApiBasNucInfo.m : used to extract the apical node, basal node, and nucleus center information.
+CalcApicalCurvature.m : used to calculate the apical curvature using the apical node of each individual cell.
+CalcBasalCurvature.m : used to calculate the basal curvature using the basal node of each individual cell.
+Both CalcApicalCurvature and CalcBasalCurvature include cell height calculation.
+The curvature calculated here is the Menger curvature.
+
+1. The input for cell information has to be extracted manually from files with a "detailedStat_" prefix. 
+   Every triplet (row-wise, i.e. row1 ~ row3) represents the apical node, basal node, and nucleus center 
+   position, respectively.
+2. For simulations involving growth, the order of cells must be entered to acquire the correct curvature calculation. 
+   The cell order can be found in the printout created (see EpiScale_run.sh). For the detail on what information is 
+   presented in the files with "detailedStat_" prefix, see 
