@@ -229,10 +229,10 @@ int main(int argc, char* argv[]) {
 	//Example:we are testing the combined role of an increase in both proliferation and actomyosin contractility in only the posterior compartment
 	double contractActomyo_multip_perCell1 = 1.0;    //anterior
 	double contractActomyo_multip_perCell2 = 1.0;    //posterior
-	//double contractActomyo_multip_perCell3 = 1.0;
+	double contractActomyo_multip_perCell3 = 1.0;    //this will be defined but not used
 	double contractActomyo_multip_perCell_apical1 = 0.1;   //anterior
 	double contractActomyo_multip_perCell_apical2 = 0.4;   //anterior
-	//double contractActomyo_multip_perCell_apical3 = 0.0625;
+	double contractActomyo_multip_perCell_apical3 = 0.0625; //this will be defined but not used
 	std::cout<<"Basal_left_actomyo_weight = "<<contractActomyo_multip_perCell1<<std::endl;
 	std::cout<<"Basal_mid_actomyo_weight = "<<contractActomyo_multip_perCell2<<std::endl;
 	std::cout<<"Basal_right_actomyo_weight = "<<contractActomyo_multip_perCell3<<std::endl;
