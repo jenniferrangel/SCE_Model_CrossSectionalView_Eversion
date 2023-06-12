@@ -88,6 +88,13 @@ To run simulation on UCR HPCC cluster:
    (8) make
    (9) After compilation, enter: exit
    (10) sbatch -p gpu --gres=gpu:1 --time=X:00:00 EpiScale_run.sh; (X here is the number of hours you want to keep the simulation running)
+
+*******************************************
+Initial conditions:
+  The initial conditions can be found in the resources folder. 
+  All of the files with the following key words are associated with either the flat or curved tissue shape.
+    (1) N01G00 & N01_0 : for flat wing disc
+    (2) N02G00 & N02_0 : for curved wing disc
    
 ********************************************
 [Data processing]
