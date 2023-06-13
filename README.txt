@@ -97,13 +97,13 @@ Initial conditions:
     (2) N02G00 & N02_0 : for curved wing disc
 
 *******************************************
-Examples of different perturbations or mechanism that can be tested can be found in the Examples_of_perturbations folder.
+Examples of different perturbations or mechanism that can be tested can be found in the Examples_of_perturbations folder:
   Inside this folder, there is a list of subfolders that contain different examples which will be listed below.
   To run any of the provided examples, the user must replace the files inside any of the following subfolders with the 
   files inside ./src/srcGPU.
     (1) CombinedPerturbation_CellProlifANDCytoskeletalRegulators: 
-            The tissue is split into 2 domains Anterior (A)|Posterior (P). 
-            Cell proliferation and cytoskeletal regulators are perturned only on the posterior side of the tissue. 
+            * The tissue is split into 2 domains Anterior (A)|Posterior (P). 
+            * Cell proliferation and cytoskeletal regulators are perturned only on the posterior side of the tissue. 
                   (i) Case I: Increase proliferation and actomyosin contractility on the posterior side.
                   (ii) Case II: Increase proliferation and ECM stiffness on the posterior side.
                   (iii) Case III: Increase proliferation and cell-ECM adhesion on the posterior side.
@@ -149,15 +149,18 @@ Examples of different perturbations or mechanism that can be tested can be found
    
 ********************************************
 [Data processing]
-ExtractApiBasNucInfo.m : used to extract the apical node, basal node, and nucleus center information.
-CalcApicalCurvature.m : used to calculate the apical curvature using the apical node of each individual cell.
-CalcBasalCurvature.m : used to calculate the basal curvature using the basal node of each individual cell.
-Both CalcApicalCurvature and CalcBasalCurvature include cell height calculation.
-The curvature calculated here is the Menger curvature.
+The data processing files can be found inside the folder data_processing:
+    * ExtractApiBasNucInfo.m: used to extract the apical node, basal node, and nucleus center information.
+    * CalcCellHeight.m: used to calculate the cell height using the apical and basal nodes of each individual cell.
+    * CalcNuclearPositioning.m: used to calculate the nuclear positioning using the apical node, basal node and 
+     nucleus center of each individual cell.
 
-1. The input for cell information has to be extracted manually from files with a "detailedStat_" prefix. 
-   Every triplet (row-wise, i.e. row1 ~ row3) represents the apical node, basal node, and nucleus center 
-   position, respectively.
-2. For simulations involving growth, the order of cells must be entered to acquire the correct curvature calculation. 
-   The cell order can be found in the printout created (see EpiScale_run.sh). For the detail on what information is 
-   presented in the files with "detailedStat_" prefix, see detailedStat_example.txt in the dataOutput folder.
+1. TheExtractApiBasNucInfo.m must be ran first. It requires the following inputs:
+     (i) The input for cell information has to be extracted manually from files with a "detailedStat_" prefix. 
+         Every triplet (row-wise, i.e. row1 ~ row3) represents the apical node, basal node, and nucleus center 
+         position, respectively.
+     (ii) For simulations involving growth, the order of cells must be entered to acquire the correct calculations. 
+          The cell order can be found in the printout created (see EpiScale_run.sh). For the detail on what information is 
+          presented in the files with "detailedStat_" prefix, see detailedStat_example.txt in the dataOutput folder.
+2. Then the files CalcCellHeight.m and CalcNuclearPositioning.m can be ran to extract the cell height and nuclear positioning 
+   for any desired simulation.
