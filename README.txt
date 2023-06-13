@@ -95,6 +95,44 @@ Initial conditions:
   All of the files with the following key words are associated with either the flat or curved tissue shape.
     (1) N01G00 & N01_0 : for flat wing disc
     (2) N02G00 & N02_0 : for curved wing disc
+
+*******************************************
+Examples of different perturbations or mechanism that can be tested can be found in the Examples_of_perturbations folder.
+  Inside this folder, there is a list of subfolders that contain different examples which will be listed below.
+  To run any of the provided examples, the user must replace the files inside any of the following subfolders with the files inside ./src/srcGPU
+    (1) CombinedPerturbation_CellProlifANDCytoskeletalRegulators: The tissue is split into 2 domains Anterior (A)|Posterior (P). 
+        Cell proliferation and cytoskeletal regulators are perturned only on the posterior side of the tissue. 
+          (i) Case I: Increase proliferation and actomyosin contractility on the posterior side.
+          (ii) Case II: Increase proliferation and ECM stiffness on the posterior side.
+          (iii) Case III: Increase proliferation and cell-ECM adhesion on the posterior side.
+    (2) IncreaseORDecrease_ProlifOnPosteriorTissueCompartment:
+          * The tissue is split into 2 domains Anterior (A)|Posterior (P). 
+          * In this example one can increase or decrease the proliferation rate in the posterior compartment. 
+    (3) PatternedProliferationRate
+          * The tissue is split into 3 domains L|M|L where M represents the medial domain and L represents the two lateral sides.
+          * In this example one can increase or decrease proliferation in the medial or lateral ends to test the role of patterned proliferation.
+    (4) Patterning_ActomyosinContractility
+          * The tissue is split into 3 domains L|M|L where M represents the medial domain and L represents the two lateral sides.
+          * Apical and basal contractility is higher in the medial region. However, the code can be modified to increase or decrease apical and basal contractility in the M or L domains.
+    (5) Patterning_BasalECMStiffness
+          * The tissue is split into 3 domains L|M|L where M represents the medial domain and L represents the two lateral sides.
+          * ECM stiffness is decreased by 50% in lateral sides as compared to the medial domain. 
+          * The code can be easily modified to increase or decrease ECM stiffness in any of the domains.
+    (6) Patterning_cellECMAdhesion
+          * The tissue is split into 3 domains L|M|L where M represents the medial domain and L represents the two lateral sides.
+          * Cell-ECM adhesion is increased by 50% in the lateral sides as compared to the medial domain. 
+          * The code can be easily modified to increase or decrease cell-ECM adhesion in any of the domains.
+    (7) Patterning_cellMembraneTension
+          * The tissue is split into 3 domains L|M|L where M represents the medial domain and L represents the two lateral sides.
+          * The code can be easily modified to increase or decrease apical, basal and lateral membrane tension in any of the 3 domains.
+    (8) RoleofCellProlif_and_patternedCellECMAdhesion
+          * The tissue is split into 3 domains L|M|L where M represents the medial domain and L represents the two lateral sides.
+          * In this example we test the case of uniform proliferation across the tissue but higher cell-ECM adhesion in the medial domain.
+          * The code can be modified to pattern proliferation as we as increase or decrease cell-ECM adhesion in any of the domains.
+    (9) VaryCellPressure_by_ChangingCellVolume
+          * In this example, cell pressure is varied by changing the target cell volume in the Lagrange Multiplier.
+          * This can be tested using (1) a linear gradient or (2) a step function. Both examples have been provided.
+
    
 ********************************************
 [Data processing]
