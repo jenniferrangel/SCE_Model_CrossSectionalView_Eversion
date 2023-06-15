@@ -140,7 +140,7 @@ Examples_of_perturbations folder:
               two lateral sides.
             * In this example we test the case of uniform proliferation across the tissue but higher cell-ECM adhesion 
               in the medial domain.
-            * The code can be modified to pattern proliferation as we as increase or decrease cell-ECM adhesion in 
+            * The code can be modified to pattern proliferation as well as increase or decrease cell-ECM adhesion in 
               any of the domains.
     (9) VaryCellPressure_by_ChangingCellVolume
             * In this example, cell pressure is varied by changing the target cell volume in the Lagrange Multiplier.
