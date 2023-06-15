@@ -96,7 +96,8 @@ Initial conditions:
     (2) N02G00 & N02_0 : for curved wing disc
 
 *******************************************
-Examples of different perturbations or mechanism that can be tested can be found in the Examples_of_perturbations folder:
+Examples of different perturbations or mechanism that can be tested using this codecan be found in the 
+Examples_of_perturbations folder:
   Inside this folder, there is a list of subfolders that contain different examples which will be listed below.
   To run any of the provided examples, the user must replace the files inside any of the following subfolders with the 
   files inside ./src/srcGPU.
