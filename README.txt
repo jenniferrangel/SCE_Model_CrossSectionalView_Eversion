@@ -69,7 +69,8 @@ For (a):
          (XI) applyMembContraction2: calculate contractile spring force.
          (XII) applyMemForce_M
          (XIII) applyVolumeConstraint
-         (XIV) growAtRandom_M_Ver2: advance the growth progress counter with specific conditions related to neighboring cells.
+         (XIV) growAtRandom_M_Ver2: advance the growth progress counter with specific conditions related to neighboring 
+               cells.
          (XV) allComponentsMove: update position of each node based on previously calculated forces.
  
 
