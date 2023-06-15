@@ -1,5 +1,3 @@
-DOI: https://zenodo.org/badge/latestdoi/314704785
-
 CUDA code for developmental biology using Subcellular Element Method
 
 Hardware requirement: 
@@ -155,12 +153,14 @@ The data processing files can be found inside the DataProcessing folder:
     * CalcNuclearPositioning.m: used to calculate the nuclear positioning using the apical node, basal node and 
      nucleus center of each individual cell.
 
-1. TheExtractApiBasNucInfo.m must be ran first. It requires the following inputs:
+Instructions on how to use these files:
+1. The ExtractApiBasNucInfo.m must be ran first. It requires inputs from (1) the "detailedStat_" files inside the dataOutput
+   folder and (2) the printout file created. More specifically:
      (i) The input for cell information has to be extracted manually from files with a "detailedStat_" prefix. 
          Every triplet (row-wise, i.e. row1 ~ row3) represents the apical node, basal node, and nucleus center 
-         position, respectively.
+         position, respectively. For the detail on what information is presented in the files with "detailedStat_" prefix, 
+         see detailedStat_example.txt in the dataOutput folder.
      (ii) For simulations involving growth, the order of cells must be entered to acquire the correct calculations. 
-          The cell order can be found in the printout created (see EpiScale_run.sh). For the detail on what information is 
-          presented in the files with "detailedStat_" prefix, see detailedStat_example.txt in the dataOutput folder.
+          The cell order can be found in the printout created (see EpiScale_run.sh). 
 2. Then the files CalcCellHeight.m and CalcNuclearPositioning.m can be ran to extract the cell height and nuclear positioning 
    for any desired simulation.
