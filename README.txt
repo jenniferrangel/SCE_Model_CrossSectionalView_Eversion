@@ -1,4 +1,4 @@
-DOI: [![DOI](https://zenodo.org/badge/468540858.svg)](https://zenodo.org/badge/latestdoi/468540858)
+DOI: https://zenodo.org/badge/latestdoi/468540858
 
 CUDA code for developmental biology using Subcellular Element Method
 
