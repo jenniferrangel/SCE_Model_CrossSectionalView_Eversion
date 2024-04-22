@@ -80,10 +80,10 @@ For (a):
 To run simulation on UCR HPCC cluster: 
    After uploading all the files under this repository, follow the command below.
    (1) cd [The folder where all your files are placed in]
-   (2) module load singluarity
+   (2) module load singularity;module load centos;module load extra; module load cuda;module load cgal
    (3) module load centos
    (4) centos.sh
-   (5) module load extra; module load GCC; module load cuda;
+   (5) module load extra; module load GCC; module load cuda/7.0;
    (6) (IF it is the first time compiling) module load CGAL; module load cmake;
    (7) (IF it is the first time compiling) cmake .
    (8) make

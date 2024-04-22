@@ -2699,8 +2699,8 @@ growthProgressReinitialize.push_back(   -9999.9);//Cell62
 	int checkForMitosisAndDivision = 250;
 	int checkForOverextension = 500;
 	bool membrAddingNode = false;
-	// if (1 < 0){
-	if (relaxCount % checkForMitosisAndDivision == 0){
+	if (1 < 0){ //uncomment this line and comment the next like to turn OFF proliferation
+	//if (relaxCount % checkForMitosisAndDivision == 0){
 		if (allocPara_m.currentActiveCellCount < allocPara_m.maxCellCount){
 			// std::cout<<"contractileSpringGrowthProgress[10] = "<<cellInfoVecs.contractileSpringGrowthProgress[10]<<std::endl;
 			enterMitoticCheckForDivAxisCal(mitoticThreshold) ;
