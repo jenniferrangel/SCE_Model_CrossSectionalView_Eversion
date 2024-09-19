@@ -1,4 +1,4 @@
-# Install script for directory: /rhome/tsaik/EpiScale_CrossSection_debug3/src/common
+# Install script for directory: /rhome/jrang008/bigdata/Updating_Eversion_Code/SCE_Model_CrossSectionalView_Eversion/src/common
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

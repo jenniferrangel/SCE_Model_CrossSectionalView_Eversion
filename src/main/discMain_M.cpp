@@ -226,9 +226,9 @@ int main(int argc, char* argv[]) {
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////// Weights applied to the coefficients of the contractile springs ///////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////
-	double contractActomyo_multip_perCell1 = 1.0;
-	double contractActomyo_multip_perCell2 = 1.0;
-	double contractActomyo_multip_perCell3 = 1.0;
+	double contractActomyo_multip_perCell1 = 1.5;
+	double contractActomyo_multip_perCell2 = 1.5;
+	double contractActomyo_multip_perCell3 = 1.5;
 	double contractActomyo_multip_perCell_apical1 = 0.0625;
 	double contractActomyo_multip_perCell_apical2 = 0.0625;
 	double contractActomyo_multip_perCell_apical3 = 0.0625;

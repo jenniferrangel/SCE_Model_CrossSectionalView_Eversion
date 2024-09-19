@@ -35,7 +35,13 @@ typedef thrust::tuple<double, double, double, bool, double, double, double, doub
 //Ali comment
 //Ali
 typedef thrust::tuple<double, uint, double, int ,uint, uint, double, double, double, double> TensionData;
+//ChangesMadeByKT2_begin
+typedef thrust::tuple<double, uint, MembraneType1, int ,uint, uint, double, double, double, double> TensionData_type2;
+//ChangesMadeByKT2_end
 typedef thrust::tuple<double, uint, uint, uint, double, double> DUiUiUiDD;
+//ChangesMadeByKT_begin
+typedef thrust::tuple<double, uint, uint, uint, double, double, MembraneType1> DUiUiUiDDT;
+//ChangesMadeByKT_end
 typedef thrust::tuple<double, uint, double, double,uint, uint, double, double, double, double> DUiDDUiUiDDDD;
 typedef thrust::tuple<double, int, int ,uint, uint, double, double > DIIUiUiDD;
 typedef thrust::tuple<ECellType,uint, double, MembraneType1 ,bool,uint, uint> ActinData; //Ali
@@ -847,8 +853,8 @@ struct AssignMemNodeType: public thrust::unary_function<BTUiUi, TII> {
 
 
 
-//Ali
-struct AddMembrForce: public thrust::unary_function<TensionData, CVec10> {
+//Ali  //ChangesMadeByKT
+struct AddMembrForce: public thrust::unary_function<TensionData_type2, CVec10> {
 	uint _bdryCount;
 	uint _maxNodePerCell;
 	double* _locXAddr;
@@ -859,26 +865,28 @@ struct AddMembrForce: public thrust::unary_function<TensionData, CVec10> {
 	double _mitoticCri;
 	double _minY ; 
 	double _maxY ; 
+	int* _cellSubdomainIndx;
 
 	// comment prevents bad formatting issues of __host__ and __device__ in Nsight
 	__host__ __device__ AddMembrForce(uint bdryCount, uint maxNodePerCell,
-			double* locXAddr, double* locYAddr, bool* isActiveAddr, int* adhereIndexAddr,double *actinLevelAddr, double mitoticCri, double minY, double maxY) :
+			double* locXAddr, double* locYAddr, bool* isActiveAddr, int* adhereIndexAddr,double *actinLevelAddr, double mitoticCri, double minY, double maxY, int* cellSubdomainIndx) :
 			_bdryCount(bdryCount), _maxNodePerCell(maxNodePerCell), _locXAddr(
-					locXAddr), _locYAddr(locYAddr), _isActiveAddr(isActiveAddr),_adhereIndexAddr(adhereIndexAddr),_actinLevelAddr(actinLevelAddr), _mitoticCri(mitoticCri),_minY(minY),_maxY(maxY) {
+					locXAddr), _locYAddr(locYAddr), _isActiveAddr(isActiveAddr),_adhereIndexAddr(adhereIndexAddr),_actinLevelAddr(actinLevelAddr), _mitoticCri(mitoticCri),_minY(minY),_maxY(maxY), _cellSubdomainIndx(cellSubdomainIndx) {
 	}
 	// comment prevents bad formatting issues of __host__ and __device__ in Nsight
-	__device__ CVec10 operator()(const TensionData &tData) const {
+	__device__ CVec10 operator()(const TensionData_type2 &tData2) const {
 
-		double progress = thrust::get<0>(tData);
-		uint activeMembrCount = thrust::get<1>(tData);
-		double cell_CenterY = thrust::get<2>(tData);
-		int    adhereIndex= thrust::get<3>(tData);
-		uint   cellRank = thrust::get<4>(tData);
-		uint   nodeRank = thrust::get<5>(tData);
-		double locX = thrust::get<6>(tData);
-		double locY = thrust::get<7>(tData);
-		double velX = thrust::get<8>(tData);
-		double velY = thrust::get<9>(tData);
+		double progress = thrust::get<0>(tData2);
+		uint activeMembrCount = thrust::get<1>(tData2);
+		// double cell_CenterY = thrust::get<2>(tData);
+		MembraneType1  memType= thrust::get<2>(tData2);
+		int    adhereIndex= thrust::get<3>(tData2);
+		uint   cellRank = thrust::get<4>(tData2);
+		uint   nodeRank = thrust::get<5>(tData2);
+		double locX = thrust::get<6>(tData2);
+		double locY = thrust::get<7>(tData2);
+		double velX = thrust::get<8>(tData2);
+		double velY = thrust::get<9>(tData2);
 
 		uint index = _bdryCount + cellRank * _maxNodePerCell + nodeRank;
 
@@ -924,6 +932,64 @@ struct AddMembrForce: public thrust::unary_function<TensionData, CVec10> {
 				lenLeft = sqrt(leftDiffX * leftDiffX + leftDiffY * leftDiffY);
 				//double forceVal = calMembrForce_Mitotic(lenLeft,progress, _mitoticCri,adhereIndex); //Ali & Abu June 30th
 				double forceVal =calMembrForce_Actin(lenLeft,kAvgLeft); // Ali & June 30th
+				//ChangesMadeByJRA_begin
+				if (_cellSubdomainIndx[cellRank] == 0){
+					if (memType == lateralA ){
+						forceVal = forceVal;
+					}
+					else if (memType == lateralB){
+						forceVal = forceVal;
+					}
+					else if (memType == apical1){
+						forceVal = forceVal;
+					}
+					else if (memType == basal1){
+						forceVal = forceVal*0.5;
+					}
+				}
+				else if (_cellSubdomainIndx[cellRank] == 1){
+					if (memType == lateralA ){
+						forceVal = forceVal;
+					}
+					else if (memType == lateralB){
+						forceVal = forceVal;
+					}
+					else if (memType == apical1){
+						forceVal = forceVal;
+					}
+					else if (memType == basal1){
+						forceVal = forceVal;
+					}
+				}
+				else if (_cellSubdomainIndx[cellRank] == 2){
+					if (memType == lateralA ){
+						forceVal = forceVal;
+					}
+					else if (memType == lateralB){
+						forceVal = forceVal;
+					}
+					else if (memType == apical1){
+						forceVal = forceVal;
+					}
+					else if (memType == basal1){
+						forceVal = forceVal*0.5;
+					}
+				}
+				else{
+					if (memType == lateralA ){
+						forceVal = forceVal;
+					}
+					else if (memType == lateralB){
+						forceVal = forceVal;
+					}
+					else if (memType == apical1){
+						forceVal = forceVal;
+					}
+					else if (memType == basal1){
+						forceVal = forceVal;
+					}
+				}//ChangesMadeByJRA_end
+			        
 			        //if (adhereIndex==-1 && _adhereIndexAddr[index_left]==-1) {
 				if (longEnough(lenLeft)) {
 					velX = velX + forceVal * leftDiffX / lenLeft;
@@ -949,6 +1015,64 @@ struct AddMembrForce: public thrust::unary_function<TensionData, CVec10> {
 						rightDiffX * rightDiffX + rightDiffY * rightDiffY);
 				//double forceVal = calMembrForce_Mitotic(lenRight,progress, _mitoticCri,adhereIndex); // Ali & June 30th
 				double forceVal = calMembrForce_Actin(lenRight,kAvgRight); // Ali & June 30th
+				//ChangesMadeByJRA_begin
+				if (_cellSubdomainIndx[cellRank] == 0){
+					if (memType == lateralA ){
+						forceVal = forceVal;
+					}
+					else if (memType == lateralB){
+						forceVal = forceVal;
+					}
+					else if (memType == apical1){
+						forceVal = forceVal;
+					}
+					else if (memType == basal1){
+						forceVal = forceVal*0.5;
+					}
+				}
+				else if (_cellSubdomainIndx[cellRank] == 1){
+					if (memType == lateralA ){
+						forceVal = forceVal;
+					}
+					else if (memType == lateralB){
+						forceVal = forceVal;
+					}
+					else if (memType == apical1){
+						forceVal = forceVal;
+					}
+					else if (memType == basal1){
+						forceVal = forceVal;
+					}
+				}
+				else if (_cellSubdomainIndx[cellRank] == 2){
+					if (memType == lateralA ){
+						forceVal = forceVal;
+					}
+					else if (memType == lateralB){
+						forceVal = forceVal;
+					}
+					else if (memType == apical1){
+						forceVal = forceVal;
+					}
+					else if (memType == basal1){
+						forceVal = forceVal*0.5;
+					}
+				}
+				else{
+					if (memType == lateralA ){
+						forceVal = forceVal;
+					}
+					else if (memType == lateralB){
+						forceVal = forceVal;
+					}
+					else if (memType == apical1){
+						forceVal = forceVal;
+					}
+					else if (memType == basal1){
+						forceVal = forceVal;
+					}
+				}//ChangesMadeByJRA_end
+
 				//if (adhereIndex==-1 && _adhereIndexAddr[index_right]==-1) {
 			if (longEnough(lenRight)) {
 					velX = velX + forceVal * rightDiffX / lenRight;
@@ -1049,19 +1173,23 @@ struct CalMembrEnergy: public thrust::unary_function<DUiUiUiDD, CVec2> {
 	bool* _isActiveAddr;
 	double* _actinLevelAddr;
 	double _mitoticCri;
-
-	__host__ __device__ CalMembrEnergy (uint maxNodePerCell,double* locXAddr, double* locYAddr, bool* isActiveAddr, double *actinLevelAddr, double mitoticCri ) :
+	int* _cellSubdomainIndx;
+	//ChangesMadeByKT2_begin
+	__host__ __device__ CalMembrEnergy (uint maxNodePerCell,double* locXAddr, double* locYAddr, bool* isActiveAddr, double *actinLevelAddr, double mitoticCri, int* cellSubdomainIndx ) :
 			 _maxNodePerCell(maxNodePerCell), _locXAddr(locXAddr), _locYAddr(locYAddr), _isActiveAddr(isActiveAddr),
-			 _actinLevelAddr(actinLevelAddr), _mitoticCri(mitoticCri) {
+			 _actinLevelAddr(actinLevelAddr), _mitoticCri(mitoticCri), _cellSubdomainIndx(cellSubdomainIndx) {
 	}
-	__device__ CVec2 operator()(const DUiUiUiDD & dUiUiUiDD) const {
+	//ChangesMadeByKT2_end
+	__device__ CVec2 operator()(const DUiUiUiDDT & dUiUiUiDDT) const {
 
-		double progress = thrust::get<0>(dUiUiUiDD);
-		uint activeMembrCount = thrust::get<1>(dUiUiUiDD);
-		uint   cellRank = thrust::get<2>(dUiUiUiDD);
-		uint   nodeRank = thrust::get<3>(dUiUiUiDD);
-		double locX = thrust::get<4>(dUiUiUiDD);
-		double locY = thrust::get<5>(dUiUiUiDD);
+		double progress = thrust::get<0>(dUiUiUiDDT);
+		uint activeMembrCount = thrust::get<1>(dUiUiUiDDT);
+		uint   cellRank = thrust::get<2>(dUiUiUiDDT);
+		uint   nodeRank = thrust::get<3>(dUiUiUiDDT);
+		double locX = thrust::get<4>(dUiUiUiDDT);
+		double locY = thrust::get<5>(dUiUiUiDDT);
+		MembraneType1	memType = thrust::get<6>(dUiUiUiDDT);
+
 
 		uint index =  cellRank * _maxNodePerCell + nodeRank;
 		double lenLeft,lenRight;
@@ -1079,7 +1207,63 @@ struct CalMembrEnergy: public thrust::unary_function<DUiUiUiDD, CVec2> {
 			lenLeft = sqrt( ( _locXAddr[index_left] - locX) *( _locXAddr[index_left] - locX) +
 			                ( _locYAddr[index_left] - locY) *(_locYAddr[index_left]  - locY)  );
 			double energyLinSpringLeft = CalMembrLinSpringEnergy(lenLeft,kAvgLeft);
-
+			//ChangesMadeByJRA_begin
+				if (_cellSubdomainIndx[cellRank] == 0){
+					if (memType == lateralA ){
+						energyLinSpringLeft = energyLinSpringLeft;
+					}
+					else if (memType == lateralB){
+						energyLinSpringLeft = energyLinSpringLeft;
+					}
+					else if (memType == apical1){
+						energyLinSpringLeft = energyLinSpringLeft;
+					}
+					else if (memType == basal1){
+						energyLinSpringLeft = energyLinSpringLeft*0.5;
+					}
+				}
+				else if (_cellSubdomainIndx[cellRank] == 1){
+					if (memType == lateralA ){
+						energyLinSpringLeft = energyLinSpringLeft;
+					}
+					else if (memType == lateralB){
+						energyLinSpringLeft = energyLinSpringLeft;
+					}
+					else if (memType == apical1){
+						energyLinSpringLeft = energyLinSpringLeft;
+					}
+					else if (memType == basal1){
+						energyLinSpringLeft = energyLinSpringLeft;
+					}
+				}
+				else if (_cellSubdomainIndx[cellRank] == 2){
+					if (memType == lateralA ){
+						energyLinSpringLeft = energyLinSpringLeft;
+					}
+					else if (memType == lateralB){
+						energyLinSpringLeft = energyLinSpringLeft;
+					}
+					else if (memType == apical1){
+						energyLinSpringLeft = energyLinSpringLeft;
+					}
+					else if (memType == basal1){
+						energyLinSpringLeft = energyLinSpringLeft*0.5;
+					}
+				}
+				else{
+					if (memType == lateralA ){
+						energyLinSpringLeft = energyLinSpringLeft;
+					}
+					else if (memType == lateralB){
+						energyLinSpringLeft = energyLinSpringLeft;
+					}
+					else if (memType == apical1){
+						energyLinSpringLeft = energyLinSpringLeft;
+					}
+					else if (memType == basal1){
+						energyLinSpringLeft = energyLinSpringLeft;
+					}
+				}//ChangesMadeByJRA_end
 			int index_right = nodeRank + 1;
 			if (index_right == (int) activeMembrCount) {
 				index_right = 0;
@@ -1090,7 +1274,63 @@ struct CalMembrEnergy: public thrust::unary_function<DUiUiUiDD, CVec2> {
 			lenRight = sqrt( (_locXAddr[index_right] - locX)*(_locXAddr[index_right] - locX)+
 					 		 (_locYAddr[index_right] - locY)*(_locYAddr[index_right] - locY) );
 			double energyLinSpringRight = CalMembrLinSpringEnergy (lenRight,kAvgRight); // Ali & June 30th
-			
+			//ChangesMadeByJRA_begin
+				if (_cellSubdomainIndx[cellRank] == 0){
+					if (memType == lateralA ){
+						energyLinSpringRight = energyLinSpringRight;
+					}
+					else if (memType == lateralB){
+						energyLinSpringRight = energyLinSpringRight;
+					}
+					else if (memType == apical1){
+						energyLinSpringRight = energyLinSpringRight;
+					}
+					else if (memType == basal1){
+						energyLinSpringRight = energyLinSpringRight*0.5;
+					}
+				}
+				else if (_cellSubdomainIndx[cellRank] == 1){
+					if (memType == lateralA ){
+						energyLinSpringRight = energyLinSpringRight;
+					}
+					else if (memType == lateralB){
+						energyLinSpringRight = energyLinSpringRight;
+					}
+					else if (memType == apical1){
+						energyLinSpringRight = energyLinSpringRight;
+					}
+					else if (memType == basal1){
+						energyLinSpringRight = energyLinSpringRight;
+					}
+				}
+				else if (_cellSubdomainIndx[cellRank] == 2){
+					if (memType == lateralA ){
+						energyLinSpringRight = energyLinSpringRight;
+					}
+					else if (memType == lateralB){
+						energyLinSpringRight = energyLinSpringRight;
+					}
+					else if (memType == apical1){
+						energyLinSpringRight = energyLinSpringRight;
+					}
+					else if (memType == basal1){
+						energyLinSpringRight = energyLinSpringRight*0.5;
+					}
+				}
+				else{
+					if (memType == lateralA ){
+						energyLinSpringRight = energyLinSpringRight;
+					}
+					else if (memType == lateralB){
+						energyLinSpringRight = energyLinSpringRight;
+					}
+					else if (memType == apical1){
+						energyLinSpringRight = energyLinSpringRight;
+					}
+					else if (memType == basal1){
+						energyLinSpringRight = energyLinSpringRight;
+					}
+				}//ChangesMadeByJRA_end
 			double leftDiffX  = _locXAddr[index_left]   -  locX;
 			double leftDiffY  = _locYAddr[index_left]  -   locY;
 			double rightDiffX = _locXAddr[index_right]  -  locX;
@@ -4229,8 +4469,9 @@ struct CellInfoVecs {
 	 * progress == 0 means recently divided
 	 * progress == 1 means ready to divide
 	 */
-
-
+	//ChangesMadeByKT_begin
+	thrust::device_vector<int> cellSubdomainIndx;
+	//ChangesMadeByKT_end
 	thrust::device_vector<int> daughterCellProduced;
 
 	thrust::device_vector<double> distFromBasalLoc;
